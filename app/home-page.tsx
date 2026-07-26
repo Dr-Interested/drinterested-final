@@ -256,7 +256,7 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
       </p>
     </div>
 
-    {/* GOAL / MISSION / VISION */}
+    {/* GOAL / MISSION / VISION Redploy*/}
     <motion.div
       className="grid md:grid-cols-3 gap-4"
       initial="hidden"
