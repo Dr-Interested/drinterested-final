@@ -144,13 +144,13 @@ export default function MembersClient() {
   const rawEd = dbMembers.find((m) => m.role === "Executive Director" || m.role === "President")
   const executiveDirector: MemberType | null = rawEd
     ? {
-        id: rawEd.id,
-        name: rawEd.name,
-        role: rawEd.role,
-        image: formatImagePath(rawEd.image),
-        bio: rawEd.bio || "",
-        socialLinks: rawEd.socials || {},
-      }
+      id: rawEd.id,
+      name: rawEd.name,
+      role: rawEd.role,
+      image: formatImagePath(rawEd.image),
+      bio: rawEd.bio || "",
+      socialLinks: rawEd.socials || {},
+    }
     : null
 
   // 2. Deputy Executive Directors
@@ -162,6 +162,17 @@ export default function MembersClient() {
     image: formatImagePath(vp.image),
     bio: vp.bio || "",
     socialLinks: vp.socials || {},
+  }))
+
+  // 2b. Executive Assistants
+  const rawExecAssistants = dbMembers.filter((m) => m.role === "Executive Assistant")
+  const executiveAssistantsList: MemberType[] = rawExecAssistants.map((ea) => ({
+    id: ea.id,
+    name: ea.name,
+    role: ea.role,
+    image: formatImagePath(ea.image),
+    bio: ea.bio || "",
+    socialLinks: ea.socials || {},
   }))
 
   // 3. Advisors
@@ -237,7 +248,7 @@ export default function MembersClient() {
   return (
     <div>
       <ScrollToTop />
-      
+
       {/* Title Banner */}
       <section className="bg-[#f5f1eb] py-10">
         <div className="container">
@@ -253,7 +264,7 @@ export default function MembersClient() {
       <section className="py-8 bg-white">
         <div className="container">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            
+
             {/* Centered Tab Headers */}
             <div className="flex justify-center mb-8">
               <TabsList className="grid grid-cols-4 gap-2 h-12 p-1 max-w-xl">
@@ -406,7 +417,70 @@ export default function MembersClient() {
                 </div>
               )}
 
-              {!executiveDirector && (!deputyexecdir || deputyexecdir.length === 0) && (
+              {/* Executive Assistants */}
+              {executiveAssistantsList && executiveAssistantsList.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 text-center text-[#405862] font-bricolage">Executive Assistants</h3>
+                  <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                    {executiveAssistantsList.map((ea) => {
+                      if (!ea) return null;
+                      return (
+                        <Card key={ea.id} className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="grid md:grid-cols-3">
+                            <div className="md:col-span-1 bg-[#f5f1eb] flex items-center justify-center">
+                              <div className="relative h-full w-full aspect-square">
+                                <Image src={ea.image} alt={ea.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
+                              </div>
+                            </div>
+                            <CardContent className="md:col-span-2 p-4">
+                              <h4 className="text-base font-semibold text-[#405862] font-bricolage">{ea.name}</h4>
+                              <p className="text-sm text-[#4ecdc4] font-medium mb-2">{ea.role}</p>
+                              <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
+                                {expandedBios[ea.id] ? (ea.bio || "") : truncateBio(ea.bio, 120)}
+                              </p>
+                              {(ea.bio || "").length > 120 && (
+                                <button
+                                  onClick={() => toggleBio(ea.id)}
+                                  className="text-[#405862] text-sm font-semibold hover:text-[#4ecdc4] transition-colors mb-3 flex items-center"
+                                >
+                                  {expandedBios[ea.id] ? (
+                                    <>
+                                      Show Less <ChevronUp className="h-4 w-4 ml-1" />
+                                    </>
+                                  ) : (
+                                    <>
+                                      See More <ChevronDown className="h-4 w-4 ml-1" />
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                              <div className="flex space-x-3">
+                                {ea.socialLinks?.linkedin && (
+                                  <Link href={ea.socialLinks.linkedin} target="_blank" rel="noopener noreferrer">
+                                    <Linkedin className="h-5 w-5" />
+                                  </Link>
+                                )}
+                                {ea.socialLinks?.instagram && (
+                                  <Link href={ea.socialLinks.instagram} target="_blank" rel="noopener noreferrer">
+                                    <Instagram className="h-5 w-5" />
+                                  </Link>
+                                )}
+                                {ea.socialLinks?.website && (
+                                  <Link href={ea.socialLinks.website} target="_blank" rel="noopener noreferrer">
+                                    <Globe className="h-5 w-5" />
+                                  </Link>
+                                )}
+                              </div>
+                            </CardContent>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {!executiveDirector && (!deputyexecdir || deputyexecdir.length === 0) && (!executiveAssistantsList || executiveAssistantsList.length === 0) && (
                 <div className="text-center py-12 text-[#405862]/80">
                   <p>No leadership team members currently listed.</p>
                 </div>
@@ -646,7 +720,7 @@ export default function MembersClient() {
                   <p>No department members currently listed.</p>
                 </div>
               )}
-              
+
               <div className="mt-8 p-6 bg-[#4ecdc4]/10 border border-[#4ecdc4]/30 rounded-lg text-center">
                 <h3 className="text-lg font-semibold text-[#405862] mb-2 font-bricolage">Interested in Joining Our Team?</h3>
                 <p className="text-[#405862]/80 mb-3">
@@ -766,31 +840,31 @@ export default function MembersClient() {
 
             {/* TAB: Join Us */}
             <TabsContent value="join" className="space-y-6">
-              
+
               {/* Detailed Recruitment Intro */}
               <div className="bg-[#f5f1eb]/40 border border-[#405862]/10 rounded-xl p-6 md:p-8 space-y-4 max-w-4xl mx-auto text-sm md:text-base text-[#405862]/90 leading-relaxed">
                 <h3 className="text-xl md:text-2xl font-bold text-[#405862] font-bricolage text-center mb-4">
                   Join Our Executive Team
                 </h3>
                 <p>
-                  Dr. Interested is a global youth organization active in <strong>106 countries</strong>, 
-                  reaching <strong>160,000+ students</strong> worldwide. We operate fully online through Discord, 
+                  Dr. Interested is a global youth organization active in <strong>106 countries</strong>,
+                  reaching <strong>160,000+ students</strong> worldwide. We operate fully online through Discord,
                   with optional in-person opportunities depending on your city.
                 </p>
                 <p>
-                  We’re recruiting across nearly every field right now — Finance, Tech, Coding, Design, 
-                  Outreach, Events, and Healthcare Careers Education. If you like building things that matter, 
+                  We’re recruiting across nearly every field right now — Finance, Tech, Coding, Design,
+                  Outreach, Events, and Healthcare Careers Education. If you like building things that matter,
                   there’s a seat for you.
                 </p>
                 <p className="font-semibold text-[#405862]">
-                  This isn’t busywork. You’ll be part of a global team that moves fast, 
+                  This isn’t busywork. You’ll be part of a global team that moves fast,
                   leads real projects, and creates impact you can point to proudly.
                 </p>
               </div>
 
               {/* Grid: What You Get & UN / Canada Opportunities */}
               <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto pt-4">
-                
+
                 {/* Benefits */}
                 <div className="space-y-6">
                   <div>
@@ -887,7 +961,7 @@ export default function MembersClient() {
               {/* Grid: 3 Open Application Role Cards */}
               <div className="max-w-4xl mx-auto pt-6">
                 <div className="grid md:grid-cols-3 gap-4">
-                  
+
                   {/* General Executive */}
                   <Card className="border-[#405862]/20 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full bg-white">
                     <CardContent className="p-5 text-center flex flex-col flex-1 justify-between gap-5">
