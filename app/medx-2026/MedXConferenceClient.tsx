@@ -51,18 +51,17 @@ const PRICING_TIERS = [
   },
   {
     id: "event-plus-food",
-    name: "Full Pass + Catered Lunch",
+    name: "Full Pass + Catered Breakfast & Lunch",
     badge: "Recommended & Most Popular",
     price: "$12.00",
     numericPrice: 12,
     foodIncluded: true,
-    description: "Full conference access plus catered lunch, beverages, snacks, and priority extras.",
+    description: "Full conference access plus catered breakfast & lunch, drinks during breakfast, and priority extras.",
     features: [
       "Everything included in General Pass",
+      "Catered Breakfast with Drinks & Beverages",
       "Delicious Catered Lunch Package included",
-      "Afternoon Refreshments & Beverage Pass",
       "Priority Seating at Keynote & Workshop Sessions",
-      "Digital Certificate of Participation",
       "Full MedX Resource & Mentorship Pack",
     ],
     highlighted: true,
@@ -79,9 +78,9 @@ export default function MedXConferenceClient() {
     seconds: 0,
   })
 
-  // Countdown to August 16, 2026 at 10:00 AM EDT
+  // Countdown to August 16, 2026 at 9:30 AM EDT
   useEffect(() => {
-    const targetDate = new Date("2026-08-16T10:00:00-04:00").getTime()
+    const targetDate = new Date("2026-08-16T09:30:00-04:00").getTime()
 
     const calculateTimeLeft = () => {
       const now = new Date().getTime()
@@ -235,7 +234,7 @@ export default function MedXConferenceClient() {
                   <Clock className="h-5 w-5 text-[#4ecdc4] flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Time</p>
-                    <p className="font-bold text-[#405862] dark:text-white text-sm md:text-base">10:00 AM – 4:00 PM</p>
+                    <p className="font-bold text-[#405862] dark:text-white text-sm md:text-base">9:30 AM – 4:30 PM</p>
                   </div>
                 </div>
 
@@ -450,12 +449,17 @@ export default function MedXConferenceClient() {
           </div>
 
           {/* Pricing Disclaimer Box */}
-          <div className="mt-10 p-6 rounded-2xl bg-white dark:bg-[#11161d] border border-[#4ecdc4]/30 max-w-3xl mx-auto text-center space-y-2 shadow-xs">
+          <div className="mt-10 p-6 rounded-2xl bg-white dark:bg-[#11161d] border border-[#4ecdc4]/30 max-w-3xl mx-auto text-center space-y-3 shadow-xs">
             <p className="text-sm font-semibold text-[#405862] dark:text-white">
               ℹ️ Registration Details & Pricing Note
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Ticket prices are set at $5.00 for Event Access Only and $12.00 for Event Access + Food. Clicking any registration button will redirect to the official Google Form where you can complete your details and confirm your ticket choice.
+              Ticket prices are set at $5.00 for General Pass and $12.00 for Full Pass + Catered Breakfast & Lunch. Clicking any registration button will redirect to the official Google Form where you can complete your details and confirm your ticket choice.
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              🎓 <strong className="text-[#405862] dark:text-white">Scholarships Available:</strong> If the ticket price poses a financial burden, scholarships are available to cover conference tickets. Please e-mail{" "}
+              <a href="mailto:finance@drinterested.org" className="text-[#4ecdc4] hover:underline font-semibold">finance@drinterested.org</a>{" "}
+              to indicate your interest in a scholarship to cover the conference ticket.
             </p>
           </div>
 
@@ -468,48 +472,47 @@ export default function MedXConferenceClient() {
           
           <div className="bg-gradient-to-b from-[#f9f7f4] to-white dark:from-[#11161d] dark:to-[#0e1218] rounded-3xl border-2 border-[#405862]/20 p-8 md:p-12 shadow-xl relative overflow-hidden">
             
-            {/* Top Emblem Header */}
-            <div className="text-center space-y-3 mb-8 border-b border-[#405862]/10 pb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-[#405862]/10 rounded-full mb-2">
-                <Building className="h-8 w-8 text-[#405862] dark:text-[#4ecdc4]" />
-              </div>
-              <p className="text-xs md:text-sm font-bold uppercase tracking-widest text-[#405862]/70 dark:text-[#f1ece7]/70">
-                Premier of Ontario • Premier ministre de l’Ontario
-              </p>
-              <h3 className="text-2xl md:text-3xl font-black text-[#405862] dark:text-white">
-                A MESSAGE FROM PREMIER DOUG FORD
-              </h3>
-              <p className="text-xs font-semibold text-[#4ecdc4]">August 16, 2026</p>
-            </div>
-
-            {/* Letter Content */}
-            <div className="space-y-5 text-base md:text-lg leading-relaxed text-[#405862]/90 dark:text-[#f1ece7]/90 font-serif italic text-pretty">
-              <p>
-                "I would like to extend a warm welcome to all the students, community leaders, and present and future health professionals taking part in <strong className="font-sans not-italic text-[#405862] dark:text-white">MedX Conference 2026</strong>."
-              </p>
-              <p>
-                "It’s great to see so many young people interested in exploring careers in health care. Our youth are the next generation of leaders, thinkers and changemakers. That’s why it’s so important to empower them and provide them with opportunities to reach their full potential."
-              </p>
-              <p>
-                "My thanks to the energetic and dedicated team behind <strong className="font-sans not-italic text-[#405862] dark:text-white">Dr. Interested</strong> for putting together this youth-oriented learning and networking event. As our population ages we will need tens of thousands of new graduates in health, as well as science and technology."
-              </p>
-              <p>
-                "Our government is investing in the future of the sector by supporting the next generation of doctors, nurses, paramedics and lab technicians through initiatives like the Ontario Learn and Stay Grant. It removes financial barriers for students while helping ensure more highly skilled health-care professionals work in the communities that need them most."
-              </p>
-              <p>
-                "My best wishes for a productive and inspiring conference."
-              </p>
-            </div>
-
-            {/* Signature Block */}
-            <div className="mt-8 pt-6 border-t border-[#405862]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <p className="font-bold text-xl text-[#405862] dark:text-white not-italic font-sans">Doug Ford</p>
-                <p className="text-sm font-semibold text-[#4ecdc4]">Premier of Ontario</p>
-              </div>
-              <Badge className="bg-[#405862] text-white px-4 py-1.5 rounded-full text-xs">
-                Official Greetings for MedX 2026
+            {/* Top Header */}
+            <div className="text-center space-y-3 mb-10 border-b border-[#405862]/10 pb-8">
+              <Badge className="bg-[#405862] text-[#4ecdc4] font-bold px-4 py-1 text-sm rounded-full">
+                Official Greetings
               </Badge>
+              <h3 className="text-2xl md:text-3xl font-black text-[#405862] dark:text-white">
+                A Message from the Premier of Ontario
+              </h3>
+            </div>
+
+            {/* Premier Portrait + Letter Side-by-Side */}
+            <div className="flex flex-col lg:flex-row gap-8 items-start">
+              
+              {/* Premier Portrait */}
+              <div className="flex flex-col items-center gap-3 lg:w-56 flex-shrink-0">
+                <div className="relative w-44 h-52 lg:w-52 lg:h-64 rounded-2xl overflow-hidden border-2 border-[#405862]/20 shadow-lg">
+                  <Image
+                    src="/medx/premier-doug-ford.jpg"
+                    alt="Premier Doug Ford"
+                    fill
+                    className="object-cover object-top"
+                  />
+                </div>
+                <div className="text-center">
+                  <p className="font-bold text-[#405862] dark:text-white text-base">Doug Ford</p>
+                  <p className="text-sm text-[#4ecdc4] font-semibold">Premier of Ontario</p>
+                </div>
+              </div>
+
+              {/* Official Letter Image */}
+              <div className="flex-1">
+                <div className="relative w-full rounded-2xl overflow-hidden border border-[#405862]/10 shadow-md">
+                  <Image
+                    src="/medx/premier-letter.png"
+                    alt="Official letter from Premier Doug Ford for MedX Conference 2026"
+                    width={800}
+                    height={1100}
+                    className="w-full h-auto object-contain"
+                  />
+                </div>
+              </div>
             </div>
 
           </div>
@@ -582,43 +585,43 @@ export default function MedXConferenceClient() {
               <div>
                 <Badge className="bg-[#4ecdc4] text-[#405862] font-bold mb-2">Event Breakdown</Badge>
                 <h2 className="text-3xl font-black text-[#405862] dark:text-white">Tentative Event Schedule</h2>
-                <p className="text-sm text-muted-foreground mt-1">August 16, 2026 • 10:00 AM to 4:00 PM</p>
+                <p className="text-sm text-muted-foreground mt-1">August 16, 2026 • 9:30 AM to 4:30 PM</p>
               </div>
 
               <div className="space-y-4 relative border-l-2 border-[#4ecdc4]/40 pl-6 ml-3">
                 <div className="relative">
                   <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white dark:border-[#080b0e]" />
-                  <p className="text-xs font-bold text-[#4ecdc4]">10:00 AM - 10:30 AM</p>
-                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Check-in, Registration & Welcome Keynote</h4>
-                  <p className="text-xs text-muted-foreground">Receive your delegate badge, conference package, and opening address.</p>
+                  <p className="text-xs font-bold text-[#4ecdc4]">9:30 AM - 9:45 AM</p>
+                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Doors Open & Registration</h4>
+                  <p className="text-xs text-muted-foreground">Arrive, check in, pick up your delegate badge, and get settled before the program begins.</p>
                 </div>
 
                 <div className="relative">
                   <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white dark:border-[#080b0e]" />
-                  <p className="text-xs font-bold text-[#4ecdc4]">10:30 AM - 12:00 PM</p>
-                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Healthcare Career Exploration Panels</h4>
-                  <p className="text-xs text-muted-foreground">Interactive panels featuring specialists across medicine, research, and allied health fields.</p>
+                  <p className="text-xs font-bold text-[#4ecdc4]">9:45 AM - 10:00 AM</p>
+                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Opening Ceremonies</h4>
+                  <p className="text-xs text-muted-foreground">Welcome address, introduction to MedX 2026, and opening remarks from Dr. Interested leadership.</p>
                 </div>
 
                 <div className="relative">
                   <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white dark:border-[#080b0e]" />
-                  <p className="text-xs font-bold text-[#4ecdc4]">12:00 PM - 1:15 PM</p>
-                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Catered Lunch & Networking Break</h4>
-                  <p className="text-xs text-muted-foreground">Enjoy catered lunch (for Food pass holders) and network with speakers, sponsors, and peers.</p>
+                  <p className="text-xs font-bold text-[#4ecdc4]">10:00 AM - 12:00 PM</p>
+                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Morning Session — Keynote Speeches</h4>
+                  <p className="text-xs text-muted-foreground">Inspiring keynote speeches from healthcare professionals, physicians, and leaders across the medical sector.</p>
                 </div>
 
                 <div className="relative">
                   <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white dark:border-[#080b0e]" />
-                  <p className="text-xs font-bold text-[#4ecdc4]">1:15 PM - 3:00 PM</p>
-                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Interactive Workshops & Skill Building</h4>
-                  <p className="text-xs text-muted-foreground">Breakout practical workshops on medical research, clinical problem-solving, and resume strategy.</p>
+                  <p className="text-xs font-bold text-[#4ecdc4]">12:00 PM - 1:00 PM</p>
+                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Lunch & Networking Break</h4>
+                  <p className="text-xs text-muted-foreground">Enjoy catered lunch (for Full Pass holders) and network with speakers, sponsors, and peers.</p>
                 </div>
 
                 <div className="relative">
                   <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white dark:border-[#080b0e]" />
-                  <p className="text-xs font-bold text-[#4ecdc4]">3:00 PM - 4:00 PM</p>
-                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Closing Ceremonies & Certificate Presentation</h4>
-                  <p className="text-xs text-muted-foreground">Final remarks, delegate awards, photo ops, and distribution of digital certificates.</p>
+                  <p className="text-xs font-bold text-[#4ecdc4]">1:00 PM - 4:30 PM</p>
+                  <h4 className="font-bold text-[#405862] dark:text-white text-base">Afternoon Session — Interactive Workshops</h4>
+                  <p className="text-xs text-muted-foreground">Hands-on breakout workshops on medical research, clinical problem-solving, healthcare skills, and career strategy.</p>
                 </div>
               </div>
             </div>
@@ -676,29 +679,51 @@ export default function MedXConferenceClient() {
             <h3 className="text-2xl font-extrabold text-[#405862] dark:text-white">Supported By Visionary Organizations</h3>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center justify-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-stretch justify-center">
             {/* Dr. Interested */}
-            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-center h-28">
-              <span className="text-xs text-muted-foreground mb-1 font-semibold">Presented By</span>
-              <span className="font-extrabold text-base text-[#405862] dark:text-white">Dr. Interested</span>
+            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-between gap-3 min-h-[120px]">
+              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Presented By</span>
+              <div className="relative w-full h-10 flex-shrink-0">
+                <Image
+                  src="/medx/dr-interested-logo.png"
+                  alt="Dr. Interested"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <span className="font-semibold text-xs text-[#405862] dark:text-white">Dr. Interested</span>
             </div>
 
             {/* Canada Service Corps */}
-            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-center h-28">
-              <span className="text-xs text-muted-foreground mb-1 font-semibold">Funded By</span>
-              <span className="font-bold text-sm text-[#405862] dark:text-white">Canada Service Corps / Canada</span>
+            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-between gap-3 min-h-[120px]">
+              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Funded By</span>
+              <div className="relative w-full h-12 flex-shrink-0">
+                <Image
+                  src="/medx/canada-service-corps-logo.png"
+                  alt="Canada Service Corps / Canada"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <span className="font-semibold text-xs text-[#405862] dark:text-white">Canada Service Corps</span>
             </div>
 
             {/* TakingITGlobal */}
-            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-center h-28">
-              <span className="text-xs text-muted-foreground mb-1 font-semibold">Sponsored By</span>
-              <span className="font-bold text-sm text-[#405862] dark:text-white">TakingITGlobal</span>
+            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-between gap-3 min-h-[120px]">
+              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Sponsored By</span>
+              <div className="relative w-full h-12 flex-shrink-0 flex items-center justify-center">
+                <span className="text-2xl font-black text-[#405862] dark:text-white tracking-tight">TIG</span>
+              </div>
+              <span className="font-semibold text-xs text-[#405862] dark:text-white">TakingITGlobal</span>
             </div>
 
             {/* Sprout Fellowship */}
-            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-center h-28">
-              <span className="text-xs text-muted-foreground mb-1 font-semibold">Sponsored By</span>
-              <span className="font-bold text-sm text-[#405862] dark:text-white">Sprout Fellowship</span>
+            <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-between gap-3 min-h-[120px]">
+              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Sponsored By</span>
+              <div className="relative w-full h-12 flex-shrink-0 flex items-center justify-center">
+                <span className="text-2xl font-black text-green-600 dark:text-green-400">🌱</span>
+              </div>
+              <span className="font-semibold text-xs text-[#405862] dark:text-white">Sprout Fellowship</span>
             </div>
           </div>
         </div>
@@ -771,7 +796,7 @@ export default function MedXConferenceClient() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white/10 font-semibold px-6 py-6 rounded-xl text-base"
+                className="border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold px-6 py-6 rounded-xl text-base"
               >
                 Return to Main Website
               </Button>
@@ -789,7 +814,7 @@ export default function MedXConferenceClient() {
             </div>
             <div>
               <p className="text-xs font-bold text-[#405862] dark:text-white">MedX Conference 2026</p>
-              <p className="text-[11px] text-muted-foreground">Aug 16, 2026 @ UTM (10 AM - 4 PM)</p>
+              <p className="text-[11px] text-muted-foreground">Aug 16, 2026 @ UTM (9:30 AM - 4:30 PM)</p>
             </div>
           </div>
 
