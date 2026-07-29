@@ -28,7 +28,7 @@ import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 // Easily configurable Google Form link & Pricing options
-const GOOGLE_FORM_URL = "https://forms.gle/UMyitptfyXvdSCtz7" // Replace with official MedX 2026 form link when ready
+const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeuOhIA8Nq5O8LYlKlITEDq2YXwlCWcqLXZtyhqTUros46huw/viewform?usp=dialog" // Replace with official MedX 2026 form link when ready
 
 const PRICING_TIERS = [
   {
@@ -133,7 +133,7 @@ export default function MedXConferenceClient() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f5f1eb] via-white to-[#f5f1eb]/40 dark:from-[#080b0e] dark:via-[#0c1015] dark:to-[#080b0e] text-[#405862] dark:text-[#f1ece7] pb-20">
-      
+
       {/* Top Banner Navigation back to Main Site */}
       <div className="bg-[#405862] text-white py-2.5 px-4 shadow-inner">
         <div className="container max-w-6xl mx-auto flex items-center justify-between text-xs md:text-sm">
@@ -174,10 +174,10 @@ export default function MedXConferenceClient() {
 
         <div className="container max-w-6xl mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-12 gap-8 md:gap-12 items-center">
-            
+
             {/* Left Content Column */}
             <div className="lg:col-span-7 text-left space-y-6">
-              
+
               {/* Badges */}
               <div className="flex flex-wrap items-center gap-2.5">
                 <Badge className="bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] font-semibold px-3 py-1 text-xs md:text-sm rounded-full shadow-sm">
@@ -209,7 +209,7 @@ export default function MedXConferenceClient() {
                     </h1>
                   </div>
                 </div>
-                
+
                 <p className="text-xl md:text-2xl font-medium text-[#405862]/90 dark:text-[#f1ece7]/90 italic">
                   "Discover your spark in healthcare!"
                 </p>
@@ -276,7 +276,7 @@ export default function MedXConferenceClient() {
             {/* Right Card Column: Countdown & Registration Quick Card */}
             <div className="lg:col-span-5">
               <Card className="border-2 border-[#4ecdc4]/40 shadow-2xl bg-white dark:bg-[#11161d] overflow-hidden rounded-2xl">
-                
+
                 {/* Card Header Banner */}
                 <div className="bg-gradient-to-r from-[#405862] to-[#2c3e46] p-6 text-white text-center relative overflow-hidden">
                   <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-24 h-24 bg-[#4ecdc4]/20 rounded-full blur-xl pointer-events-none" />
@@ -288,7 +288,7 @@ export default function MedXConferenceClient() {
                 </div>
 
                 <CardContent className="p-6 space-y-6">
-                  
+
                   {/* Countdown Timer */}
                   <div className="bg-[#f5f1eb] dark:bg-[#161c24] p-4 rounded-xl border border-[#4ecdc4]/20 text-center">
                     <p className="text-xs font-bold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider mb-2">
@@ -365,7 +365,7 @@ export default function MedXConferenceClient() {
       {/* Pricing & Registration Section (CENTRAL GOAL) */}
       <section id="register-section" className="py-16 md:py-24 bg-[#f5f1eb]/60 dark:bg-[#0c1015]">
         <div className="container max-w-5xl mx-auto px-4">
-          
+
           <div className="text-center space-y-4 mb-12">
             <Badge className="bg-[#405862] text-[#4ecdc4] font-bold px-4 py-1 text-sm rounded-full">
               Registration & Pricing
@@ -383,11 +383,10 @@ export default function MedXConferenceClient() {
             {PRICING_TIERS.map((tier) => (
               <Card
                 key={tier.id}
-                className={`relative flex flex-col rounded-2xl transition-all duration-300 ${
-                  tier.highlighted
+                className={`relative flex flex-col rounded-2xl transition-all duration-300 ${tier.highlighted
                     ? "border-2 border-[#4ecdc4] shadow-xl bg-white dark:bg-[#11161d] scale-100 md:scale-[1.03] z-10"
                     : "border border-[#405862]/20 shadow-md bg-white/90 dark:bg-[#11161d]/90"
-                }`}
+                  }`}
               >
                 {tier.highlighted && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#4ecdc4] text-[#405862] font-extrabold text-xs uppercase px-4 py-1 rounded-full shadow-sm tracking-wide">
@@ -419,9 +418,8 @@ export default function MedXConferenceClient() {
                     {tier.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-sm">
                         <CheckCircle2
-                          className={`h-5 w-5 flex-shrink-0 mt-0.5 ${
-                            tier.highlighted ? "text-[#4ecdc4]" : "text-[#405862] dark:text-[#4ecdc4]"
-                          }`}
+                          className={`h-5 w-5 flex-shrink-0 mt-0.5 ${tier.highlighted ? "text-[#4ecdc4]" : "text-[#405862] dark:text-[#4ecdc4]"
+                            }`}
                         />
                         <span className="text-[#405862]/90 dark:text-[#f1ece7]/90">{feature}</span>
                       </li>
@@ -433,11 +431,10 @@ export default function MedXConferenceClient() {
                   <Link href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" className="w-full">
                     <Button
                       size="lg"
-                      className={`w-full font-bold py-6 text-base rounded-xl transition-all flex items-center justify-center gap-2 ${
-                        tier.highlighted
+                      className={`w-full font-bold py-6 text-base rounded-xl transition-all flex items-center justify-center gap-2 ${tier.highlighted
                           ? "bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] shadow-md hover:scale-[1.02]"
                           : "bg-[#405862] hover:bg-[#30434b] text-white hover:scale-[1.02]"
-                      }`}
+                        }`}
                     >
                       <span>{tier.ctaText}</span>
                       <ExternalLink className="h-4 w-4" />
@@ -469,9 +466,9 @@ export default function MedXConferenceClient() {
       {/* Official Greetings: Premier Doug Ford Message Section */}
       <section className="py-16 md:py-24 bg-white dark:bg-[#080b0e]">
         <div className="container max-w-4xl mx-auto px-4">
-          
+
           <div className="bg-gradient-to-b from-[#f9f7f4] to-white dark:from-[#11161d] dark:to-[#0e1218] rounded-3xl border-2 border-[#405862]/20 p-8 md:p-12 shadow-xl relative overflow-hidden">
-            
+
             {/* Top Header */}
             <div className="text-center space-y-3 mb-10 border-b border-[#405862]/10 pb-8">
               <Badge className="bg-[#405862] text-[#4ecdc4] font-bold px-4 py-1 text-sm rounded-full">
@@ -484,7 +481,7 @@ export default function MedXConferenceClient() {
 
             {/* Premier Portrait + Letter Side-by-Side */}
             <div className="flex flex-col lg:flex-row gap-8 items-start">
-              
+
               {/* Premier Portrait */}
               <div className="flex flex-col items-center gap-3 lg:w-56 flex-shrink-0">
                 <div className="relative w-44 h-52 lg:w-52 lg:h-64 rounded-2xl overflow-hidden border-2 border-[#405862]/20 shadow-lg">
@@ -579,7 +576,7 @@ export default function MedXConferenceClient() {
       <section className="py-16 md:py-24 bg-white dark:bg-[#080b0e]">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-12 gap-12 items-start">
-            
+
             {/* Timeline */}
             <div className="lg:col-span-7 space-y-6">
               <div>
