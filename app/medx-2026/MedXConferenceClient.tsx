@@ -708,8 +708,13 @@ export default function MedXConferenceClient() {
             {/* TakingITGlobal */}
             <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-between gap-3 min-h-[120px]">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Sponsored By</span>
-              <div className="relative w-full h-12 flex-shrink-0 flex items-center justify-center">
-                <span className="text-2xl font-black text-[#405862] dark:text-white tracking-tight">TIG</span>
+              <div className="relative w-full h-12 flex-shrink-0">
+                <Image
+                  src="/taking-it-global-logo.png"
+                  alt="TakingITGlobal"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <span className="font-semibold text-xs text-[#405862] dark:text-white">TakingITGlobal</span>
             </div>
@@ -717,8 +722,13 @@ export default function MedXConferenceClient() {
             {/* Sprout Fellowship */}
             <div className="bg-white dark:bg-[#11161d] p-5 rounded-2xl border border-[#405862]/10 shadow-xs flex flex-col items-center justify-between gap-3 min-h-[120px]">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Sponsored By</span>
-              <div className="relative w-full h-12 flex-shrink-0 flex items-center justify-center">
-                <span className="text-2xl font-black text-green-600 dark:text-green-400">🌱</span>
+              <div className="relative w-full h-12 flex-shrink-0">
+                <Image
+                  src="/sprout-fellowship-logo.png"
+                  alt="Sprout Fellowship"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <span className="font-semibold text-xs text-[#405862] dark:text-white">Sprout Fellowship</span>
             </div>
