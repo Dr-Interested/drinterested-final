@@ -34,10 +34,19 @@ export default function MemberCard({ member }: MemberCardProps) {
     setTilt({ x: 0, y: 0 })
   }
 
-  // Derive display email (use custom if available, else standard format)
+  const getFormattedEmail = (name: string) => {
+    const parts = name.trim().toLowerCase().split(/\s+/).filter(Boolean)
+    if (parts.length === 0) return "info@drinterested.org"
+    if (parts.length === 1) return `${parts[0]}@drinterested.org`
+    const firstName = parts[0]
+    const lastInitial = parts[parts.length - 1][0]
+    return `${firstName}${lastInitial}@drinterested.org`
+  }
+
+  // Derive display email (use custom mailto if available, else firstnamelastinitial@drinterested.org)
   const formattedEmail = member.socials?.website?.includes("mailto:")
     ? member.socials.website.replace("mailto:", "")
-    : `${member.name.toLowerCase().replace(/[^a-z0-9]/g, ".")}@drinterested.org`
+    : getFormattedEmail(member.name)
 
   // Derive website link
   const websiteUrl = member.socials?.website && !member.socials.website.includes("mailto:")
@@ -90,13 +99,13 @@ export default function MemberCard({ member }: MemberCardProps) {
             </div>
 
             {/* Logo Badge Icon */}
-            <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-[#EDFAF9] border border-[#4ecdc4]/30 flex items-center justify-center p-2.5 shadow-sm">
+            <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-[#EDFAF9] border border-[#4ecdc4]/30 flex items-center justify-center p-2 shadow-sm overflow-hidden">
               <Image
-                src="/logo.png"
+                src="/circle-logo.png"
                 alt="Dr. Interested Logo"
                 width={48}
                 height={48}
-                className="object-contain"
+                className="object-contain rounded-full"
               />
             </div>
           </div>
