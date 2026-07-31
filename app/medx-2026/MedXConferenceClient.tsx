@@ -185,13 +185,13 @@ export default function MedXConferenceClient() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative pt-8 pb-16 md:pt-14 md:pb-24 overflow-hidden border-b border-[#4ecdc4]/20">
+      <section className="relative pt-4 pb-12 md:pt-8 md:pb-16 overflow-hidden border-b border-[#4ecdc4]/20">
         {/* Subtle Background Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#4ecdc4]/15 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute top-1/2 right-10 w-[300px] h-[300px] bg-[#405862]/10 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="container max-w-6xl mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-12 gap-8 md:gap-12 items-center">
+          <div className="grid lg:grid-cols-12 gap-6 md:gap-8 items-center">
 
             {/* Left Content Column */}
             <div className="lg:col-span-7 text-left space-y-6">
@@ -296,76 +296,76 @@ export default function MedXConferenceClient() {
               <Card className="border-2 border-[#4ecdc4]/40 shadow-2xl bg-white dark:bg-[#11161d] overflow-hidden rounded-2xl">
 
                 {/* Card Header Banner */}
-                <div className="bg-gradient-to-r from-[#405862] to-[#2c3e46] p-6 text-white text-center relative overflow-hidden">
+                <div className="bg-gradient-to-r from-[#405862] to-[#2c3e46] p-4 md:p-5 text-white text-center relative overflow-hidden">
                   <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-24 h-24 bg-[#4ecdc4]/20 rounded-full blur-xl pointer-events-none" />
-                  <Badge className="bg-[#4ecdc4] text-[#405862] font-bold uppercase text-[10px] mb-2">
+                  <Badge className="bg-[#4ecdc4] text-[#405862] font-bold uppercase text-[10px] mb-1.5">
                     Registration Open
                   </Badge>
-                  <h3 className="text-xl md:text-2xl font-bold">Secure Your Spot Today</h3>
-                  <p className="text-white/80 text-xs mt-1">Limited capacity at UTM. Early registration encouraged!</p>
+                  <h3 className="text-lg md:text-xl font-bold">Secure Your Spot Today</h3>
+                  <p className="text-white/80 text-[11px] mt-1">Limited capacity at UTM. Early registration encouraged!</p>
                 </div>
 
-                <CardContent className="p-6 space-y-6">
+                <CardContent className="p-4 md:p-5 space-y-4">
 
                   {/* Registration Countdown Timer (BIGGER) */}
-                  <div className="bg-[#4ecdc4]/10 dark:bg-[#161c24] p-5 rounded-xl border-2 border-[#4ecdc4] text-center shadow-md">
-                    <p className="text-sm font-extrabold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider mb-3">
+                  <div className="bg-[#4ecdc4]/10 dark:bg-[#161c24] p-3 md:p-4 rounded-xl border-2 border-[#4ecdc4] text-center shadow-md">
+                    <p className="text-xs font-extrabold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider mb-2">
                       Registration Closes In
                     </p>
-                    <div className="grid grid-cols-4 gap-3">
-                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                    <div className="grid grid-cols-4 gap-2">
+                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
                           {registrationTimeLeft.days}
                         </span>
-                        <span className="text-xs text-muted-foreground uppercase font-bold">Days</span>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Days</span>
                       </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
                           {registrationTimeLeft.hours}
                         </span>
-                        <span className="text-xs text-muted-foreground uppercase font-bold">Hrs</span>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Hrs</span>
                       </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
                           {registrationTimeLeft.minutes}
                         </span>
-                        <span className="text-xs text-muted-foreground uppercase font-bold">Mins</span>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Mins</span>
                       </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
                           {registrationTimeLeft.seconds}
                         </span>
-                        <span className="text-xs text-muted-foreground uppercase font-bold">Secs</span>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Secs</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Event Countdown Timer (SMALLER) */}
-                  <div className="bg-[#f5f1eb] dark:bg-[#161c24] p-3 rounded-xl border border-[#405862]/10 text-center opacity-90">
-                    <p className="text-[10px] font-bold text-[#405862] dark:text-white uppercase tracking-wider mb-2">
+                  <div className="bg-[#f5f1eb] dark:bg-[#161c24] p-2 rounded-xl border border-[#405862]/10 text-center opacity-90">
+                    <p className="text-[10px] font-bold text-[#405862] dark:text-white uppercase tracking-wider mb-1">
                       Event Starts In
                     </p>
                     <div className="grid grid-cols-4 gap-1.5">
                       <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
-                        <span className="block text-lg font-black text-[#405862] dark:text-white">
+                        <span className="block text-base font-black text-[#405862] dark:text-white">
                           {timeLeft.days}
                         </span>
                         <span className="text-[8px] text-muted-foreground uppercase font-semibold">Days</span>
                       </div>
                       <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
-                        <span className="block text-lg font-black text-[#405862] dark:text-white">
+                        <span className="block text-base font-black text-[#405862] dark:text-white">
                           {timeLeft.hours}
                         </span>
                         <span className="text-[8px] text-muted-foreground uppercase font-semibold">Hours</span>
                       </div>
                       <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
-                        <span className="block text-lg font-black text-[#405862] dark:text-white">
+                        <span className="block text-base font-black text-[#405862] dark:text-white">
                           {timeLeft.minutes}
                         </span>
                         <span className="text-[8px] text-muted-foreground uppercase font-semibold">Mins</span>
                       </div>
                       <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
-                        <span className="block text-lg font-black text-[#405862] dark:text-white">
+                        <span className="block text-base font-black text-[#405862] dark:text-white">
                           {timeLeft.seconds}
                         </span>
                         <span className="text-[8px] text-muted-foreground uppercase font-semibold">Secs</span>
@@ -374,34 +374,34 @@ export default function MedXConferenceClient() {
                   </div>
 
                   {/* Pricing Options Preview */}
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Pass Options:
                     </p>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-3 rounded-lg border border-[#4ecdc4]/30 bg-[#4ecdc4]/5">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between p-2 md:p-2.5 rounded-lg border border-[#4ecdc4]/30 bg-[#4ecdc4]/5">
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-[#4ecdc4]" />
-                          <span className="text-sm font-semibold text-[#405862] dark:text-white">Event Access Only</span>
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#4ecdc4]" />
+                          <span className="text-xs font-semibold text-[#405862] dark:text-white">Event Access Only</span>
                         </div>
-                        <span className="font-extrabold text-[#405862] dark:text-white">$5.00</span>
+                        <span className="text-sm font-extrabold text-[#405862] dark:text-white">$5.00</span>
                       </div>
-                      <div className="flex items-center justify-between p-3 rounded-lg border-2 border-[#4ecdc4] bg-white dark:bg-[#1a212b]">
+                      <div className="flex items-center justify-between p-2 md:p-2.5 rounded-lg border-2 border-[#4ecdc4] bg-white dark:bg-[#1a212b]">
                         <div className="flex items-center gap-2">
-                          <Utensils className="h-4 w-4 text-[#4ecdc4]" />
+                          <Utensils className="h-3.5 w-3.5 text-[#4ecdc4]" />
                           <div>
-                            <span className="text-sm font-bold text-[#405862] dark:text-white">Event Access + Food</span>
-                            <span className="ml-2 text-[10px] bg-[#4ecdc4] text-[#405862] font-bold px-1.5 py-0.5 rounded">Popular</span>
+                            <span className="text-xs font-bold text-[#405862] dark:text-white">Event Access + Food</span>
+                            <span className="ml-1.5 text-[9px] bg-[#4ecdc4] text-[#405862] font-bold px-1 py-0.5 rounded">Popular</span>
                           </div>
                         </div>
-                        <span className="font-extrabold text-[#405862] dark:text-white">$12.00</span>
+                        <span className="text-sm font-extrabold text-[#405862] dark:text-white">$12.00</span>
                       </div>
                     </div>
                   </div>
 
                   <Button
                     onClick={scrollToRegistration}
-                    className="w-full bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] font-bold py-6 text-base rounded-xl shadow-md transition-all hover:scale-[1.01]"
+                    className="w-full bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] font-bold py-4 md:py-5 text-sm rounded-xl shadow-md transition-all hover:scale-[1.01]"
                   >
                     Select Pass & Register
                   </Button>
@@ -414,7 +414,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* Pricing & Registration Section (CENTRAL GOAL) */}
-      <section id="register-section" className="py-16 md:py-24 bg-[#f5f1eb]/60 dark:bg-[#0c1015]">
+      <section id="register-section" className="py-10 md:py-16 bg-[#f5f1eb]/60 dark:bg-[#0c1015]">
         <div className="container max-w-5xl mx-auto px-4">
 
           <div className="text-center space-y-4 mb-12">
@@ -515,7 +515,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* Official Greetings: Premier Doug Ford Message Section */}
-      <section className="py-16 md:py-24 bg-white dark:bg-[#080b0e]">
+      <section className="py-10 md:py-16 bg-white dark:bg-[#080b0e]">
         <div className="container max-w-4xl mx-auto px-4">
 
           <div className="bg-gradient-to-b from-[#f9f7f4] to-white dark:from-[#11161d] dark:to-[#0e1218] rounded-3xl border-2 border-[#405862]/20 p-8 md:p-12 shadow-xl relative overflow-hidden">
@@ -569,7 +569,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* Conference Pillars / Why Attend */}
-      <section className="py-16 md:py-24 bg-[#f5f1eb]/50 dark:bg-[#0c1015]">
+      <section className="py-10 md:py-16 bg-[#f5f1eb]/50 dark:bg-[#0c1015]">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center space-y-4 mb-16">
             <Badge variant="outline" className="border-[#4ecdc4] text-[#405862] dark:text-[#f1ece7] font-semibold px-4 py-1 text-sm rounded-full">
@@ -624,7 +624,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* Schedule & Venue Section */}
-      <section className="py-16 md:py-24 bg-white dark:bg-[#080b0e]">
+      <section className="py-10 md:py-16 bg-white dark:bg-[#080b0e]">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-12 gap-12 items-start">
 
@@ -718,7 +718,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* Sponsors & Partners Section */}
-      <section className="py-14 bg-[#f5f1eb]/80 dark:bg-[#0c1015] border-t border-b border-[#4ecdc4]/20">
+      <section className="py-10 bg-[#f5f1eb]/80 dark:bg-[#0c1015] border-t border-b border-[#4ecdc4]/20">
         <div className="container max-w-5xl mx-auto px-4 text-center space-y-8">
           <div>
             <Badge variant="secondary" className="bg-white dark:bg-[#161c24] text-[#405862] dark:text-[#4ecdc4] font-bold mb-2">
@@ -788,7 +788,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* Workshop Host Registration Section */}
-      <section className="py-12 bg-white dark:bg-[#080b0e] border-t border-[#4ecdc4]/20">
+      <section className="py-8 bg-white dark:bg-[#080b0e] border-t border-[#4ecdc4]/20">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="bg-[#4ecdc4]/5 dark:bg-[#11161d] rounded-2xl border-2 border-[#4ecdc4]/30 p-8 shadow-sm flex flex-col md:flex-row items-center gap-8 justify-between">
             <div className="space-y-3 flex-1 text-center md:text-left">
@@ -820,7 +820,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* FAQ Accordion Section */}
-      <section className="py-16 md:py-24 bg-white dark:bg-[#080b0e]">
+      <section className="py-10 md:py-16 bg-white dark:bg-[#080b0e]">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="text-center space-y-3 mb-12">
             <Badge className="bg-[#405862] text-[#4ecdc4] font-bold">Got Questions?</Badge>
@@ -868,7 +868,7 @@ export default function MedXConferenceClient() {
       </section>
 
       {/* Return to Main Site Bottom CTA Banner */}
-      <section className="py-12 bg-gradient-to-r from-[#405862] via-[#334852] to-[#405862] text-white">
+      <section className="py-8 bg-gradient-to-r from-[#405862] via-[#334852] to-[#405862] text-white">
         <div className="container max-w-5xl mx-auto px-4 text-center space-y-6">
           <h3 className="text-2xl md:text-3xl font-black">Ready to Discover Your Spark in Healthcare?</h3>
           <p className="text-white/80 max-w-xl mx-auto text-sm md:text-base">
