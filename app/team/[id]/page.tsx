@@ -31,7 +31,7 @@ export async function generateMetadata({
     member.bio || `${member.name} is ${member.role} at Dr. Interested - inspiring youth in healthcare careers.`
   )
   const imageUrl = member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`
-  const url = `${baseUrl}/team/${member.id}`
+  const url = `${baseUrl}/team/${member.slug || member.id}`
 
   // Build keyword list from name, role parts, and org
   const roleKeywords = member.role.split(/[-|,]/g).map((s) => s.trim()).filter(Boolean)
@@ -103,7 +103,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const sameAs = member.socials
     ? Object.values(member.socials).filter(Boolean)
     : []
-  const memberUrl = `${baseUrl}/team/${member.id}`
+  const memberUrl = `${baseUrl}/team/${member.slug || member.id}`
   const memberImage = member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`
 
   // schema.org/Person — rich Google Knowledge Panel signals

@@ -178,7 +178,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all members from database using helper
   const members = await getAllMembersCombined()
   const teamPages: MetadataRoute.Sitemap = members.map((member) => ({
-    url: `${baseUrl}/team/${member.id}`,
+    url: `${baseUrl}/team/${member.slug}`,
     lastModified: currentDate,
     changeFrequency: "monthly" as const,
     priority: 0.7,

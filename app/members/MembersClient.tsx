@@ -11,9 +11,11 @@ import { departments as staticDepartments } from "@/data/members"
 import ScrollToTop from "@/components/scroll-to-top"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { supabase } from "@/lib/supabase-client"
+import { generateSlug } from "@/lib/members-data"
 
 type MemberType = {
   id: string
+  slug?: string
   name: string
   role: string
   image: string
@@ -105,6 +107,11 @@ export default function MembersClient() {
     if (img.startsWith("http")) return img
     if (img.startsWith("/")) return img
     return `/${img}`
+  }
+
+  const getMemberSlug = (m: MemberType | null | undefined) => {
+    if (!m) return ""
+    return m.slug || generateSlug(m, dbMembers)
   }
 
   // Dynamic distribution of members
@@ -289,12 +296,12 @@ export default function MembersClient() {
                     <Card className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow">
                       <div className="grid md:grid-cols-3">
                         <div className="md:col-span-1 bg-[#f5f1eb] flex items-center justify-center">
-                          <Link href={`/team/${executiveDirector.id}`} className="relative h-full w-full aspect-square block group/img">
+                          <Link href={`/team/${getMemberSlug(executiveDirector)}`} className="relative h-full w-full aspect-square block group/img">
                             <Image src={executiveDirector.image} alt={executiveDirector.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover group-hover/img:scale-105 transition-transform" />
                           </Link>
                         </div>
                         <CardContent className="md:col-span-2 p-4">
-                          <Link href={`/team/${executiveDirector.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                          <Link href={`/team/${getMemberSlug(executiveDirector)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
                             <h4 className="text-lg font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{executiveDirector.name}</h4>
                           </Link>
                           <p className="text-sm text-[#4ecdc4] font-medium mb-2">{executiveDirector.role}</p>
@@ -367,12 +374,12 @@ export default function MembersClient() {
                         <Card key={vp.id} className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow">
                           <div className="grid md:grid-cols-3">
                             <div className="md:col-span-1 bg-[#f5f1eb] flex items-center justify-center">
-                              <Link href={`/team/${vp.id}`} className="relative h-full w-full aspect-square block group/img">
+                              <Link href={`/team/${getMemberSlug(vp)}`} className="relative h-full w-full aspect-square block group/img">
                                 <Image src={vp.image} alt={vp.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover group-hover/img:scale-105 transition-transform" />
                               </Link>
                             </div>
                             <CardContent className="md:col-span-2 p-4">
-                              <Link href={`/team/${vp.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                              <Link href={`/team/${getMemberSlug(vp)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
                                 <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{vp.name}</h4>
                               </Link>
                               <p className="text-sm text-[#4ecdc4] font-medium mb-2">{vp.role}</p>
@@ -432,12 +439,12 @@ export default function MembersClient() {
                         <Card key={ea.id} className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow">
                           <div className="grid md:grid-cols-3">
                             <div className="md:col-span-1 bg-[#f5f1eb] flex items-center justify-center">
-                              <Link href={`/team/${ea.id}`} className="relative h-full w-full aspect-square block group/img">
+                              <Link href={`/team/${getMemberSlug(ea)}`} className="relative h-full w-full aspect-square block group/img">
                                 <Image src={ea.image} alt={ea.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover group-hover/img:scale-105 transition-transform" />
                               </Link>
                             </div>
                             <CardContent className="md:col-span-2 p-4">
-                              <Link href={`/team/${ea.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                              <Link href={`/team/${getMemberSlug(ea)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
                                 <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{ea.name}</h4>
                               </Link>
                               <p className="text-sm text-[#4ecdc4] font-medium mb-2">{ea.role}</p>
@@ -526,7 +533,7 @@ export default function MembersClient() {
                                 >
                                   <div className="grid grid-cols-3">
                                     <div className="col-span-1 bg-[#f5f1eb]">
-                                      <Link href={`/team/${director.id}`} className="relative h-full w-full aspect-square block group/img">
+                                      <Link href={`/team/${getMemberSlug(director)}`} className="relative h-full w-full aspect-square block group/img">
                                         <Image
                                           src={director.image}
                                           alt={director.name}
@@ -537,7 +544,7 @@ export default function MembersClient() {
                                       </Link>
                                     </div>
                                     <CardContent className="col-span-2 p-3">
-                                      <Link href={`/team/${director.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                                      <Link href={`/team/${getMemberSlug(director)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
                                         <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-[#4ecdc4]">{director.name}</h5>
                                       </Link>
                                       <p className="text-xs text-[#4ecdc4] font-medium mb-1">{director.role}</p>
@@ -607,7 +614,7 @@ export default function MembersClient() {
                                 >
                                   <CardContent className="p-3">
                                     <div className="flex items-center gap-2 mb-1">
-                                      <Link href={`/team/${member.id}`} className="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0 group/img">
+                                      <Link href={`/team/${getMemberSlug(member)}`} className="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0 group/img">
                                         <Image
                                           src={member.image}
                                           alt={member.name}
@@ -617,7 +624,7 @@ export default function MembersClient() {
                                         />
                                       </Link>
                                       <div>
-                                        <Link href={`/team/${member.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                                        <Link href={`/team/${getMemberSlug(member)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
                                           <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-[#4ecdc4]">{member.name}</h5>
                                         </Link>
                                         <p className="text-xs text-[#405862]/75">{member.role}</p>
@@ -689,7 +696,7 @@ export default function MembersClient() {
                                   key={ambassador.id}
                                   className="flex items-center gap-2 p-2 rounded-lg bg-[#f5f1eb]/40 border border-[#405862]/10 hover:border-[#4ecdc4]/40 transition-colors"
                                 >
-                                  <Link href={`/team/${ambassador.id}`} className="relative h-7 w-7 rounded-full overflow-hidden flex-shrink-0 group/img">
+                                  <Link href={`/team/${getMemberSlug(ambassador)}`} className="relative h-7 w-7 rounded-full overflow-hidden flex-shrink-0 group/img">
                                     <Image
                                       src={ambassador.image}
                                       alt={ambassador.name}
@@ -699,7 +706,7 @@ export default function MembersClient() {
                                     />
                                   </Link>
                                   <div className="min-w-0">
-                                    <Link href={`/team/${ambassador.id}`} className="block hover:text-[#4ecdc4] transition-colors">
+                                    <Link href={`/team/${getMemberSlug(ambassador)}`} className="block hover:text-[#4ecdc4] transition-colors">
                                       <p className="font-medium text-xs text-[#405862] hover:text-[#4ecdc4] truncate font-bricolage">{ambassador.name}</p>
                                     </Link>
                                     <p className="text-[10px] text-[#405862]/60 truncate">{ambassador.role}</p>
@@ -763,7 +770,7 @@ export default function MembersClient() {
                           className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow"
                         >
                           <div className="bg-[#f5f1eb] flex items-center justify-center p-4">
-                            <Link href={`/team/${advisor.id}`} className="relative h-32 w-32 rounded-full overflow-hidden block group/img">
+                            <Link href={`/team/${getMemberSlug(advisor)}`} className="relative h-32 w-32 rounded-full overflow-hidden block group/img">
                               <Image
                                 src={advisor.image}
                                 alt={advisor.name}
@@ -774,7 +781,7 @@ export default function MembersClient() {
                             </Link>
                           </div>
                           <CardContent className="p-4">
-                            <Link href={`/team/${advisor.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                            <Link href={`/team/${getMemberSlug(advisor)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
                               <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{advisor.name}</h4>
                             </Link>
                             <p className="text-sm text-[#4ecdc4] font-medium mb-2">{advisor.role}</p>
