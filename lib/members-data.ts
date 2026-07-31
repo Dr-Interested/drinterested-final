@@ -17,10 +17,12 @@ export type UnifiedMember = {
 }
 
 export const formatImagePath = (img: string | undefined | null): string => {
-  if (!img) return "/logo.png"
-  if (img.startsWith("http")) return img
-  if (img.startsWith("/")) return img
-  return `/${img}`
+  if (!img) return "/circle-logo.png"
+  const clean = img.trim()
+  if (!clean || clean === "logo.png" || clean === "/logo.png") return "/circle-logo.png"
+  if (clean.startsWith("http")) return clean
+  if (clean.startsWith("/")) return clean
+  return `/${clean}`
 }
 
 export function generateSlug(member: { name: string, role: string }, allMembers: { name: string, role: string }[]): string {

@@ -14,6 +14,7 @@ interface MemberCardProps {
 export default function MemberCard({ member }: MemberCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+  const [imgSrc, setImgSrc] = useState(member.image || "/circle-logo.png")
   const maxTilt = 8 // maximum tilt angle in degrees
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -117,12 +118,13 @@ export default function MemberCard({ member }: MemberCardProps) {
               {/* Member Photo */}
               <div className="relative w-32 h-32 md:w-36 md:h-36 rounded-xl overflow-hidden border-2 border-[#4ecdc4]/40 shadow-md flex-shrink-0 bg-[#f5f1eb]">
                 <Image
-                  src={member.image}
+                  src={imgSrc}
                   alt={member.name}
                   fill
                   sizes="(max-width: 768px) 128px, 144px"
                   className="object-cover"
                   priority
+                  onError={() => setImgSrc("/circle-logo.png")}
                 />
               </div>
 

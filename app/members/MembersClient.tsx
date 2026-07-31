@@ -103,10 +103,12 @@ export default function MembersClient() {
 
   // Helper to map DB image path to standard web URLs
   const formatImagePath = (img: string | undefined | null) => {
-    if (!img) return "/logo.png"
-    if (img.startsWith("http")) return img
-    if (img.startsWith("/")) return img
-    return `/${img}`
+    if (!img) return "/circle-logo.png"
+    const clean = img.trim()
+    if (!clean || clean === "logo.png" || clean === "/logo.png") return "/circle-logo.png"
+    if (clean.startsWith("http")) return clean
+    if (clean.startsWith("/")) return clean
+    return `/${clean}`
   }
 
   const getMemberSlug = (m: MemberType | null | undefined) => {
