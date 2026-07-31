@@ -77,21 +77,39 @@ export default function MedXConferenceClient() {
     minutes: 0,
     seconds: 0,
   })
+  const [registrationTimeLeft, setRegistrationTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  })
 
-  // Countdown to August 16, 2026 at 9:30 AM EDT
+  // Countdown to August 16, 2026 at 9:30 AM EDT (Event)
+  // Countdown to August 10, 2026 at 4:00 PM EDT (Registration Close)
   useEffect(() => {
     const targetDate = new Date("2026-08-16T09:30:00-04:00").getTime()
+    const targetRegDate = new Date("2026-08-10T16:00:00-04:00").getTime()
 
     const calculateTimeLeft = () => {
       const now = new Date().getTime()
+      
       const difference = targetDate - now
-
       if (difference > 0) {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
           hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
+        })
+      }
+
+      const regDiff = targetRegDate - now
+      if (regDiff > 0) {
+        setRegistrationTimeLeft({
+          days: Math.floor(regDiff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((regDiff / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((regDiff / 1000 / 60) % 60),
+          seconds: Math.floor((regDiff / 1000) % 60),
         })
       }
     }
@@ -289,35 +307,68 @@ export default function MedXConferenceClient() {
 
                 <CardContent className="p-6 space-y-6">
 
-                  {/* Countdown Timer */}
-                  <div className="bg-[#f5f1eb] dark:bg-[#161c24] p-4 rounded-xl border border-[#4ecdc4]/20 text-center">
-                    <p className="text-xs font-bold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider mb-2">
-                      Event Countdown
+                  {/* Registration Countdown Timer (BIGGER) */}
+                  <div className="bg-[#4ecdc4]/10 dark:bg-[#161c24] p-5 rounded-xl border-2 border-[#4ecdc4] text-center shadow-md">
+                    <p className="text-sm font-extrabold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider mb-3">
+                      Registration Closes In
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#405862]/10 shadow-xs">
-                        <span className="block text-xl md:text-2xl font-black text-[#405862] dark:text-white">
+                    <div className="grid grid-cols-4 gap-3">
+                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                          {registrationTimeLeft.days}
+                        </span>
+                        <span className="text-xs text-muted-foreground uppercase font-bold">Days</span>
+                      </div>
+                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                          {registrationTimeLeft.hours}
+                        </span>
+                        <span className="text-xs text-muted-foreground uppercase font-bold">Hrs</span>
+                      </div>
+                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                          {registrationTimeLeft.minutes}
+                        </span>
+                        <span className="text-xs text-muted-foreground uppercase font-bold">Mins</span>
+                      </div>
+                      <div className="bg-white dark:bg-[#0c1015] p-3 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                        <span className="block text-3xl font-black text-[#405862] dark:text-white">
+                          {registrationTimeLeft.seconds}
+                        </span>
+                        <span className="text-xs text-muted-foreground uppercase font-bold">Secs</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Event Countdown Timer (SMALLER) */}
+                  <div className="bg-[#f5f1eb] dark:bg-[#161c24] p-3 rounded-xl border border-[#405862]/10 text-center opacity-90">
+                    <p className="text-[10px] font-bold text-[#405862] dark:text-white uppercase tracking-wider mb-2">
+                      Event Starts In
+                    </p>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
+                        <span className="block text-lg font-black text-[#405862] dark:text-white">
                           {timeLeft.days}
                         </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">Days</span>
+                        <span className="text-[8px] text-muted-foreground uppercase font-semibold">Days</span>
                       </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#405862]/10 shadow-xs">
-                        <span className="block text-xl md:text-2xl font-black text-[#405862] dark:text-white">
+                      <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
+                        <span className="block text-lg font-black text-[#405862] dark:text-white">
                           {timeLeft.hours}
                         </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">Hours</span>
+                        <span className="text-[8px] text-muted-foreground uppercase font-semibold">Hours</span>
                       </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#405862]/10 shadow-xs">
-                        <span className="block text-xl md:text-2xl font-black text-[#405862] dark:text-white">
+                      <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
+                        <span className="block text-lg font-black text-[#405862] dark:text-white">
                           {timeLeft.minutes}
                         </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">Mins</span>
+                        <span className="text-[8px] text-muted-foreground uppercase font-semibold">Mins</span>
                       </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#405862]/10 shadow-xs">
-                        <span className="block text-xl md:text-2xl font-black text-[#405862] dark:text-white">
+                      <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-md border border-[#405862]/5">
+                        <span className="block text-lg font-black text-[#405862] dark:text-white">
                           {timeLeft.seconds}
                         </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">Secs</span>
+                        <span className="text-[8px] text-muted-foreground uppercase font-semibold">Secs</span>
                       </div>
                     </div>
                   </div>
@@ -731,6 +782,38 @@ export default function MedXConferenceClient() {
                 />
               </div>
               <span className="font-semibold text-xs text-[#405862] dark:text-white">Sprout Fellowship</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Workshop Host Registration Section */}
+      <section className="py-12 bg-white dark:bg-[#080b0e] border-t border-[#4ecdc4]/20">
+        <div className="container max-w-4xl mx-auto px-4">
+          <div className="bg-[#4ecdc4]/5 dark:bg-[#11161d] rounded-2xl border-2 border-[#4ecdc4]/30 p-8 shadow-sm flex flex-col md:flex-row items-center gap-8 justify-between">
+            <div className="space-y-3 flex-1 text-center md:text-left">
+              <Badge className="bg-[#405862] text-[#4ecdc4] font-bold px-3 py-1 text-xs rounded-full">
+                Call for Workshops
+              </Badge>
+              <h3 className="text-2xl font-black text-[#405862] dark:text-white">
+                Host a Workshop at MedX 2026
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-xl text-pretty mx-auto md:mx-0">
+                Are you a youth organization, club, or individual eager to share healthcare skills and opportunities? 
+                Host a hands-on, interactive session during our afternoon portion (12:00 PM to 4:00 PM, with the option to stay the full day). 
+                We encourage all groups and individuals to apply!
+              </p>
+              <p className="text-xs font-bold text-[#405862] dark:text-[#4ecdc4] mt-2">
+                ⚠️ Applications close August 5th, 2026 at 11:00 PM ET.
+              </p>
+            </div>
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <Link href="https://forms.gle/MewmbgGK4GdibPGK8" target="_blank" rel="noopener noreferrer">
+                <Button className="w-full md:w-auto bg-[#405862] hover:bg-[#30434b] text-white font-bold py-6 px-8 text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                  <span>Apply to Host</span>
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
