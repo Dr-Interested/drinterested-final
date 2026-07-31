@@ -1,16 +1,15 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
 import SeoSchema from "@/components/seo-schema"
-import { supabase } from "@/lib/supabase-client"
+import MemberCard from "@/components/members/MemberCard"
+import { getUnifiedMemberById } from "@/lib/members-data"
 
 const baseUrl = "https://www.drinterested.org"
 
 const truncate = (text: string, maxLength = 160) =>
   text.length > maxLength ? `${text.slice(0, maxLength - 3)}...` : text
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
 export const revalidate = 3600 // revalidate every hour
 
 export async function generateMetadata({
@@ -19,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const { data: member } = await supabase.from('members').select('*').eq('id', id).single()
+  const member = await getUnifiedMemberById(id)
 
   if (!member) {
     return {
@@ -28,16 +27,44 @@ export async function generateMetadata({
     }
   }
 
-  const description = truncate(member.bio || "")
-  const imageUrl = member.image?.startsWith('http') ? member.image : `${baseUrl}${member.image || '/logo.png'}`
+  const description = truncate(
+    member.bio || `${member.name} is ${member.role} at Dr. Interested - inspiring youth in healthcare careers.`
+  )
+  const imageUrl = member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`
   const url = `${baseUrl}/team/${member.id}`
 
+  // Build keyword list from name, role parts, and org
+  const roleKeywords = member.role.split(/[-|,]/g).map((s) => s.trim()).filter(Boolean)
+  const keywords = [
+    member.name,
+    member.role,
+    ...roleKeywords,
+    "Dr. Interested",
+    "Dr. Interested team",
+    "healthcare education",
+    "medical education",
+    "youth healthcare",
+    "student organization",
+  ]
+
   return {
-    title: `${member.name} | ${member.role}`,
+    title: `${member.name} - ${member.role} | Dr. Interested`,
     description,
-    keywords: [member.name, member.role, "Dr. Interested"],
+    keywords,
+    authors: [{ name: member.name, url }],
+    category: "People",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     openGraph: {
-      title: `${member.name} | ${member.role}`,
+      title: `${member.name} | ${member.role} - Dr. Interested`,
       description,
       url,
       siteName: "Dr. Interested",
@@ -47,16 +74,17 @@ export async function generateMetadata({
           url: imageUrl,
           width: 800,
           height: 800,
-          alt: `${member.name} - ${member.role}`,
+          alt: `${member.name} - ${member.role} at Dr. Interested`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${member.name} | ${member.role}`,
+      title: `${member.name} | ${member.role} - Dr. Interested`,
       description,
       images: [imageUrl],
       creator: "@DrInterested",
+      site: "@DrInterested",
     },
     alternates: {
       canonical: url,
@@ -66,7 +94,7 @@ export async function generateMetadata({
 
 export default async function MemberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { data: member } = await supabase.from('members').select('*').eq('id', id).single()
+  const member = await getUnifiedMemberById(id)
 
   if (!member) {
     notFound()
@@ -76,106 +104,80 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     ? Object.values(member.socials).filter(Boolean)
     : []
   const memberUrl = `${baseUrl}/team/${member.id}`
-  const memberImage = member.image?.startsWith('http') ? member.image : `${baseUrl}${member.image || '/logo.png'}`
+  const memberImage = member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`
 
+  // schema.org/Person — rich Google Knowledge Panel signals
   const personSchema = {
     "@context": "https://schema.org",
     "@type": "Person",
     "@id": `${memberUrl}#person`,
     name: member.name,
     jobTitle: member.role,
-    image: memberImage,
+    image: {
+      "@type": "ImageObject",
+      url: memberImage,
+      width: 800,
+      height: 800,
+      caption: `${member.name} - ${member.role} at Dr. Interested`,
+    },
     url: memberUrl,
-    description: member.bio,
+    description: member.bio || undefined,
     affiliation: {
       "@type": "Organization",
+      "@id": `${baseUrl}#organization`,
       name: "Dr. Interested",
       url: baseUrl,
     },
     worksFor: {
       "@type": "Organization",
+      "@id": `${baseUrl}#organization`,
       name: "Dr. Interested",
       url: baseUrl,
     },
     sameAs: sameAs.length ? sameAs : undefined,
     mainEntityOfPage: {
-      "@type": "WebPage",
+      "@type": "ProfilePage",
       "@id": memberUrl,
+      name: `${member.name} | Dr. Interested`,
+      description: member.bio || undefined,
+      url: memberUrl,
+      image: memberImage,
     },
   }
 
+  // Standalone BreadcrumbList for Google rich results
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: baseUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Our Team",
+        item: `${baseUrl}/members`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: member.name,
+        item: memberUrl,
+      },
+    ],
+  }
+
   return (
-    <div>
+    <main className="min-h-screen bg-[#f5f1eb]/60 py-8">
       <SeoSchema schema={personSchema} />
-      <section className="hero-section bg-[#f5f1eb] py-10 md:py-16">
-        <div className="container">
-          <div className="grid gap-6 md:grid-cols-3 items-center">
-            <div className="md:col-span-1 flex justify-center">
-              <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-lg overflow-hidden shadow-sm border border-[#405862]/10">
-                <Image
-                  src={member.image || "/logo.png"}
-                  alt={member.name}
-                  fill
-                  sizes="(max-width: 768px) 224px, 256px"
-                  className="object-cover"
-                />
-              </div>
-            </div>
-            <div className="md:col-span-2">
-              <p className="text-sm text-[#405862]/70 mb-2">
-                Dr. Interested Team Member
-              </p>
-              <h1 className="text-3xl md:text-4xl font-bold text-[#405862] mb-2">
-                {member.name}
-              </h1>
-              <p className="text-lg text-[#405862]/80 mb-4">{member.role}</p>
-              <p className="text-[#405862]/80">{member.bio}</p>
-              {member.socials && (
-                <div className="flex flex-wrap gap-3 mt-4">
-                  {member.socials.linkedin && (
-                    <Link
-                      href={member.socials.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#405862] hover:text-[#4ecdc4] underline"
-                    >
-                      LinkedIn
-                    </Link>
-                  )}
-                  {member.socials.instagram && (
-                    <Link
-                      href={member.socials.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#405862] hover:text-[#4ecdc4] underline"
-                    >
-                      Instagram
-                    </Link>
-                  )}
-                  {member.socials.website && (
-                    <Link
-                      href={member.socials.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#405862] hover:text-[#4ecdc4] underline"
-                    >
-                      Website
-                    </Link>
-                  )}
-                </div>
-              )}
-              <div className="mt-6">
-                <Link
-                  href="/members"
-                  className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors"
-                >
-                  Back to members
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+      <SeoSchema schema={breadcrumbSchema} />
+      <div className="container mx-auto">
+        <MemberCard member={member} />
+      </div>
+    </main>
   )
 }

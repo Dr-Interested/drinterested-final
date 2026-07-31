@@ -289,12 +289,14 @@ export default function MembersClient() {
                     <Card className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow">
                       <div className="grid md:grid-cols-3">
                         <div className="md:col-span-1 bg-[#f5f1eb] flex items-center justify-center">
-                          <div className="relative h-full w-full aspect-square">
-                            <Image src={executiveDirector.image} alt={executiveDirector.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
-                          </div>
+                          <Link href={`/team/${executiveDirector.id}`} className="relative h-full w-full aspect-square block group/img">
+                            <Image src={executiveDirector.image} alt={executiveDirector.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover group-hover/img:scale-105 transition-transform" />
+                          </Link>
                         </div>
                         <CardContent className="md:col-span-2 p-4">
-                          <h4 className="text-lg font-semibold text-[#405862] font-bricolage">{executiveDirector.name}</h4>
+                          <Link href={`/team/${executiveDirector.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                            <h4 className="text-lg font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{executiveDirector.name}</h4>
+                          </Link>
                           <p className="text-sm text-[#4ecdc4] font-medium mb-2">{executiveDirector.role}</p>
                           <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                             {expandedBios[executiveDirector.id] ? (executiveDirector.bio || "") : truncateBio(executiveDirector.bio)}
@@ -365,12 +367,14 @@ export default function MembersClient() {
                         <Card key={vp.id} className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow">
                           <div className="grid md:grid-cols-3">
                             <div className="md:col-span-1 bg-[#f5f1eb] flex items-center justify-center">
-                              <div className="relative h-full w-full aspect-square">
-                                <Image src={vp.image} alt={vp.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
-                              </div>
+                              <Link href={`/team/${vp.id}`} className="relative h-full w-full aspect-square block group/img">
+                                <Image src={vp.image} alt={vp.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover group-hover/img:scale-105 transition-transform" />
+                              </Link>
                             </div>
                             <CardContent className="md:col-span-2 p-4">
-                              <h4 className="text-base font-semibold text-[#405862] font-bricolage">{vp.name}</h4>
+                              <Link href={`/team/${vp.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                                <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{vp.name}</h4>
+                              </Link>
                               <p className="text-sm text-[#4ecdc4] font-medium mb-2">{vp.role}</p>
                               <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                                 {expandedBios[vp.id] ? (vp.bio || "") : truncateBio(vp.bio, 120)}
@@ -428,12 +432,14 @@ export default function MembersClient() {
                         <Card key={ea.id} className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow">
                           <div className="grid md:grid-cols-3">
                             <div className="md:col-span-1 bg-[#f5f1eb] flex items-center justify-center">
-                              <div className="relative h-full w-full aspect-square">
-                                <Image src={ea.image} alt={ea.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
-                              </div>
+                              <Link href={`/team/${ea.id}`} className="relative h-full w-full aspect-square block group/img">
+                                <Image src={ea.image} alt={ea.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover group-hover/img:scale-105 transition-transform" />
+                              </Link>
                             </div>
                             <CardContent className="md:col-span-2 p-4">
-                              <h4 className="text-base font-semibold text-[#405862] font-bricolage">{ea.name}</h4>
+                              <Link href={`/team/${ea.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                                <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{ea.name}</h4>
+                              </Link>
                               <p className="text-sm text-[#4ecdc4] font-medium mb-2">{ea.role}</p>
                               <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                                 {expandedBios[ea.id] ? (ea.bio || "") : truncateBio(ea.bio, 120)}
@@ -520,18 +526,20 @@ export default function MembersClient() {
                                 >
                                   <div className="grid grid-cols-3">
                                     <div className="col-span-1 bg-[#f5f1eb]">
-                                      <div className="relative h-full w-full aspect-square">
+                                      <Link href={`/team/${director.id}`} className="relative h-full w-full aspect-square block group/img">
                                         <Image
                                           src={director.image}
                                           alt={director.name}
                                           fill
                                           sizes="(max-width: 768px) 33vw, 150px"
-                                          className="object-cover"
+                                          className="object-cover group-hover/img:scale-105 transition-transform"
                                         />
-                                      </div>
+                                      </Link>
                                     </div>
                                     <CardContent className="col-span-2 p-3">
-                                      <h5 className="font-semibold text-sm text-[#405862] font-bricolage">{director.name}</h5>
+                                      <Link href={`/team/${director.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                                        <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-[#4ecdc4]">{director.name}</h5>
+                                      </Link>
                                       <p className="text-xs text-[#4ecdc4] font-medium mb-1">{director.role}</p>
                                       <p className="text-xs text-[#405862]/90 leading-relaxed mb-1">
                                         {expandedBios[director.id] ? (director.bio || "") : truncateBio(director.bio, 80)}
@@ -599,17 +607,19 @@ export default function MembersClient() {
                                 >
                                   <CardContent className="p-3">
                                     <div className="flex items-center gap-2 mb-1">
-                                      <div className="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
+                                      <Link href={`/team/${member.id}`} className="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0 group/img">
                                         <Image
                                           src={member.image}
                                           alt={member.name}
                                           fill
                                           sizes="32px"
-                                          className="object-cover"
+                                          className="object-cover group-hover/img:scale-110 transition-transform"
                                         />
-                                      </div>
+                                      </Link>
                                       <div>
-                                        <h5 className="font-semibold text-sm text-[#405862] font-bricolage">{member.name}</h5>
+                                        <Link href={`/team/${member.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                                          <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-[#4ecdc4]">{member.name}</h5>
+                                        </Link>
                                         <p className="text-xs text-[#405862]/75">{member.role}</p>
                                       </div>
                                     </div>
@@ -679,17 +689,19 @@ export default function MembersClient() {
                                   key={ambassador.id}
                                   className="flex items-center gap-2 p-2 rounded-lg bg-[#f5f1eb]/40 border border-[#405862]/10 hover:border-[#4ecdc4]/40 transition-colors"
                                 >
-                                  <div className="relative h-7 w-7 rounded-full overflow-hidden flex-shrink-0">
+                                  <Link href={`/team/${ambassador.id}`} className="relative h-7 w-7 rounded-full overflow-hidden flex-shrink-0 group/img">
                                     <Image
                                       src={ambassador.image}
                                       alt={ambassador.name}
                                       fill
                                       sizes="28px"
-                                      className="object-cover"
+                                      className="object-cover group-hover/img:scale-110 transition-transform"
                                     />
-                                  </div>
+                                  </Link>
                                   <div className="min-w-0">
-                                    <p className="font-medium text-xs text-[#405862] truncate font-bricolage">{ambassador.name}</p>
+                                    <Link href={`/team/${ambassador.id}`} className="block hover:text-[#4ecdc4] transition-colors">
+                                      <p className="font-medium text-xs text-[#405862] hover:text-[#4ecdc4] truncate font-bricolage">{ambassador.name}</p>
+                                    </Link>
                                     <p className="text-[10px] text-[#405862]/60 truncate">{ambassador.role}</p>
                                   </div>
                                   {(ambassador.socialLinks?.linkedin || ambassador.socialLinks?.instagram) && (
@@ -751,18 +763,20 @@ export default function MembersClient() {
                           className="overflow-hidden border-[#405862]/20 shadow-sm hover:shadow-md transition-shadow"
                         >
                           <div className="bg-[#f5f1eb] flex items-center justify-center p-4">
-                            <div className="relative h-32 w-32 rounded-full overflow-hidden">
+                            <Link href={`/team/${advisor.id}`} className="relative h-32 w-32 rounded-full overflow-hidden block group/img">
                               <Image
                                 src={advisor.image}
                                 alt={advisor.name}
                                 fill
                                 sizes="128px"
-                                className="object-cover"
+                                className="object-cover group-hover/img:scale-105 transition-transform"
                               />
-                            </div>
+                            </Link>
                           </div>
                           <CardContent className="p-4">
-                            <h4 className="text-base font-semibold text-[#405862] font-bricolage">{advisor.name}</h4>
+                            <Link href={`/team/${advisor.id}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
+                              <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{advisor.name}</h4>
+                            </Link>
                             <p className="text-sm text-[#4ecdc4] font-medium mb-2">{advisor.role}</p>
                             <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                               {expandedBios[advisor.id] ? (advisor.bio || "") : truncateBio(advisor.bio, 120)}

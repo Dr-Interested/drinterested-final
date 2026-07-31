@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { supabase } from "@/lib/supabase-client"
 import { blogTopics } from "@/data/blog"
+import { getAllMembersCombined } from "@/lib/members-data"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.drinterested.org"
@@ -174,13 +175,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Fetch all members from supabase
-  const { data: members } = await supabase.from('members').select('id')
-  const teamPages: MetadataRoute.Sitemap = (members || []).map((member) => ({
+  // Fetch all members from database using helper
+  const members = await getAllMembersCombined()
+  const teamPages: MetadataRoute.Sitemap = members.map((member) => ({
     url: `${baseUrl}/team/${member.id}`,
     lastModified: currentDate,
     changeFrequency: "monthly" as const,
-    priority: 0.5,
+    priority: 0.7,
   }))
 
   return [
