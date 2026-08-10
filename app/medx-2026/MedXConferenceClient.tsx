@@ -45,6 +45,8 @@ const PRICING_TIERS = [
       "Networking Sessions with Healthcare Professionals & Peers",
       "Digital Certificate of Participation",
       "Official MedX Conference Digital Toolkit",
+      "MedX Gift Bag",
+      "Dessert (🍰)",
     ],
     highlighted: false,
     ctaText: "Register - $5.00",
@@ -83,34 +85,59 @@ export default function MedXConferenceClient() {
     minutes: 0,
     seconds: 0,
   })
+  // Extended deadline countdowns (shown after Aug 10 4PM ET passes)
+  const [fullPassTimeLeft, setFullPassTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  })
+  const [generalPassTimeLeft, setGeneralPassTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  })
+  // "extended" phase = original Aug 10 deadline has passed
+  const [showExtendedCountdowns, setShowExtendedCountdowns] = useState(false)
 
   // Countdown to August 16, 2026 at 9:30 AM EDT (Event)
-  // Countdown to August 10, 2026 at 4:00 PM EDT (Registration Close)
+  // Countdown to August 10, 2026 at 4:00 PM EDT (Original Registration Close)
+  // Extended: Full Pass → August 11, 4:00 PM EDT | General Pass → August 14, 11:59 PM EDT
   useEffect(() => {
     const targetDate = new Date("2026-08-16T09:30:00-04:00").getTime()
     const targetRegDate = new Date("2026-08-10T16:00:00-04:00").getTime()
+    const targetFullPassDate = new Date("2026-08-11T16:00:00-04:00").getTime()
+    const targetGeneralPassDate = new Date("2026-08-14T23:59:00-04:00").getTime()
+
+    const calcTime = (target: number) => {
+      const diff = target - new Date().getTime()
+      if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 }
+      return {
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / 1000 / 60) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      }
+    }
 
     const calculateTimeLeft = () => {
       const now = new Date().getTime()
-      
+
       const difference = targetDate - now
       if (difference > 0) {
-        setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60),
-        })
+        setTimeLeft(calcTime(targetDate))
       }
 
       const regDiff = targetRegDate - now
       if (regDiff > 0) {
-        setRegistrationTimeLeft({
-          days: Math.floor(regDiff / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((regDiff / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((regDiff / 1000 / 60) % 60),
-          seconds: Math.floor((regDiff / 1000) % 60),
-        })
+        setRegistrationTimeLeft(calcTime(targetRegDate))
+        setShowExtendedCountdowns(false)
+      } else {
+        // Original deadline passed — switch to extended phase
+        setShowExtendedCountdowns(true)
+        setFullPassTimeLeft(calcTime(targetFullPassDate))
+        setGeneralPassTimeLeft(calcTime(targetGeneralPassDate))
       }
     }
 
@@ -307,38 +334,102 @@ export default function MedXConferenceClient() {
 
                 <CardContent className="p-4 md:p-5 space-y-4">
 
-                  {/* Registration Countdown Timer (BIGGER) */}
-                  <div className="bg-[#4ecdc4]/10 dark:bg-[#161c24] p-3 md:p-4 rounded-xl border-2 border-[#4ecdc4] text-center shadow-md">
-                    <p className="text-xs font-extrabold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider mb-2">
-                      Registration Closes In
-                    </p>
-                    <div className="grid grid-cols-4 gap-2">
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
-                          {registrationTimeLeft.days}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Days</span>
-                      </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
-                          {registrationTimeLeft.hours}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Hrs</span>
-                      </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
-                          {registrationTimeLeft.minutes}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Mins</span>
-                      </div>
-                      <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
-                        <span className="block text-2xl font-black text-[#405862] dark:text-white">
-                          {registrationTimeLeft.seconds}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-bold">Secs</span>
+                  {/* Registration Countdown Timer — phase-conditional */}
+                  {!showExtendedCountdowns ? (
+                    /* ── Phase 1: Original Aug 10 4PM ET deadline ── */
+                    <div className="bg-[#4ecdc4]/10 dark:bg-[#161c24] p-3 md:p-4 rounded-xl border-2 border-[#4ecdc4] text-center shadow-md">
+                      <p className="text-xs font-extrabold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider mb-2">
+                        Registration Closes In
+                      </p>
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                          <span className="block text-2xl font-black text-[#405862] dark:text-white">
+                            {registrationTimeLeft.days}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Days</span>
+                        </div>
+                        <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                          <span className="block text-2xl font-black text-[#405862] dark:text-white">
+                            {registrationTimeLeft.hours}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Hrs</span>
+                        </div>
+                        <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                          <span className="block text-2xl font-black text-[#405862] dark:text-white">
+                            {registrationTimeLeft.minutes}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Mins</span>
+                        </div>
+                        <div className="bg-white dark:bg-[#0c1015] p-2 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                          <span className="block text-2xl font-black text-[#405862] dark:text-white">
+                            {registrationTimeLeft.seconds}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Secs</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* ── Phase 2: Extended Deadlines (two timers) ── */
+                    <div className="space-y-3">
+                      {/* Full Pass Extended Deadline */}
+                      <div className="bg-[#4ecdc4]/10 dark:bg-[#161c24] p-3 rounded-xl border-2 border-[#4ecdc4] text-center shadow-md">
+                        <div className="flex items-center justify-center gap-1.5 mb-1">
+                          <Utensils className="h-3 w-3 text-[#4ecdc4]" />
+                          <p className="text-[10px] font-extrabold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider">
+                            Full Pass Closes In
+                          </p>
+                        </div>
+                        <p className="text-[9px] text-muted-foreground mb-2">📅 Tue, Aug 11 &nbsp;⏰ 4:00 PM ET</p>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{fullPassTimeLeft.days}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Days</span>
+                          </div>
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{fullPassTimeLeft.hours}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Hrs</span>
+                          </div>
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{fullPassTimeLeft.minutes}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Mins</span>
+                          </div>
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#4ecdc4]/50 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{fullPassTimeLeft.seconds}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Secs</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* General Pass Extended Deadline */}
+                      <div className="bg-[#405862]/8 dark:bg-[#161c24] p-3 rounded-xl border-2 border-[#405862]/40 dark:border-[#4ecdc4]/30 text-center shadow-md">
+                        <div className="flex items-center justify-center gap-1.5 mb-1">
+                          <CheckCircle2 className="h-3 w-3 text-[#405862] dark:text-[#4ecdc4]" />
+                          <p className="text-[10px] font-extrabold text-[#405862] dark:text-[#4ecdc4] uppercase tracking-wider">
+                            General Pass Closes In
+                          </p>
+                        </div>
+                        <p className="text-[9px] text-muted-foreground mb-2">📅 Fri, Aug 14 &nbsp;⏰ 11:59 PM ET</p>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#405862]/20 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{generalPassTimeLeft.days}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Days</span>
+                          </div>
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#405862]/20 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{generalPassTimeLeft.hours}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Hrs</span>
+                          </div>
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#405862]/20 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{generalPassTimeLeft.minutes}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Mins</span>
+                          </div>
+                          <div className="bg-white dark:bg-[#0c1015] p-1.5 rounded-lg border border-[#405862]/20 shadow-sm">
+                            <span className="block text-xl font-black text-[#405862] dark:text-white">{generalPassTimeLeft.seconds}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold">Secs</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Event Countdown Timer (SMALLER) */}
                   <div className="bg-[#f5f1eb] dark:bg-[#161c24] p-2 rounded-xl border border-[#405862]/10 text-center opacity-90">
@@ -435,8 +526,8 @@ export default function MedXConferenceClient() {
               <Card
                 key={tier.id}
                 className={`relative flex flex-col rounded-2xl transition-all duration-300 ${tier.highlighted
-                    ? "border-2 border-[#4ecdc4] shadow-xl bg-white dark:bg-[#11161d] scale-100 md:scale-[1.03] z-10"
-                    : "border border-[#405862]/20 shadow-md bg-white/90 dark:bg-[#11161d]/90"
+                  ? "border-2 border-[#4ecdc4] shadow-xl bg-white dark:bg-[#11161d] scale-100 md:scale-[1.03] z-10"
+                  : "border border-[#405862]/20 shadow-md bg-white/90 dark:bg-[#11161d]/90"
                   }`}
               >
                 {tier.highlighted && (
@@ -483,8 +574,8 @@ export default function MedXConferenceClient() {
                     <Button
                       size="lg"
                       className={`w-full font-bold py-6 text-base rounded-xl transition-all flex items-center justify-center gap-2 ${tier.highlighted
-                          ? "bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] shadow-md hover:scale-[1.02]"
-                          : "bg-[#405862] hover:bg-[#30434b] text-white hover:scale-[1.02]"
+                        ? "bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] shadow-md hover:scale-[1.02]"
+                        : "bg-[#405862] hover:bg-[#30434b] text-white hover:scale-[1.02]"
                         }`}
                     >
                       <span>{tier.ctaText}</span>
@@ -799,8 +890,8 @@ export default function MedXConferenceClient() {
                 Host a Workshop at MedX 2026
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-xl text-pretty mx-auto md:mx-0">
-                Are you a youth organization, club, or individual eager to share healthcare skills and opportunities? 
-                Host a hands-on, interactive session during our afternoon portion (12:00 PM to 4:00 PM, with the option to stay the full day). 
+                Are you a youth organization, club, or individual eager to share healthcare skills and opportunities?
+                Host a hands-on, interactive session during our afternoon portion (12:00 PM to 4:00 PM, with the option to stay the full day).
                 We encourage all groups and individuals to apply!
               </p>
               <p className="text-xs font-bold text-[#405862] dark:text-[#4ecdc4] mt-2">
