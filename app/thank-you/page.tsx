@@ -40,6 +40,12 @@ export const metadata: Metadata = {
 export default function ThankYouPage() {
   return (
     <div className="hero-section container flex flex-col items-center justify-center min-h-[70vh] py-16 text-center">
+      {/* Meta Pixel: CompleteRegistration event for newsletter subscription */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `if(typeof fbq !== 'undefined'){ fbq('track', 'CompleteRegistration'); }`,
+        }}
+      />
       <div className="max-w-md mx-auto">
         <div className="mb-6 flex justify-center">
           <div className="relative h-24 w-24">

@@ -67,6 +67,11 @@ export default function ContactClientPage() {
       if (response.ok) {
         setIsSubmitted(true)
         setSubmitError(null)
+
+        // Meta Pixel: track contact form submission
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          ;(window as any).fbq("track", "Contact")
+        }
         
         // Securely trigger the Discord webhook notification via our API route
         try {
