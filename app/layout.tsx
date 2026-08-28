@@ -194,7 +194,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
           <AccessibilityWidget />
-          <SeoSchema schema={generateOrganizationSchema()} />
+          <SeoSchema id="organization-schema" schema={generateOrganizationSchema()} />
           <Suspense fallback={null}>
             <div className="flex min-h-screen flex-col">
               <Navbar />

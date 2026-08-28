@@ -132,7 +132,7 @@ export default function ContactClientPage() {
 
   return (
     <div>
-      <SeoSchema schema={contactPageSchema} />
+      <SeoSchema id="contact-schema" schema={contactPageSchema} />
 
       <section className="hero-section bg-[#f5f1eb] py-10 md:py-16">
         <div className="container">

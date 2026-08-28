@@ -2,12 +2,15 @@ import type { Metadata } from "next"
 import { generateSeoMetadata } from "@/lib/seo-utils"
 import { supabase } from "@/lib/supabase-client"
 import Link from "next/link"
-import Image from "next/image"
 import { Calendar, Clock, ArrowLeft, Share2 } from "lucide-react"
 import ScrollToTop from "@/components/scroll-to-top"
 import NewsletterForm from "@/components/newsletter-form"
 import ReactMarkdown from "react-markdown"
 import SeoSchema from "@/components/seo-schema"
+import PageBreadcrumb from "@/components/page-breadcrumb"
+import SafeImage from "@/components/safe-image"
+import { resolvePublicationAuthor } from "@/lib/author-backfill"
+import { normalizeMarkdown } from "@/lib/markdown-utils"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -21,11 +24,35 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: "Publication Not Found" }
   }
 
+  const contentTypeLabel =
+    publication.content_type === "op-ed" ? "Op-Ed" : publication.content_type === "policy" ? "Policy Work" : "Blog"
+
+  // Real, per-post keywords — title terms + topic + content type + policy type, so each post
+  // is indexed under its own relevant terms rather than emitting an empty keywords tag.
+  const keywords = [
+    publication.title,
+    publication.topic,
+    contentTypeLabel,
+    publication.policy_type ? publication.policy_type.replace(/-/g, " ") : undefined,
+    "Dr. Interested",
+    "healthcare education",
+    "medical education",
+    ...String(publication.title || "")
+      .split(/\s+/)
+      .filter((w: string) => w.length > 3),
+  ].filter((v, i, arr): v is string => Boolean(v) && arr.indexOf(v) === i)
+
   return generateSeoMetadata({
     title: publication.title,
     description: publication.excerpt,
+    keywords,
     url: `https://www.drinterested.org/publications/${publication.slug}`,
     image: publication.cover_image || "/websitebanner.jpg",
+    type: "article",
+    publishedTime: publication.created_at,
+    modifiedTime: publication.updated_at || publication.created_at,
+    author: publication.author_name || undefined,
+    section: publication.topic,
   })
 }
 
@@ -62,7 +89,16 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
   let authorData = publication.author || {}
   if (Array.isArray(authorData)) authorData = authorData[0] || {}
 
-  const resolvedAuthorName = publication.author_name || authorData.name || "Unknown Author"
+  // Resolves the byline through the live member → historical roster backup → generic
+  // "Publications Team" fallback chain, so departed members still get credited for their work.
+  const author = resolvePublicationAuthor({
+    slug: publication.slug,
+    authorName: publication.author_name,
+    liveMember: authorData.name ? authorData : null,
+  })
+  const resolvedAuthorName = author.name
+
+  const postUrl = `https://www.drinterested.org/publications/${publication.slug}`
 
   const publicationSchema = {
     "@context": "https://schema.org",
@@ -71,10 +107,18 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
     description: publication.excerpt,
     image: publication.cover_image,
     datePublished: publication.created_at,
+    dateModified: publication.updated_at || publication.created_at,
+    keywords: [publication.topic, publication.content_type, publication.policy_type].filter(Boolean).join(", "),
+    articleSection: publication.topic,
+    url: postUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": postUrl,
+    },
     author: {
-      "@type": "Person",
+      "@type": author.isGenericFallback ? "Organization" : "Person",
       name: resolvedAuthorName,
-      image: authorData.image,
+      image: author.image,
     },
     publisher: {
       "@type": "Organization",
@@ -96,11 +140,18 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
   return (
     <div>
       <ScrollToTop />
-      <SeoSchema schema={publicationSchema} />
+      <SeoSchema id="article-schema" schema={publicationSchema} />
 
       {/* Article Header */}
       <section className="bg-[#f5f1eb] py-10 md:py-16">
         <div className="container max-w-3xl">
+          <PageBreadcrumb
+            items={[
+              { name: "Home", href: "/" },
+              { name: "Publications", href: "/publications" },
+              { name: publication.title, href: `/publications/${publication.slug}` },
+            ]}
+          />
           <Link
             href="/publications"
             className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] mb-6 transition-colors"
@@ -129,19 +180,12 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
 
           <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8 pb-8 border-b border-[#405862]/20">
             <div className="flex items-center gap-3">
-              {authorData.image && (
-                <div className="relative h-12 w-12 rounded-full overflow-hidden">
-                  <Image
-                    src={authorData.image}
-                    alt={resolvedAuthorName}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+              <div className="relative h-12 w-12 rounded-full overflow-hidden flex-shrink-0 bg-[#f5f1eb]">
+                <SafeImage src={author.image} alt={resolvedAuthorName} fill className="object-cover" />
+              </div>
               <div>
                 <p className="font-semibold text-[#405862]">{resolvedAuthorName}</p>
-                {authorData.bio && <p className="text-sm text-[#405862]/70">{authorData.bio}</p>}
+                {author.bio && <p className="text-sm text-[#405862]/70">{author.bio}</p>}
               </div>
             </div>
 
@@ -167,9 +211,10 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
       {publication.cover_image && (
         <section className="bg-white">
           <div className="container max-w-3xl">
-            <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-              <Image
+            <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg bg-[#f5f1eb]">
+              <SafeImage
                 src={publication.cover_image}
+                fallbackSrc="/websitebanner.jpg"
                 alt={publication.title}
                 fill
                 className="object-cover"
@@ -183,62 +228,61 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
       {/* Article Content */}
       <section className="py-16 bg-white">
         <div className="container max-w-3xl">
-          <div className="prose prose-lg max-w-none prose-green">
-            <ReactMarkdown>{publication.content}</ReactMarkdown>
+          <div className="blog-prose">
+            <ReactMarkdown>{normalizeMarkdown(publication.content)}</ReactMarkdown>
           </div>
         </div>
       </section>
 
       {/* Author Bio Section */}
-      {authorData.name && (
-        <section className="py-12 bg-[#f5f1eb]">
-          <div className="container max-w-3xl">
-            <div className="bg-white rounded-lg p-8 border border-[#405862]/10">
-              <h3 className="text-xl font-bold text-[#405862] mb-4">About the Author</h3>
-              <div className="flex gap-6">
-                {authorData.image && (
-                  <div className="relative h-24 w-24 rounded-full overflow-hidden flex-shrink-0">
-                    <Image
-                      src={authorData.image}
-                      alt={resolvedAuthorName}
-                      fill
-                      className="object-cover"
-                    />
+      <section className="py-12 bg-[#f5f1eb]">
+        <div className="container max-w-3xl">
+          <div className="bg-white rounded-lg p-8 border border-[#405862]/10">
+            <h3 className="text-xl font-bold text-[#405862] mb-4">About the Author</h3>
+            <div className="flex gap-6">
+              <div className="relative h-24 w-24 rounded-full overflow-hidden flex-shrink-0 bg-[#f5f1eb]">
+                <SafeImage src={author.image} alt={resolvedAuthorName} fill className="object-cover" />
+              </div>
+              <div>
+                <p className="font-semibold text-[#405862] mb-2">{resolvedAuthorName}</p>
+                {author.bio && <p className="text-[#405862]/80 text-sm mb-4">{author.bio}</p>}
+                {author.isGenericFallback && (
+                  <Link
+                    href="/members"
+                    className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-semibold"
+                  >
+                    Meet the current Dr. Interested team →
+                  </Link>
+                )}
+                {(author.linkedIn || author.instagram) && (
+                  <div className="flex gap-4">
+                    {author.linkedIn && (
+                      <Link
+                        href={author.linkedIn}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#405862] hover:text-[#4ecdc4] transition-colors text-sm font-medium"
+                      >
+                        LinkedIn
+                      </Link>
+                    )}
+                    {author.instagram && (
+                      <Link
+                        href={author.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#405862] hover:text-[#4ecdc4] transition-colors text-sm font-medium"
+                      >
+                        Instagram
+                      </Link>
+                    )}
                   </div>
                 )}
-                <div>
-                  <p className="font-semibold text-[#405862] mb-2">{resolvedAuthorName}</p>
-                  <p className="text-[#405862]/80 text-sm mb-4">{authorData.bio}</p>
-                  {(authorData.socials?.linkedin || authorData.socials?.instagram) && (
-                    <div className="flex gap-4">
-                      {authorData.socials?.linkedin && (
-                        <Link
-                          href={authorData.socials.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#405862] hover:text-[#4ecdc4] transition-colors text-sm font-medium"
-                        >
-                          LinkedIn
-                        </Link>
-                      )}
-                      {authorData.socials?.instagram && (
-                        <Link
-                          href={authorData.socials.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#405862] hover:text-[#4ecdc4] transition-colors text-sm font-medium"
-                        >
-                          Instagram
-                        </Link>
-                      )}
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Newsletter */}
       <section className="py-16 bg-[#405862] text-white">

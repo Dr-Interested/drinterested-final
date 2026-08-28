@@ -1,13 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Clock, ChevronRight } from "lucide-react"
 import ScrollToTop from "@/components/scroll-to-top"
 import SeoSchema from "@/components/seo-schema"
 import NewsletterForm from "@/components/newsletter-form"
+import SafeImage from "@/components/safe-image"
+import MediaCard, { type MediaItem } from "@/components/publications/media-card"
+
+export type { MediaItem }
 
 type Publication = {
   slug: string
@@ -33,9 +36,10 @@ type Publication = {
 
 const ContentCard = ({ post, index, section }: { post: Publication; index: number; section: string }) => (
   <Card className="overflow-hidden border-[#405862]/20 hover:shadow-lg transition-all duration-300 hover:border-[#405862] flex flex-col h-full group">
-    <div className="relative h-48 w-full">
-      <Image
-        src={post.coverImage || "/placeholder.svg"}
+    <div className="relative h-48 w-full bg-[#f5f1eb]">
+      <SafeImage
+        src={post.coverImage || "/websitebanner.jpg"}
+        fallbackSrc="/websitebanner.jpg"
         alt={post.title}
         fill
         className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -67,13 +71,8 @@ const ContentCard = ({ post, index, section }: { post: Publication; index: numbe
       <div className="mt-auto">
         <div className="flex items-center justify-between pt-4 border-t border-[#405862]/10">
           <div className="flex items-center">
-            <div className="relative h-8 w-8 rounded-full overflow-hidden mr-2">
-              <Image
-                src={post.author.image || "/placeholder.svg"}
-                alt={post.author.name}
-                fill
-                className="object-cover"
-              />
+            <div className="relative h-8 w-8 rounded-full overflow-hidden mr-2 bg-[#f5f1eb] flex-shrink-0">
+              <SafeImage src={post.author.image || "/circle-logo.png"} alt={post.author.name} fill className="object-cover" />
             </div>
             <div>
               <span className="text-xs font-medium text-[#405862] block">{post.author.name}</span>
@@ -96,11 +95,17 @@ export default function PublicationsClientPage({
   policyWork = [],
   opEds = [],
   blogs = [],
+  webinars = [],
+  podcasts = [],
 }: {
   policyWork: Publication[]
   opEds: Publication[]
   blogs: Publication[]
+  webinars?: MediaItem[]
+  podcasts?: MediaItem[]
 }) {
+  const PREVIEW_COUNT = 6
+
   const publicationsListingSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -117,7 +122,7 @@ export default function PublicationsClientPage({
   return (
     <div>
       <ScrollToTop />
-      <SeoSchema schema={publicationsListingSchema} />
+      <SeoSchema id="publications-listing-schema" schema={publicationsListingSchema} />
 
       {/* Hero Section */}
       <section className="hero-section bg-[#f5f1eb] py-10 md:py-16">
@@ -133,7 +138,7 @@ export default function PublicationsClientPage({
 
       {/* Policy Work Section */}
       {policyWork.length > 0 && (
-        <section className="py-16 bg-white">
+        <section id="policy-work" className="py-16 bg-white">
           <div className="container">
             <h2 className="text-2xl font-bold mb-8 text-[#405862]">
               Policy Work
@@ -157,7 +162,7 @@ export default function PublicationsClientPage({
 
       {/* Op-Eds Section */}
       {opEds.length > 0 && (
-        <section className={policyWork.length > 0 ? "py-16 bg-[#f5f1eb]" : "py-16 bg-white"}>
+        <section id="op-eds" className={policyWork.length > 0 ? "py-16 bg-[#f5f1eb]" : "py-16 bg-white"}>
           <div className="container">
             <h2 className="text-2xl font-bold mb-8 text-[#405862]">
               Op-Eds
@@ -181,7 +186,7 @@ export default function PublicationsClientPage({
 
       {/* Blog Section */}
       {blogs.length > 0 && (
-        <section className={opEds.length > 0 || policyWork.length > 0 ? "py-16 bg-white" : "py-16 bg-white"}>
+        <section id="blog" className={opEds.length > 0 || policyWork.length > 0 ? "py-16 bg-white" : "py-16 bg-white"}>
           <div className="container">
             <h2 className="text-2xl font-bold mb-8 text-[#405862]">
               Blog
@@ -199,6 +204,70 @@ export default function PublicationsClientPage({
                 ))}
               </div>
             )}
+          </div>
+        </section>
+      )}
+
+      {/* Webinars Section */}
+      {webinars.length > 0 && (
+        <section id="webinars" className="py-16 bg-[#f5f1eb]">
+          <div className="container">
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-[#405862]">
+                  Webinars
+                  <div className="w-24 h-1 bg-[#4ecdc4] mt-2"></div>
+                </h2>
+                <p className="text-[#405862]/80 mt-4 max-w-2xl">
+                  Recordings from the Dr. Interested Webinar Series and Code Blue Planet 2026.
+                </p>
+              </div>
+              {webinars.length > PREVIEW_COUNT && (
+                <Link
+                  href="/publications/webinars"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-[#405862] hover:text-[#4ecdc4] transition-colors whitespace-nowrap"
+                >
+                  View all {webinars.length} webinars <ChevronRight className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {webinars.slice(0, PREVIEW_COUNT).map((item, index) => (
+                <MediaCard key={item.id} item={item} index={index} href={`/watch/${item.slug}`} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Podcasts Section */}
+      {podcasts.length > 0 && (
+        <section id="podcasts" className="py-16 bg-white">
+          <div className="container">
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-[#405862]">
+                  Podcasts
+                  <div className="w-24 h-1 bg-[#4ecdc4] mt-2"></div>
+                </h2>
+                <p className="text-[#405862]/80 mt-4 max-w-2xl">
+                  Every episode of the Dr. Interested Podcast, written and hosted by our members.
+                </p>
+              </div>
+              {podcasts.length > PREVIEW_COUNT && (
+                <Link
+                  href="/publications/podcasts"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-[#405862] hover:text-[#4ecdc4] transition-colors whitespace-nowrap"
+                >
+                  View all {podcasts.length} episodes <ChevronRight className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {podcasts.slice(0, PREVIEW_COUNT).map((item, index) => (
+                <MediaCard key={item.id} item={item} index={index} href={`/listen/${item.slug}`} />
+              ))}
+            </div>
           </div>
         </section>
       )}

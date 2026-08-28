@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { blogTopics as topics } from "@/data/blog"
 import BlogTopicClientPage from "./blog-topic-client"
 import { supabase } from "@/lib/supabase-client"
+import { resolvePublicationAuthor } from "@/lib/author-backfill"
 
 export const revalidate = 300 // Revalidate topic pages every 5 minutes (ISR)
 
@@ -97,9 +98,13 @@ export default async function BlogTopicPage({
   const formattedPosts = (blogsData || []).map((blog: any) => {
     let authorData = blog.author || {}
     if (Array.isArray(authorData)) authorData = authorData[0] || {}
-    
-    // Priority: joined member name > manual author_name field > "Unknown Author"
-    const resolvedAuthorName = authorData.name || blog.author_name || "Unknown Author"
+
+    // Live member → historical roster backup → generic "Publications Team" fallback.
+    const author = resolvePublicationAuthor({
+      slug: blog.slug,
+      authorName: blog.author_name,
+      liveMember: authorData.name ? authorData : null,
+    })
 
     return {
       slug: blog.slug,
@@ -114,12 +119,12 @@ export default async function BlogTopicPage({
         day: "numeric",
       }),
       author: {
-        name: resolvedAuthorName,
-        image: authorData.image || "/logo.png",
-        bio: authorData.bio || "",
-        linkedIn: authorData.socials?.linkedin || "",
-        twitter: authorData.socials?.twitter || "",
-        instagram: authorData.socials?.instagram || "",
+        name: author.name,
+        image: author.image,
+        bio: author.bio,
+        linkedIn: author.linkedIn || "",
+        twitter: "",
+        instagram: author.instagram || "",
       },
     }
   })

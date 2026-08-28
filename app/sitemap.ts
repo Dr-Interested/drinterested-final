@@ -4,6 +4,9 @@ import { blogTopics } from "@/data/blog"
 import { getAllMembersCombined } from "@/lib/members-data"
 import galleryManifest from "@/public/medexplore-2026/gallery-manifest.json"
 import documentManifest from "@/public/medexplore-2026/letters-manifest.json"
+import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
+import { webinars as webinarData } from "@/data/webinars"
+import { podcasts as podcastData } from "@/data/podcasts"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.drinterested.org"
@@ -60,12 +63,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 1.0,
     },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: currentDate,
-      changeFrequency: "daily",
-      priority: 1.0,
-    },
+    // Note: /blog and /blog/[slug] intentionally omitted — they 301-redirect to /publications
+    // and /publications/[slug]. Listing a redirecting URL in the sitemap wastes crawl budget
+    // and shows up as a "Page with redirect" issue in Search Console.
     {
       url: `${baseUrl}/publications`,
       lastModified: currentDate,
@@ -170,8 +170,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Fetch blogs (only need slug and created_at for the blog post pages)
-  const { data: blogs } = await supabase.from('blogs').select('slug, created_at')
+  // Fetch blogs — slug/created_at for the URL, cover_image so every post's image is
+  // indexable via the sitemap's image extension (Google Images eligibility).
+  const { data: blogs } = await supabase.from('blogs').select('slug, created_at, cover_image, title')
 
   // Blog topic pages — derived from static slugs (guaranteed to match actual routes)
   const blogTopicPages: MetadataRoute.Sitemap = blogTopics.map((topic) => ({
@@ -179,41 +180,100 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: currentDate,
     changeFrequency: "weekly" as const,
     priority: 0.65,
+    images: topic.image ? [`${baseUrl}${topic.image}`] : undefined,
   }))
 
-  const blogPostPages: MetadataRoute.Sitemap = (blogs || []).map((post) => ({
-    url: `${baseUrl}/publications/${post.slug}`,
-    lastModified: new Date(post.created_at),
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }))
+  const blogPostPages: MetadataRoute.Sitemap = (blogs || []).map((post) => {
+    const coverImage = post.cover_image
+      ? post.cover_image.startsWith("http")
+        ? post.cover_image
+        : `${baseUrl}${post.cover_image.startsWith("/") ? "" : "/"}${post.cover_image}`
+      : undefined
+    return {
+      url: `${baseUrl}/publications/${post.slug}`,
+      lastModified: new Date(post.created_at),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+      images: coverImage ? [coverImage] : undefined,
+    }
+  })
 
-  // Fetch webinars
-  const { data: webinars } = await supabase.from('webinars').select('id, created_at')
-  const watchPages: MetadataRoute.Sitemap = (webinars || []).map((webinar) => ({
+  // Fetch admin-announced webinars from Supabase (upcoming/completed, registration flow)
+  const { data: dbWebinars } = await supabase.from('webinars').select('id, created_at')
+  const dbWatchPages: MetadataRoute.Sitemap = (dbWebinars || []).map((webinar) => ({
     url: `${baseUrl}/watch/${webinar.id}`,
     lastModified: new Date(webinar.created_at),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }))
 
-  // Fetch all members from database using helper
+  // Curated static episode archive — Dr. Interested Webinar Series, Code Blue Planet 2026, and
+  // the Dr. Interested Podcast, pulled from their YouTube/Spotify sources. Each entry's YouTube
+  // thumbnail is listed as that page's sitemap image (Google Images eligibility).
+  const curatedWatchPages: MetadataRoute.Sitemap = webinarData.map((w) => ({
+    url: `${baseUrl}/watch/${w.slug}`,
+    lastModified: currentDate,
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+    images: [w.thumbnailPath],
+  }))
+  const listenPages: MetadataRoute.Sitemap = podcastData.map((p) => ({
+    url: `${baseUrl}/listen/${p.slug}`,
+    lastModified: currentDate,
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+    images: [p.thumbnailPath],
+  }))
+  const watchPages = [...dbWatchPages, ...curatedWatchPages]
+
+  const publicationsCategoryPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/publications/webinars`,
+      lastModified: currentDate,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/publications/podcasts`,
+      lastModified: currentDate,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+  ]
+
+  // Fetch all members from database using helper. Each member's headshot is listed as that
+  // page's sitemap image — pairs the photo with the page whose <h1>/alt text carries their name,
+  // which is what makes an image (not just the page) eligible for Google Images.
   const members = await getAllMembersCombined()
   const teamPages: MetadataRoute.Sitemap = members.map((member) => ({
     url: `${baseUrl}/team/${member.slug}`,
     lastModified: currentDate,
     changeFrequency: "monthly" as const,
     priority: 0.7,
+    images: [member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`],
+  }))
+
+  // Policy submissions (e.g. UN/OHCHR filings) — each page's rendered PDF pages listed as
+  // sitemap images too, same reasoning as the MedExplore image sitemap entries above.
+  const policyPages: MetadataRoute.Sitemap = POLICY_SUBMISSIONS.map((submission) => ({
+    url: `${baseUrl}/publications/policy/${submission.slug}`,
+    lastModified: new Date(submission.isoDate),
+    changeFrequency: "yearly",
+    priority: 0.8,
+    images: submission.documents.flatMap((doc) => doc.pages.map((p) => `${baseUrl}${p.file}`)),
   }))
 
   return [
     ...mainPages,
     ...medExplorePages,
+    ...policyPages,
     ...impactReportPages,
     ...newsletterPage,
     ...chessPage,
     ...otherPages,
+    ...publicationsCategoryPages,
     ...watchPages,
+    ...listenPages,
     ...blogTopicPages,
     ...blogPostPages,
     ...teamPages,

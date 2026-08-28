@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import SeoSchema from "@/components/seo-schema"
+import PageBreadcrumb from "@/components/page-breadcrumb"
 import MemberCard from "@/components/members/MemberCard"
 import { getUnifiedMemberById } from "@/lib/members-data"
 
@@ -145,36 +146,18 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     },
   }
 
-  // Standalone BreadcrumbList for Google rich results
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: baseUrl,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Our Team",
-        item: `${baseUrl}/members`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: member.name,
-        item: memberUrl,
-      },
-    ],
-  }
-
   return (
     <main className="min-h-screen bg-[#f5f1eb]/60 py-8">
-      <SeoSchema schema={personSchema} />
-      <SeoSchema schema={breadcrumbSchema} />
+      <SeoSchema id="person-schema" schema={personSchema} />
+      <div className="container mx-auto max-w-3xl px-4">
+        <PageBreadcrumb
+          items={[
+            { name: "Home", href: "/" },
+            { name: "Our Team", href: "/members" },
+            { name: member.name, href: `/team/${member.slug || member.id}` },
+          ]}
+        />
+      </div>
       <div className="container mx-auto">
         <MemberCard member={member} />
       </div>

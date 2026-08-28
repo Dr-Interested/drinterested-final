@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { Loader2 } from "lucide-react"
+import ImageUploadField from "@/components/admin/image-upload-field"
 
 type Webinar = {
   id: string
@@ -135,10 +136,13 @@ export default function WebinarsAdmin() {
               <label className="block text-sm font-medium mb-1">Speaker</label>
               <input type="text" className="w-full p-2 border rounded" value={form.speaker || ""} onChange={(e) => setForm({...form, speaker: e.target.value})} />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Thumbnail URL</label>
-              <input type="text" className="w-full p-2 border rounded" value={form.image || ""} onChange={(e) => setForm({...form, image: e.target.value})} />
-            </div>
+            <ImageUploadField
+              label="Thumbnail"
+              bucket="webinar-images"
+              pathPrefix="thumbnails"
+              value={form.image || ""}
+              onChange={(url) => setForm({ ...form, image: url })}
+            />
             <div>
               <label className="block text-sm font-medium mb-1">Video URL (optional)</label>
               <input type="text" className="w-full p-2 border rounded" value={form.video_url || ""} onChange={(e) => setForm({...form, video_url: e.target.value})} />

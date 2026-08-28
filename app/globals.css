@@ -656,3 +656,173 @@ img.loading {
     margin-right: 0;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Blog / publication article body — hand-rolled in place of @tailwindcss/typography
+   (avoiding a new npm dependency here) since Tailwind's Preflight reset strips all
+   default margins from headings/paragraphs/lists, which is what made ReactMarkdown
+   output for blog posts render with no spacing at all ("badly formatted").
+   --------------------------------------------------------------------------- */
+.blog-prose {
+  color: #2f3e45;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.blog-prose > * + * {
+  margin-top: 1.25em;
+}
+
+.blog-prose p {
+  margin: 0;
+}
+
+.blog-prose h1,
+.blog-prose h2,
+.blog-prose h3,
+.blog-prose h4,
+.blog-prose h5,
+.blog-prose h6 {
+  color: #405862;
+  font-weight: 800;
+  line-height: 1.3;
+  margin-top: 1.75em;
+  margin-bottom: 0.6em;
+}
+
+.blog-prose h1 {
+  font-size: 1.875em;
+}
+.blog-prose h2 {
+  font-size: 1.5em;
+}
+.blog-prose h3 {
+  font-size: 1.25em;
+}
+.blog-prose h4 {
+  font-size: 1.1em;
+}
+
+.blog-prose ul,
+.blog-prose ol {
+  margin: 0;
+  padding-left: 1.4em;
+}
+
+.blog-prose ul {
+  list-style: disc;
+}
+
+.blog-prose ol {
+  list-style: decimal;
+}
+
+.blog-prose li {
+  margin-top: 0.4em;
+}
+
+.blog-prose li > p {
+  margin: 0;
+}
+
+.blog-prose a {
+  color: #1e7a70;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+
+.blog-prose a:hover {
+  color: #4ecdc4;
+}
+
+.blog-prose strong {
+  color: #405862;
+  font-weight: 700;
+}
+
+.blog-prose blockquote {
+  margin: 0;
+  padding: 0.75em 1.25em;
+  border-left: 4px solid #4ecdc4;
+  background: #f5f1eb;
+  border-radius: 0.5rem;
+  font-style: italic;
+  color: #405862;
+}
+
+.blog-prose blockquote > * + * {
+  margin-top: 0.75em;
+}
+
+.blog-prose hr {
+  border: none;
+  border-top: 1px solid rgba(64, 88, 98, 0.15);
+  margin: 2em 0;
+}
+
+.blog-prose img {
+  border-radius: 0.75rem;
+  margin: 1.5em auto;
+}
+
+.blog-prose code {
+  background: rgba(64, 88, 98, 0.08);
+  color: #405862;
+  padding: 0.15em 0.4em;
+  border-radius: 0.35rem;
+  font-size: 0.9em;
+}
+
+.blog-prose pre {
+  background: #1c2b30;
+  color: #f1ece7;
+  padding: 1em 1.25em;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+}
+
+.blog-prose pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.blog-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.blog-prose th,
+.blog-prose td {
+  border: 1px solid rgba(64, 88, 98, 0.15);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.blog-prose th {
+  background: #f5f1eb;
+  color: #405862;
+  font-weight: 700;
+}
+
+.dark .blog-prose,
+[data-theme="dark"] .blog-prose {
+  color: #d9e3e6;
+}
+
+.dark .blog-prose h1,
+.dark .blog-prose h2,
+.dark .blog-prose h3,
+.dark .blog-prose h4,
+.dark .blog-prose h5,
+.dark .blog-prose h6,
+.dark .blog-prose strong {
+  color: #f1ece7;
+}
+
+.dark .blog-prose blockquote {
+  background: #161c24;
+  color: #f1ece7;
+}

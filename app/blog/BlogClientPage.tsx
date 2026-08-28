@@ -88,7 +88,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
   return (
     <div>
       <ScrollToTop />
-      <SeoSchema schema={blogListingSchema} />
+      <SeoSchema id="blog-listing-schema" schema={blogListingSchema} />
 
       {/* Hero Section */}
       <section className="hero-section bg-[#f5f1eb] py-10 md:py-16">

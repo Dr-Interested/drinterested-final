@@ -7,6 +7,7 @@ import Link from "next/link"
 import EventsAdmin from "./EventsAdmin"
 import WebinarsAdmin from "./WebinarsAdmin"
 import ReactMarkdown from "react-markdown"
+import ImageUploadField from "@/components/admin/image-upload-field"
 
 type Member = {
   id: string
@@ -710,6 +711,13 @@ export default function DbAdminPage() {
     try {
       const finalSlug = blogForm.slug || blogForm.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
+      // Snapshot the linked member's current name into author_name even when author_id is set.
+      // Previously author_name was nulled out whenever a member was linked, which meant that if
+      // that member was later removed from the members table, the post permanently lost any
+      // record of who wrote it (the FK just dangled). Keeping a denormalized text copy means the
+      // credit survives regardless of what happens to the members table later.
+      const linkedMemberName = blogForm.author_id ? members.find((m) => m.id === blogForm.author_id)?.name : undefined
+
       const blogData = {
         title: blogForm.title,
         slug: finalSlug,
@@ -718,9 +726,10 @@ export default function DbAdminPage() {
         cover_image: blogForm.cover_image,
         topic: blogForm.topic,
         reading_time: blogForm.reading_time,
-        // author_id links to a member; author_name is for non-member / guest authors
+        // author_id links to a member for a live avatar/bio when they're still a member;
+        // author_name is always kept in sync as a permanent text credit either way.
         author_id: blogForm.author_id || null,
-        author_name: !blogForm.author_id ? (blogForm.author_name || null) : null,
+        author_name: linkedMemberName || blogForm.author_name || null,
         featured: blogForm.featured || false,
         content_type: (blogForm as any).content_type || "blog",
         policy_type: (blogForm as any).policy_type || null
@@ -1641,17 +1650,14 @@ export default function DbAdminPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Cover Image URL</label>
-                  <input
-                    type="text"
-                    value={blogForm.cover_image || ""}
-                    onChange={(e) => setBlogForm({ ...blogForm, cover_image: e.target.value })}
-                    placeholder="/cover.png"
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ImageUploadField
+                  label="Cover Image"
+                  bucket="blog-images"
+                  pathPrefix="covers"
+                  value={blogForm.cover_image || ""}
+                  onChange={(url) => setBlogForm({ ...blogForm, cover_image: url })}
+                />
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Reading Time</label>
                   <input

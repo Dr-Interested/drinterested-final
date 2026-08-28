@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import NewsletterForm from "@/components/newsletter-form"
+import PageBreadcrumb from "@/components/page-breadcrumb"
 import PhotoLightbox from "./PhotoLightbox"
 import DocumentStrip from "./DocumentStrip"
 import { AGENDA, HIGHLIGHT_PHOTOS, HERO_PHOTO, LETTERS, CERTIFICATES, galleryFor, type GalleryImage } from "./data"
@@ -140,6 +141,17 @@ export default function MedXConferenceClient() {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Breadcrumb Navigation */}
+      <div className="container max-w-6xl mx-auto px-4 pt-3">
+        <PageBreadcrumb
+          items={[
+            { name: "Home", href: "/" },
+            { name: "Events", href: "/events" },
+            { name: "MedExplore 2026 Recap", href: "/medx-2026" },
+          ]}
+        />
       </div>
 
       {/* Hero Section */}

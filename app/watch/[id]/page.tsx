@@ -2,8 +2,44 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import WatchPageClient from "@/components/watch/WatchPageClient"
 import { supabase } from "@/lib/supabase-client"
+import { getWebinarBySlug, type Webinar } from "@/data/webinars"
 
 export const revalidate = 3600; // Revalidate individual webinars every hour (ISR)
+
+const baseUrl = "https://www.drinterested.org"
+
+/**
+ * Resolves a /watch/[id] request against two sources:
+ *  1. The Supabase `webinars` table (admin-announced upcoming/completed webinars, keyed by UUID) —
+ *     mapped into the full Webinar shape with safe defaults, since the raw row is missing fields
+ *     (tags, views, duration, host, youtubeUrl, ...) that the player UI relies on.
+ *  2. The curated static archive in data/webinars.ts (past episodes pulled from YouTube/Spotify,
+ *     keyed by slug) when no matching Supabase row exists.
+ */
+async function resolveWebinar(id: string): Promise<Webinar | null> {
+  const { data: row } = await supabase.from("webinars").select("*").eq("id", id).maybeSingle()
+
+  if (row) {
+    return {
+      id: row.id,
+      slug: row.id,
+      title: row.title,
+      description: row.description || "",
+      longDescription: row.description || "",
+      date: row.date || "",
+      views: 0,
+      duration: "",
+      videoPath: row.video_url && !row.video_url.includes("youtu") ? row.video_url : "",
+      thumbnailPath: row.image || "/logo.png",
+      youtubeUrl: row.video_url && row.video_url.includes("youtu") ? row.video_url : "",
+      tags: [],
+      speaker: row.speaker || undefined,
+      host: "Dr. Interested Webinar Series",
+    }
+  }
+
+  return getWebinarBySlug(id) || null
+}
 
 export async function generateMetadata({
   params,
@@ -11,36 +47,21 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
+  if (!id) notFound()
 
-  if (!id) {
-    notFound()
-  }
+  const webinar = await resolveWebinar(id)
+  if (!webinar) return { title: "Webinar Not Found" }
 
-  const { data: webinar } = await supabase.from("webinars").select("*").eq("id", id).single()
-
-  if (!webinar) {
-    return { title: "Webinar Not Found" }
-  }
-
-  const baseUrl = "https://www.drinterested.org"
-  const watchUrl = `${baseUrl}/watch/${webinar.id}`
+  const watchUrl = `${baseUrl}/watch/${id}`
+  const imageUrl = webinar.thumbnailPath.startsWith("http") ? webinar.thumbnailPath : `${baseUrl}${webinar.thumbnailPath}`
 
   return {
     title: webinar.title,
     description: webinar.description,
-
-    keywords: [
-      "Dr. Interested",
-      "webinar",
-      "medical education",
-      "premed",
-      "healthcare careers",
-    ],
-
+    keywords: ["Dr. Interested", "webinar", "medical education", "premed", "healthcare careers", ...(webinar.tags || [])],
     authors: [{ name: "Dr. Interested" }],
     creator: "Dr. Interested",
     publisher: "Dr. Interested",
-
     openGraph: {
       type: "video.other",
       locale: "en_US",
@@ -48,36 +69,15 @@ export async function generateMetadata({
       title: webinar.title,
       description: webinar.description,
       siteName: "Dr. Interested",
-      videos: webinar.video_url ? [
-        {
-          url: webinar.video_url.startsWith('http') ? webinar.video_url : `${baseUrl}${webinar.video_url}`,
-          width: 1920,
-          height: 1080,
-          type: "video/mp4",
-        },
-      ] : [],
-      images: [
-        {
-          url: webinar.image.startsWith('http') ? webinar.image : `${baseUrl}${webinar.image}`,
-          width: 1280,
-          height: 720,
-          alt: webinar.title,
-          type: "image/jpeg",
-        },
-      ],
+      images: [{ url: imageUrl, width: 1280, height: 720, alt: webinar.title, type: "image/jpeg" }],
     },
-
     twitter: {
       card: "summary_large_image",
       title: webinar.title,
       description: webinar.description,
-      images: [webinar.image.startsWith('http') ? webinar.image : `${baseUrl}${webinar.image}`],
+      images: [imageUrl],
     },
-
-    alternates: {
-      canonical: watchUrl,
-    },
-
+    alternates: { canonical: watchUrl },
     robots: {
       index: true,
       follow: true,
@@ -94,8 +94,7 @@ export default async function WatchPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-
-  const { data: webinar } = await supabase.from("webinars").select("*").eq("id", id).single()
+  const webinar = await resolveWebinar(id)
 
   if (!webinar) {
     notFound()

@@ -71,8 +71,11 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "fixed top-0 md:sticky z-50 w-full backdrop-blur-md supports-[backdrop-filter]:bg-background/60 transition-all duration-300",
-        scrolled ? "bg-white/95 shadow-md py-1 border-b" : "bg-transparent py-3",
+        // Fixed vertical padding and a fixed-width (always-present, just transparent when idle)
+        // border at all times — only background/shadow/border-color toggle on scroll, so the
+        // header's box height never changes and never shifts page content below it (avoids CLS).
+        "fixed top-0 md:sticky z-50 w-full py-2 border-b backdrop-blur-md supports-[backdrop-filter]:bg-background/60 transition-colors duration-300",
+        scrolled ? "bg-white/95 shadow-md border-border" : "bg-transparent border-transparent",
       )}
     >
       <div className="container flex items-center justify-between">

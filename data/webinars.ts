@@ -227,6 +227,114 @@ export const webinars: Webinar[] = [
   },
 ]
 
+// Code Blue Planet 2026 — a Dr. Interested x Toronto Climate Week mini-series on climate change
+// and health, YouTube-only (no self-hosted file, no matching Spotify episode).
+const codeBluePlanet2026: Webinar[] = [
+  {
+    id: "cbp-opening-lunch-closing",
+    slug: "code-blue-planet-2026-opening-lunch-closing",
+    title: "Code Blue Planet 2026: Opening Remarks, Lunch & Closing",
+    description: "Opening remarks, lunch, and closing from Code Blue Planet 2026 — a Dr. Interested x Toronto Climate Week event on climate change and health.",
+    longDescription:
+      "The opening and closing bookends of Code Blue Planet 2026, a joint Dr. Interested x Toronto Climate Week event bringing together students and speakers to explore the intersection of climate change and healthcare.",
+    date: "June 12, 2026",
+    views: 0,
+    duration: "",
+    videoPath: "",
+    thumbnailPath: "https://img.youtube.com/vi/ICwOUxjWmeQ/hqdefault.jpg",
+    youtubeUrl: "https://youtu.be/ICwOUxjWmeQ",
+    tags: ["CodeBluePlanet", "ClimateChange", "TorontoClimateWeek"],
+    host: "Dr. Interested x Toronto Climate Week",
+  },
+  {
+    id: "cbp-reshaping-modern-medicine",
+    slug: "code-blue-planet-2026-reshaping-modern-medicine",
+    title: "Code Blue Planet 2026: How Climate Change Is Reshaping Modern Medicine",
+    description: "Melissa Blum & Annalise Morelock on how climate change is reshaping modern medicine.",
+    longDescription:
+      "Melissa Blum and Annalise Morelock explore how a changing climate is reshaping the practice of modern medicine, from Code Blue Planet 2026.",
+    date: "June 13, 2026",
+    views: 0,
+    duration: "",
+    videoPath: "",
+    thumbnailPath: "https://img.youtube.com/vi/WJJwFvn1s-Y/hqdefault.jpg",
+    youtubeUrl: "https://youtu.be/WJJwFvn1s-Y",
+    tags: ["CodeBluePlanet", "ClimateChange", "ModernMedicine"],
+    speaker: "Melissa Blum & Annalise Morelock",
+    host: "Dr. Interested x Toronto Climate Week",
+  },
+  {
+    id: "cbp-indigenous-medicine",
+    slug: "code-blue-planet-2026-indigenous-medicine",
+    title: "Code Blue Planet 2026: Climate Change and Indigenous Medicine",
+    description: "Dr. Dawn Martin-Hill on climate change and Indigenous medicine.",
+    longDescription:
+      "Dr. Dawn Martin-Hill discusses the impact of climate change on Indigenous medicine and healing practices, from Code Blue Planet 2026.",
+    date: "June 14, 2026",
+    views: 0,
+    duration: "",
+    videoPath: "",
+    thumbnailPath: "https://img.youtube.com/vi/Usr0GrMELo8/hqdefault.jpg",
+    youtubeUrl: "https://youtu.be/Usr0GrMELo8",
+    tags: ["CodeBluePlanet", "ClimateChange", "IndigenousMedicine"],
+    speaker: "Dr. Dawn Martin-Hill",
+    host: "Dr. Interested x Toronto Climate Week",
+  },
+  {
+    id: "cbp-ayurveda",
+    slug: "code-blue-planet-2026-ayurveda",
+    title: "Code Blue Planet 2026: What Is Ayurveda and How Is Climate Change Affecting It?",
+    description: "Tanvi & Neah on Ayurveda and how climate change is affecting it.",
+    longDescription:
+      "Tanvi and Neah introduce Ayurvedic medicine and examine how climate change is affecting its practice, from Code Blue Planet 2026.",
+    date: "June 15, 2026",
+    views: 0,
+    duration: "",
+    videoPath: "",
+    thumbnailPath: "https://img.youtube.com/vi/omOJGHNKtho/hqdefault.jpg",
+    youtubeUrl: "https://youtu.be/omOJGHNKtho",
+    tags: ["CodeBluePlanet", "ClimateChange", "Ayurveda"],
+    speaker: "Tanvi & Neah",
+    host: "Dr. Interested x Toronto Climate Week",
+  },
+  {
+    id: "cbp-pharmacy",
+    slug: "code-blue-planet-2026-pharmacy",
+    title: "Code Blue Planet 2026: How Climate Change Is Affecting Pharmacy",
+    description: "Shellyza Sajwani on how climate change is affecting pharmacy.",
+    longDescription:
+      "Shellyza Sajwani examines how climate change is affecting the field of pharmacy, from Code Blue Planet 2026.",
+    date: "June 16, 2026",
+    views: 0,
+    duration: "",
+    videoPath: "",
+    thumbnailPath: "https://img.youtube.com/vi/_Qzy7ARuvvA/hqdefault.jpg",
+    youtubeUrl: "https://youtu.be/_Qzy7ARuvvA",
+    tags: ["CodeBluePlanet", "ClimateChange", "Pharmacy"],
+    speaker: "Shellyza Sajwani",
+    host: "Dr. Interested x Toronto Climate Week",
+  },
+  {
+    id: "cbp-mental-health",
+    slug: "code-blue-planet-2026-mental-health",
+    title: "Code Blue Planet 2026: How Climate Change Affects Mental Health",
+    description: "Maiwand Amiri on how climate change affects mental health.",
+    longDescription:
+      "Maiwand Amiri explores the connection between climate change and mental health, from Code Blue Planet 2026.",
+    date: "June 17, 2026",
+    views: 0,
+    duration: "",
+    videoPath: "",
+    thumbnailPath: "https://img.youtube.com/vi/om_aT09d4Ww/hqdefault.jpg",
+    youtubeUrl: "https://youtu.be/om_aT09d4Ww",
+    tags: ["CodeBluePlanet", "ClimateChange", "MentalHealth"],
+    speaker: "Maiwand Amiri",
+    host: "Dr. Interested x Toronto Climate Week",
+  },
+]
+
+webinars.push(...codeBluePlanet2026)
+
 export function getWebinarBySlug(slug: string) {
   return webinars.find(
     (webinar) => webinar.slug.trim() === slug.trim()

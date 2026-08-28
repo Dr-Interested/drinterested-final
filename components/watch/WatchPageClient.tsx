@@ -24,7 +24,23 @@ interface WatchPageClientProps {
   webinar: Webinar;
 }
 
+/** Pulls a plain video ID out of any common YouTube URL shape (watch?v=, youtu.be/, embed/, playlist-only links return null). */
+function extractYoutubeVideoId(url: string | undefined): string | null {
+  if (!url) return null
+  const patterns = [/[?&]v=([\w-]{11})/, /youtu\.be\/([\w-]{11})/, /youtube\.com\/embed\/([\w-]{11})/]
+  for (const re of patterns) {
+    const match = url.match(re)
+    if (match) return match[1]
+  }
+  return null
+}
+
 export default function WatchPageClient({ webinar }: WatchPageClientProps) {
+  // Defensive defaults — a Supabase-sourced row won't have every field this component expects.
+  const tags = webinar.tags ?? []
+  const hasHostedVideo = Boolean(webinar.videoPath)
+  const youtubeVideoId = extractYoutubeVideoId(webinar.youtubeUrl)
+  const useYoutubeEmbed = !hasHostedVideo && Boolean(youtubeVideoId)
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -257,77 +273,91 @@ export default function WatchPageClient({ webinar }: WatchPageClientProps) {
               onMouseEnter={() => setShowControls(true)}
               onMouseLeave={() => setShowControls(isPlaying ? false : true)}
             >
-              <video
-                ref={videoRef}
-                className="w-full h-full peer"
-                poster={webinar.thumbnailPath}
-                onLoadedMetadata={handleLoadedMetadata}
-                onTimeUpdate={handleTimeUpdate}
-                playsInline
-                preload="auto"
-                muted={isMuted}
-              >
-                <source src={webinar.videoPath.startsWith("") ? webinar.videoPath : `/${webinar.videoPath}`} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-
-              {/* Overlay Play/Pause */}
-              <button
-                onClick={togglePlay}
-                className={`absolute inset-0 flex items-center justify-center bg-black/10 transition-opacity duration-300 ${showControls ? "opacity-100 cursor-pointer" : "opacity-0 pointer-events-none"
-                  }`}
-                aria-label={isPlaying ? "Pause" : "Play"}
-              >
-                {isPlaying ? (
-                  <Pause className="w-16 h-16 text-teal-400 opacity-50 fill-teal-400" />
-                ) : (
-                  <Play className="w-16 h-16 text-teal-400 opacity-50 fill-teal-400" />
-                )}
-              </button>
-
-              {/* Bottom Controls */}
-              <div
-                className={`absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/60 via-black/30 to-transparent transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}
-              >
-                <input
-                  type="range"
-                  min={0}
-                  max={duration}
-                  disabled={duration === 0}
-                  step="any"
-                  value={currentTime}
-                  onChange={handleSeek}
-                  className="w-full h-1 mb-3 bg-white/30 rounded-lg appearance-none cursor-pointer accent-[#4ecdc4]"
+              {useYoutubeEmbed ? (
+                // No self-hosted file for this episode — embed the YouTube player directly
+                // rather than pointing a custom player at a link that may not exist.
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
+                  title={webinar.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
                 />
-                <div className="flex items-center justify-between text-white text-sm">
-                  <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
-                  <div className="flex flex-row items-center space-x-2">
-                    <div className="bg-black/50 rounded-md px-2 py-1 text-white text-sm">
-                      <label htmlFor="playbackRate" className="mr-2">Speed:</label>
-                      <select
-                        id="playbackRate"
-                        value={playbackRate}
-                        onChange={(e) => changePlaybackRate(parseFloat(e.target.value))}
-                        className="bg-transparent text-white focus:outline-none"
-                      >
-                        <option value="0.5">0.5x</option>
-                        <option value="0.75">0.75x</option>
-                        <option value="1">1x</option>
-                        <option value="1.25">1.25x</option>
-                        <option value="1.5">1.5x</option>
-                        <option value="2">2x</option>
-                      </select>
+              ) : (
+                <>
+                  <video
+                    ref={videoRef}
+                    className="w-full h-full peer"
+                    poster={webinar.thumbnailPath}
+                    onLoadedMetadata={handleLoadedMetadata}
+                    onTimeUpdate={handleTimeUpdate}
+                    playsInline
+                    preload="auto"
+                    muted={isMuted}
+                  >
+                    <source src={webinar.videoPath.startsWith("") ? webinar.videoPath : `/${webinar.videoPath}`} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+
+                  {/* Overlay Play/Pause */}
+                  <button
+                    onClick={togglePlay}
+                    className={`absolute inset-0 flex items-center justify-center bg-black/10 transition-opacity duration-300 ${showControls ? "opacity-100 cursor-pointer" : "opacity-0 pointer-events-none"
+                      }`}
+                    aria-label={isPlaying ? "Pause" : "Play"}
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-16 h-16 text-teal-400 opacity-50 fill-teal-400" />
+                    ) : (
+                      <Play className="w-16 h-16 text-teal-400 opacity-50 fill-teal-400" />
+                    )}
+                  </button>
+
+                  {/* Bottom Controls */}
+                  <div
+                    className={`absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/60 via-black/30 to-transparent transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}
+                  >
+                    <input
+                      type="range"
+                      min={0}
+                      max={duration}
+                      disabled={duration === 0}
+                      step="any"
+                      value={currentTime}
+                      onChange={handleSeek}
+                      className="w-full h-1 mb-3 bg-white/30 rounded-lg appearance-none cursor-pointer accent-[#4ecdc4]"
+                    />
+                    <div className="flex items-center justify-between text-white text-sm">
+                      <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
+                      <div className="flex flex-row items-center space-x-2">
+                        <div className="bg-black/50 rounded-md px-2 py-1 text-white text-sm">
+                          <label htmlFor="playbackRate" className="mr-2">Speed:</label>
+                          <select
+                            id="playbackRate"
+                            value={playbackRate}
+                            onChange={(e) => changePlaybackRate(parseFloat(e.target.value))}
+                            className="bg-transparent text-white focus:outline-none"
+                          >
+                            <option value="0.5">0.5x</option>
+                            <option value="0.75">0.75x</option>
+                            <option value="1">1x</option>
+                            <option value="1.25">1.25x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                          </select>
+                        </div>
+                        <button onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"} className="hover:text-[#4ecdc4] transition-colors">
+                          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                        </button>
+                        <input type="range" min={0} max={1} step={0.05} value={volume} onChange={handleVolumeChange} className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-[#4ecdc4]" />
+                        <button onClick={toggleFullscreen} aria-label="Fullscreen" className="hover:text-[#4ecdc4] transition-colors">
+                          <Maximize className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
-                    <button onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"} className="hover:text-[#4ecdc4] transition-colors">
-                      {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                    </button>
-                    <input type="range" min={0} max={1} step={0.05} value={volume} onChange={handleVolumeChange} className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-[#4ecdc4]" />
-                    <button onClick={toggleFullscreen} aria-label="Fullscreen" className="hover:text-[#4ecdc4] transition-colors">
-                      <Maximize className="w-5 h-5" />
-                    </button>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
             <div className="flex justify-end py-2">
               <Button
@@ -401,7 +431,7 @@ export default function WatchPageClient({ webinar }: WatchPageClientProps) {
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {webinar.tags.map((tag) => (
+                  {tags.map((tag) => (
                     <span key={tag} className="text-xs bg-[#4ecdc4]/20 text-[#4ecdc4] px-3 py-1 rounded-full">
                       #{tag}
                     </span>

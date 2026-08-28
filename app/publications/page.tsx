@@ -2,6 +2,43 @@ import type { Metadata } from "next"
 import { generateSeoMetadata } from "@/lib/seo-utils"
 import PublicationsClientPage from "./PublicationsClientPage"
 import { supabase } from "@/lib/supabase-client"
+import { resolvePublicationAuthor } from "@/lib/author-backfill"
+import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
+import { webinars as webinarData } from "@/data/webinars"
+import { podcasts as podcastData } from "@/data/podcasts"
+import type { MediaItem } from "./PublicationsClientPage"
+
+// Newest-first by date; both data files use human-readable "Month D, YYYY" strings.
+const byDateDesc = (a: { date: string }, b: { date: string }) =>
+  new Date(b.date).getTime() - new Date(a.date).getTime()
+
+const curatedWebinars: MediaItem[] = [...webinarData]
+  .sort(byDateDesc)
+  .map((w) => ({
+    id: w.id,
+    slug: w.slug,
+    title: w.title,
+    description: w.description,
+    date: w.date,
+    thumbnailPath: w.thumbnailPath,
+    youtubeUrl: w.youtubeUrl,
+    spotifyUrl: w.spotifyUrl,
+    speaker: w.speaker,
+  }))
+
+const curatedPodcasts: MediaItem[] = [...podcastData]
+  .sort(byDateDesc)
+  .map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+    date: p.date,
+    thumbnailPath: p.thumbnailPath,
+    youtubeUrl: p.youtubeUrl,
+    spotifyUrl: p.spotifyUrl,
+    speaker: p.speaker,
+  }))
 
 export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 
@@ -39,7 +76,13 @@ export default async function PublicationsPage() {
     let authorData = contentData.author || {}
     if (Array.isArray(authorData)) authorData = authorData[0] || {}
 
-    const resolvedAuthorName = contentData.author_name || authorData.name || "Unknown Author"
+    // Live member → historical roster backup → generic "Publications Team" fallback, so a
+    // departed member's old posts still show a real name/photo instead of "Unknown Author".
+    const author = resolvePublicationAuthor({
+      slug: contentData.slug,
+      authorName: contentData.author_name,
+      liveMember: authorData.name ? authorData : null,
+    })
 
     return {
       slug: contentData.slug,
@@ -58,12 +101,12 @@ export default async function PublicationsPage() {
         day: "numeric",
       }),
       author: {
-        name: resolvedAuthorName,
-        image: authorData.image || "/logo.png",
-        bio: authorData.bio || "",
-        linkedIn: authorData.socials?.linkedin || "",
-        twitter: authorData.socials?.twitter || "",
-        instagram: authorData.socials?.instagram || "",
+        name: author.name,
+        image: author.image,
+        bio: author.bio,
+        linkedIn: author.linkedIn || "",
+        twitter: "",
+        instagram: author.instagram || "",
       }
     }
   }
@@ -81,5 +124,42 @@ export default async function PublicationsPage() {
     console.error("Error fetching publications:", contentError)
   }
 
-  return <PublicationsClientPage policyWork={policyWork} opEds={opEds} blogs={blogs} />
+  // Manually-curated policy submissions (e.g. UN/OHCHR filings) that live outside the CMS —
+  // their own dedicated page at /publications/policy/[slug] gets richer treatment (PDF page
+  // images + full text + prominent OHCHR links) than the generic blog editor supports.
+  // Prefixing the slug with "policy/" makes the existing card's /publications/${slug} link
+  // resolve straight to that route without needing to change the shared card component.
+  const curatedPolicyWork = POLICY_SUBMISSIONS.map((submission) => ({
+    slug: `policy/${submission.slug}`,
+    title: submission.title,
+    excerpt: submission.summary,
+    content: "",
+    coverImage: submission.documents[0]?.pages[0]?.file || "/websitebanner.jpg",
+    topic: submission.resolution,
+    readingTime: `${submission.documents.reduce((n, d) => n + d.paragraphs.length, 0)} min read`,
+    featured: true,
+    contentType: "policy",
+    policyType: "input",
+    date: submission.date,
+    author: {
+      name: "Dr. Interested",
+      image: "/circle-logo.png",
+      bio: "",
+      linkedIn: "",
+      twitter: "",
+      instagram: "",
+    },
+  }))
+
+  policyWork = [...curatedPolicyWork, ...policyWork]
+
+  return (
+    <PublicationsClientPage
+      policyWork={policyWork}
+      opEds={opEds}
+      blogs={blogs}
+      webinars={curatedWebinars}
+      podcasts={curatedPodcasts}
+    />
+  )
 }
