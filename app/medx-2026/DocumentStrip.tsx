@@ -6,6 +6,11 @@ import { Download } from "lucide-react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import type { SupportDocument } from "./data"
 
+function docAlt(doc: SupportDocument) {
+  const kind = doc.category === "letters" ? "Letter of support" : "Certificate of recognition"
+  return `${kind} from ${doc.name}, ${doc.role} — Dr. Interested MedExplore 2026 Conference (MedX 2026), August 16, 2026`
+}
+
 export default function DocumentStrip({ documents }: { documents: SupportDocument[] }) {
   const [active, setActive] = useState<SupportDocument | null>(null)
   // duplicate the list so the CSS marquee can loop seamlessly
@@ -26,7 +31,7 @@ export default function DocumentStrip({ documents }: { documents: SupportDocumen
               <div className="relative w-full aspect-[17/22] rounded-lg overflow-hidden border border-[#405862]/15 shadow-sm bg-white">
                 <Image
                   src={doc.image}
-                  alt={`${doc.category === "letters" ? "Letter" : "Certificate"} from ${doc.name}`}
+                  alt={docAlt(doc)}
                   fill
                   sizes="180px"
                   className="object-cover object-top"
@@ -53,7 +58,7 @@ export default function DocumentStrip({ documents }: { documents: SupportDocumen
               >
                 <Image
                   src={active.image}
-                  alt={`${active.category === "letters" ? "Letter" : "Certificate"} from ${active.name}`}
+                  alt={docAlt(active)}
                   fill
                   sizes="90vw"
                   className="object-contain"

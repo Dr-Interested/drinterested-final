@@ -2,10 +2,32 @@ import type { MetadataRoute } from "next"
 import { supabase } from "@/lib/supabase-client"
 import { blogTopics } from "@/data/blog"
 import { getAllMembersCombined } from "@/lib/members-data"
+import galleryManifest from "@/public/medexplore-2026/gallery-manifest.json"
+import documentManifest from "@/public/medexplore-2026/letters-manifest.json"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.drinterested.org"
   const currentDate = new Date()
+
+  // Every MedExplore 2026 (MedX 2026) recap photo, letter, and certificate — indexed as an
+  // image sitemap entry on the canonical /medx-2026 URL so each one is eligible for Google Images.
+  const medExploreGalleryImages = Object.values(
+    galleryManifest as Record<string, { file: string }[]>,
+  ).flatMap((entries) => entries.map((e) => `${baseUrl}${e.file}`))
+  const medExploreDocumentImages = (documentManifest as { image: string }[]).map((d) => `${baseUrl}${d.image}`)
+  const medExplorePages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/medx-2026`,
+      lastModified: currentDate,
+      changeFrequency: "monthly",
+      priority: 0.9,
+      images: [
+        `${baseUrl}/medexplore-2026/MedExplore2026.png`,
+        ...medExploreGalleryImages,
+        ...medExploreDocumentImages,
+      ],
+    },
+  ]
 
   const mainPages: MetadataRoute.Sitemap = [
     {
@@ -186,6 +208,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...mainPages,
+    ...medExplorePages,
     ...impactReportPages,
     ...newsletterPage,
     ...chessPage,

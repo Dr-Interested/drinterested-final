@@ -124,6 +124,13 @@ export function galleryFor(slug?: keyof typeof galleryManifest): GalleryImage[] 
 
 export const HIGHLIGHT_PHOTOS: GalleryImage[] = (galleryManifest as Record<string, GalleryImage[]>).highlights ?? []
 
+// Dedicated hero photo for the recap page — also used as the base for the OG/Twitter share image.
+export const HERO_PHOTO: GalleryImage = {
+  file: "/medexplore-2026/MedExplore2026.png",
+  w: 2200,
+  h: 1649,
+}
+
 const documents = documentManifest as SupportDocument[]
 
 export const LETTERS: SupportDocument[] = documents.filter((d) => d.category === "letters")

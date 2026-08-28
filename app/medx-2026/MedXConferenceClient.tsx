@@ -21,13 +21,20 @@ import { Badge } from "@/components/ui/badge"
 import NewsletterForm from "@/components/newsletter-form"
 import PhotoLightbox from "./PhotoLightbox"
 import DocumentStrip from "./DocumentStrip"
-import { AGENDA, HIGHLIGHT_PHOTOS, LETTERS, CERTIFICATES, galleryFor, type GalleryImage } from "./data"
+import { AGENDA, HIGHLIGHT_PHOTOS, HERO_PHOTO, LETTERS, CERTIFICATES, galleryFor, type GalleryImage } from "./data"
 
-type LightboxState = { images: GalleryImage[]; index: number; caption?: string }
+type LightboxState = { images: GalleryImage[]; index: number; caption?: string; context?: string }
 
 const PRESS_URL =
   "https://www.insauga.com/mississauga-teen-starts-global-organization-helping-students-explore-healthcare-careers/"
 const INSTAGRAM_URL = "https://www.instagram.com/dr.interested/"
+
+const EVENT_CONTEXT =
+  "Dr. Interested MedExplore 2026 Conference (MedX 2026) — University of Toronto Mississauga, Davis Building — Sunday, August 16, 2026"
+
+function photoAlt(caption: string, index: number, total: number) {
+  return `${caption} — ${EVENT_CONTEXT}${total > 1 ? ` (photo ${index + 1} of ${total})` : ""}`
+}
 
 function AgendaPhotoGrid({
   images,
@@ -51,13 +58,13 @@ function AgendaPhotoGrid({
           <button
             key={img.file}
             type="button"
-            onClick={() => onOpen({ images, index: i, caption })}
+            onClick={() => onOpen({ images, index: i, caption, context: EVENT_CONTEXT })}
             className="relative aspect-square rounded-lg overflow-hidden border border-[#405862]/15 group"
             aria-label={isLastWithMore ? `View all ${images.length} photos` : `View photo from ${caption}`}
           >
             <Image
               src={img.file}
-              alt={`${caption} photo ${i + 1}`}
+              alt={photoAlt(caption, i, images.length)}
               fill
               sizes="(max-width: 640px) 33vw, 140px"
               className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -210,24 +217,27 @@ export default function MedXConferenceClient() {
             {/* Right Column: Stat Card + Hero Photo */}
             <div className="lg:col-span-5">
               <div className="rounded-2xl overflow-hidden border-2 border-[#4ecdc4]/40 shadow-2xl bg-white dark:bg-[#11161d]">
-                {HIGHLIGHT_PHOTOS[0] && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setLightbox({ images: HIGHLIGHT_PHOTOS, index: 0, caption: "MedExplore 2026 Highlights" })
-                    }
-                    className="relative w-full aspect-[4/3] block group"
-                  >
-                    <Image
-                      src={HIGHLIGHT_PHOTOS[0].file}
-                      alt="MedExplore 2026 conference highlight photo"
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 500px"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      priority
-                    />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setLightbox({
+                      images: [HERO_PHOTO, ...HIGHLIGHT_PHOTOS],
+                      index: 0,
+                      caption: "MedExplore 2026 Recap",
+                      context: EVENT_CONTEXT,
+                    })
+                  }
+                  className="relative w-full aspect-[4/3] block group"
+                >
+                  <Image
+                    src={HERO_PHOTO.file}
+                    alt={`Students, speakers, and volunteers at the ${EVENT_CONTEXT}`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 500px"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    priority
+                  />
+                </button>
                 <div className="p-5 md:p-6 grid grid-cols-3 gap-3 text-center">
                   <div>
                     <p className="text-2xl md:text-3xl font-black text-[#405862] dark:text-white">100+</p>
