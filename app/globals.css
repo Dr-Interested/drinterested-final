@@ -394,6 +394,73 @@ img.loading {
   }
 }
 
+@keyframes doc-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.doc-marquee {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.doc-marquee__track {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  width: max-content;
+  padding: 0.5rem 1rem;
+  animation: doc-marquee 60s linear infinite;
+}
+
+.doc-marquee:hover .doc-marquee__track {
+  animation-play-state: paused;
+}
+
+.doc-marquee__card {
+  width: 150px;
+  flex-shrink: 0;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.doc-marquee__card:hover {
+  transform: translateY(-3px);
+}
+
+.doc-marquee__card:focus-visible {
+  outline: 2px solid #4ecdc4;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .doc-marquee__card {
+    width: 120px;
+  }
+  .doc-marquee__track {
+    gap: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-marquee__track {
+    animation: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Dark mode palette overrides */
 .dark {
   color-scheme: dark;

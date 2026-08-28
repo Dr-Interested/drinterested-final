@@ -2,28 +2,26 @@ import type { Metadata } from "next"
 import MedXConferenceClient from "./MedXConferenceClient"
 
 export const metadata: Metadata = {
-  title: "MedX Conference 2026 | Dr. Interested",
+  title: "MedExplore 2026 Recap (MedX 2026) | Dr. Interested",
   description:
-    "Join MedX Conference 2026 at University of Toronto Mississauga (UTM) on Sunday, August 16, 2026 (9:30 AM - 4:30 PM). A premier youth-focused healthcare career exploration conference for high school and post-secondary students. Hear from professionals, attend interactive workshops, and network. General admission passes and full passes with catered food available.",
+    "See how MedExplore 2026 (MedX 2026) went at the University of Toronto Mississauga, Davis Building on Sunday, August 16, 2026. Over 100 students, 23 speakers, guests, and panelists, and 17 volunteers came together for a full day exploring careers in healthcare. Photos, agenda recap, letters of support, and certificates of recognition.",
   keywords: [
+    "MedExplore 2026",
     "MedX Conference 2026",
     "MedX",
-    "Dr. Interested MedX",
-    "UTM MedX Conference",
+    "Dr. Interested MedExplore",
+    "UTM healthcare conference recap",
     "University of Toronto Mississauga healthcare conference",
-    "youth healthcare conference",
+    "youth healthcare conference recap",
     "premed conference Ontario",
     "high school medical conference",
     "healthcare career exploration",
     "Mississauga healthcare event",
-    "medical workshops for high schoolers",
-    "healthcare professional panel",
-    "youth medical networking",
   ],
   openGraph: {
-    title: "MedX Conference 2026 | Dr. Interested",
+    title: "MedExplore 2026 Recap (MedX 2026) | Dr. Interested",
     description:
-      "Join MedX Conference 2026 at University of Toronto Mississauga on Sunday, August 16, 2026. Explore healthcare careers, attend hands-on workshops, connect with professionals, and empower your future in medicine.",
+      "Over 100 students, 23 speakers, guests, and panelists, and 17 volunteers came together at UTM on August 16, 2026 for a full day exploring careers in healthcare. See the recap.",
     url: "https://www.drinterested.org/medx-2026",
     siteName: "Dr. Interested",
     type: "website",
@@ -32,15 +30,14 @@ export const metadata: Metadata = {
         url: "/medx.png",
         width: 1200,
         height: 630,
-        alt: "MedX Conference 2026 - Explore. Learn. Lead.",
+        alt: "MedExplore 2026 (MedX 2026) Recap",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MedX Conference 2026 | Dr. Interested",
-    description:
-      "Join MedX Conference 2026 at UTM on August 16, 2026. Discover your spark in healthcare!",
+    title: "MedExplore 2026 Recap (MedX 2026) | Dr. Interested",
+    description: "See how MedExplore 2026 (MedX 2026) went at UTM on August 16, 2026.",
     images: ["/medx.png"],
   },
   alternates: {

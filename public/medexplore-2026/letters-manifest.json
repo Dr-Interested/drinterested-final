@@ -1,0 +1,232 @@
+[
+  {
+    "slug": "doug-ford",
+    "category": "letters",
+    "name": "Doug Ford",
+    "role": "Premier of Ontario",
+    "image": "/medexplore-2026/letters/doug-ford.jpg",
+    "pdf": "/medexplore-2026/letters/doug-ford.pdf",
+    "w": 1149,
+    "h": 1664
+  },
+  {
+    "slug": "david-piccini",
+    "category": "letters",
+    "name": "Hon. David Piccini",
+    "role": "MPP",
+    "image": "/medexplore-2026/letters/david-piccini.jpg",
+    "pdf": "/medexplore-2026/letters/david-piccini.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "kinga-surma",
+    "category": "letters",
+    "name": "Kinga Surma",
+    "role": "MPP, Etobicoke Centre",
+    "image": "/medexplore-2026/letters/kinga-surma.jpg",
+    "pdf": "/medexplore-2026/letters/kinga-surma.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "kusendova-bashta",
+    "category": "letters",
+    "name": "Natalia Kusendova-Bashta",
+    "role": "MPP, Mississauga Centre; Minister of Long-Term Care",
+    "image": "/medexplore-2026/letters/kusendova-bashta.jpg",
+    "pdf": "/medexplore-2026/letters/kusendova-bashta.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "lee-fairclough",
+    "category": "letters",
+    "name": "Lee Fairclough",
+    "role": "MPP, Etobicoke-Lakeshore",
+    "image": "/medexplore-2026/letters/lee-fairclough.jpg",
+    "pdf": "/medexplore-2026/letters/lee-fairclough.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "silvia-gualtieri",
+    "category": "letters",
+    "name": "Silvia Gualtieri",
+    "role": "MPP, Mississauga East-Cooksville",
+    "image": "/medexplore-2026/letters/silvia-gualtieri.jpg",
+    "pdf": "/medexplore-2026/letters/silvia-gualtieri.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "carolyn-parrish",
+    "category": "letters",
+    "name": "Carolyn Parrish",
+    "role": "Mayor, City of Mississauga",
+    "image": "/medexplore-2026/letters/carolyn-parrish.jpg",
+    "pdf": "/medexplore-2026/letters/carolyn-parrish.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "kevin-holland",
+    "category": "letters",
+    "name": "Hon. Kevin Holland",
+    "role": "Associate Minister of Forestry and Forest Products; MPP, Thunder Bay-Atikokan",
+    "image": "/medexplore-2026/letters/kevin-holland.jpg",
+    "pdf": "/medexplore-2026/letters/kevin-holland.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "stephen-dasko",
+    "category": "letters",
+    "name": "Stephen Dasko",
+    "role": "Councillor, City of Mississauga",
+    "image": "/medexplore-2026/letters/stephen-dasko.jpg",
+    "pdf": "/medexplore-2026/letters/stephen-dasko.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "dipika-damerla",
+    "category": "letters",
+    "name": "Dipika Damerla",
+    "role": "Councillor, City of Mississauga",
+    "image": "/medexplore-2026/letters/dipika-damerla.jpg",
+    "pdf": "/medexplore-2026/letters/dipika-damerla.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "andrea-hazell",
+    "category": "certificates",
+    "name": "Andrea Hazell",
+    "role": "MPP, Scarborough-Guildwood",
+    "image": "/medexplore-2026/certificates/andrea-hazell.jpg",
+    "pdf": "/medexplore-2026/certificates/andrea-hazell.pdf",
+    "w": 1305,
+    "h": 1700
+  },
+  {
+    "slug": "sheref-sabawy",
+    "category": "certificates",
+    "name": "Sheref Sabawy",
+    "role": "MPP, Mississauga-Erin Mills",
+    "image": "/medexplore-2026/certificates/sheref-sabawy.jpg",
+    "pdf": "/medexplore-2026/certificates/sheref-sabawy.pdf",
+    "w": 1276,
+    "h": 1700
+  },
+  {
+    "slug": "david-smith",
+    "category": "certificates",
+    "name": "David Smith",
+    "role": "MPP",
+    "image": "/medexplore-2026/certificates/david-smith.jpg",
+    "pdf": "/medexplore-2026/certificates/david-smith.pdf",
+    "w": 1298,
+    "h": 1700
+  },
+  {
+    "slug": "nina-tangri",
+    "category": "certificates",
+    "name": "Nina Tangri",
+    "role": "MPP, Mississauga-Streetsville",
+    "image": "/medexplore-2026/certificates/nina-tangri.jpg",
+    "pdf": "/medexplore-2026/certificates/nina-tangri.pdf",
+    "w": 1248,
+    "h": 1700
+  },
+  {
+    "slug": "rudy-cuzzetto",
+    "category": "certificates",
+    "name": "Rudy Cuzzetto",
+    "role": "MPP, Mississauga-Lakeshore",
+    "image": "/medexplore-2026/certificates/rudy-cuzzetto.jpg",
+    "pdf": "/medexplore-2026/certificates/rudy-cuzzetto.pdf",
+    "w": 1303,
+    "h": 1700
+  },
+  {
+    "slug": "billy-pang",
+    "category": "certificates",
+    "name": "Billy Pang",
+    "role": "MPP, Markham-Unionville",
+    "image": "/medexplore-2026/certificates/billy-pang.jpg",
+    "pdf": "/medexplore-2026/certificates/billy-pang.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "graydon-smith",
+    "category": "certificates",
+    "name": "Hon. Graydon Smith",
+    "role": "MPP, Parry Sound-Muskoka",
+    "image": "/medexplore-2026/certificates/graydon-smith.jpg",
+    "pdf": "/medexplore-2026/certificates/graydon-smith.pdf",
+    "w": 1270,
+    "h": 1700
+  },
+  {
+    "slug": "chris-fonseca",
+    "category": "certificates",
+    "name": "Chris Fonseca",
+    "role": "Councillor, City of Mississauga",
+    "image": "/medexplore-2026/certificates/chris-fonseca.jpg",
+    "pdf": "/medexplore-2026/certificates/chris-fonseca.pdf",
+    "w": 1377,
+    "h": 1700
+  },
+  {
+    "slug": "natalie-hart",
+    "category": "certificates",
+    "name": "Natalie Hart",
+    "role": "Councillor, City of Mississauga",
+    "image": "/medexplore-2026/certificates/natalie-hart.jpg",
+    "pdf": "/medexplore-2026/certificates/natalie-hart.pdf",
+    "w": 1326,
+    "h": 1699
+  },
+  {
+    "slug": "harkirat-singh",
+    "category": "certificates",
+    "name": "Harkirat Singh",
+    "role": "Deputy Mayor, City of Brampton",
+    "image": "/medexplore-2026/certificates/harkirat-singh.jpg",
+    "pdf": "/medexplore-2026/certificates/harkirat-singh.pdf",
+    "w": 1290,
+    "h": 1700
+  },
+  {
+    "slug": "nick-mantas",
+    "category": "certificates",
+    "name": "Nick Mantas",
+    "role": "Councillor, City of Toronto",
+    "image": "/medexplore-2026/certificates/nick-mantas.jpg",
+    "pdf": "/medexplore-2026/certificates/nick-mantas.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "amandeep-sodhi",
+    "category": "certificates",
+    "name": "Amandeep Sodhi",
+    "role": "Member of Parliament",
+    "image": "/medexplore-2026/certificates/amandeep-sodhi.jpg",
+    "pdf": "/medexplore-2026/certificates/amandeep-sodhi.pdf",
+    "w": 1313,
+    "h": 1700
+  },
+  {
+    "slug": "deepak-anand",
+    "category": "certificates",
+    "name": "Deepak Anand",
+    "role": "MPP, Mississauga-Malton",
+    "image": "/medexplore-2026/certificates/deepak-anand.jpg",
+    "pdf": null,
+    "w": 1313,
+    "h": 1700
+  }
+]

@@ -68,6 +68,11 @@ const nextConfig = {
         destination: "/members/apply",
         permanent: true,
       },
+      {
+        source: "/medexplore-2026",
+        destination: "/medx-2026",
+        permanent: true,
+      },
     ];
   },
 
