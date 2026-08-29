@@ -12,6 +12,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.drinterested.org"
   const currentDate = new Date()
 
+  // Sitemap/RSS image URLs must be absolute — several curated data entries store a
+  // site-relative path (e.g. "/11.png") rather than a full URL.
+  const absoluteUrl = (path: string) => (path.startsWith("http") ? path : `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`)
+
   // Every MedExplore 2026 (MedX 2026) recap photo, letter, and certificate — indexed as an
   // image sitemap entry on the canonical /medx-2026 URL so each one is eligible for Google Images.
   const medExploreGalleryImages = Object.values(
@@ -215,14 +219,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: currentDate,
     changeFrequency: "yearly" as const,
     priority: 0.6,
-    images: [w.thumbnailPath],
+    images: [absoluteUrl(w.thumbnailPath)],
   }))
   const listenPages: MetadataRoute.Sitemap = podcastData.map((p) => ({
     url: `${baseUrl}/listen/${p.slug}`,
     lastModified: currentDate,
     changeFrequency: "yearly" as const,
     priority: 0.6,
-    images: [p.thumbnailPath],
+    images: [absoluteUrl(p.thumbnailPath)],
   }))
   const watchPages = [...dbWatchPages, ...curatedWatchPages]
 

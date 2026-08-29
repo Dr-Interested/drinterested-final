@@ -17,6 +17,10 @@ function escapeXml(unsafe: string): string {
 export async function GET() {
   const baseUrl = "https://www.drinterested.org"
 
+  // RSS <media:content>/<img> URLs must be absolute — some curated data entries store a
+  // site-relative path (e.g. "/11.png") rather than a full URL.
+  const absoluteUrl = (path: string) => (path.startsWith("http") ? path : `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`)
+
   const imageDescriptions: Record<string, string> = {
     // Logo and branding
     "/logo.png":
@@ -341,12 +345,12 @@ export async function GET() {
       <pubDate>${pubDate}</pubDate>
       <category>Webinar</category>
       ${w.speaker ? `<author><![CDATA[${w.speaker}]]></author>` : ""}
-      <media:content url="${escapeXml(w.thumbnailPath)}" medium="image" type="image/jpeg">
+      <media:content url="${escapeXml(absoluteUrl(w.thumbnailPath))}" medium="image" type="image/jpeg">
         <media:title><![CDATA[${w.title} - Thumbnail]]></media:title>
         <media:description><![CDATA[${w.description}]]></media:description>
       </media:content>
       <content:encoded><![CDATA[
-        <img src="${escapeXml(w.thumbnailPath)}" alt="${escapeXml(w.title)}" />
+        <img src="${escapeXml(absoluteUrl(w.thumbnailPath))}" alt="${escapeXml(w.title)}" />
         <p>${w.description}</p>
         <p><a href="${escapeXml(w.youtubeUrl)}">Watch on YouTube</a>${w.spotifyUrl ? ` &middot; <a href="${escapeXml(w.spotifyUrl)}">Listen on Spotify</a>` : ""}</p>
       ]]></content:encoded>
@@ -365,12 +369,12 @@ export async function GET() {
       <pubDate>${pubDate}</pubDate>
       <category>Podcast</category>
       ${p.speaker ? `<author><![CDATA[${p.speaker}]]></author>` : ""}
-      <media:content url="${escapeXml(p.thumbnailPath)}" medium="image" type="image/jpeg">
+      <media:content url="${escapeXml(absoluteUrl(p.thumbnailPath))}" medium="image" type="image/jpeg">
         <media:title><![CDATA[${p.title} - Thumbnail]]></media:title>
         <media:description><![CDATA[${p.description}]]></media:description>
       </media:content>
       <content:encoded><![CDATA[
-        <img src="${escapeXml(p.thumbnailPath)}" alt="${escapeXml(p.title)}" />
+        <img src="${escapeXml(absoluteUrl(p.thumbnailPath))}" alt="${escapeXml(p.title)}" />
         <p>${p.description}</p>
         <p><a href="${escapeXml(p.youtubeUrl)}">Watch on YouTube</a> &middot; <a href="${escapeXml(p.spotifyUrl)}">Listen on Spotify</a></p>
       ]]></content:encoded>

@@ -119,7 +119,9 @@ export default async function PublicationsPage() {
     const formattedContent = allContentData.map(formatContent)
     policyWork = formattedContent.filter(c => c.contentType === "policy")
     opEds = formattedContent.filter(c => c.contentType === "op-ed")
-    blogs = formattedContent.filter(c => c.contentType === "blog")
+    // Publications page only ever shows the latest 6 blog posts (full archive still lives at
+    // each post's own URL and in the sitemap/RSS — this just caps the listing).
+    blogs = formattedContent.filter(c => c.contentType === "blog").slice(0, 6)
   } else if (contentError) {
     console.error("Error fetching publications:", contentError)
   }

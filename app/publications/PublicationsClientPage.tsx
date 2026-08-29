@@ -130,8 +130,20 @@ export default function PublicationsClientPage({
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-[#405862] mb-4">
             Publications
           </h1>
-          <p className="text-center text-lg text-[#405862]/80 max-w-2xl mx-auto mb-8">
+          <p className="text-center text-lg text-[#405862]/80 max-w-2xl mx-auto mb-3">
             Explore our blog posts, op-eds, and policy work on healthcare education, medical advocacy, and systemic change.
+          </p>
+          <p className="text-center text-xs text-[#405862]/50 max-w-2xl mx-auto mb-8">
+            Content on this page is for informational and entertainment purposes only and is not medical or career
+            advice. See our{" "}
+            <Link href="/terms" className="underline hover:text-[#405862]">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy-policy" className="underline hover:text-[#405862]">
+              Privacy Policy
+            </Link>{" "}
+            for more information.
           </p>
         </div>
       </section>
