@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { generateOrganizationSchema } from "@/lib/seo-utils"
 import SeoSchema from "@/components/seo-schema"
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -205,6 +206,7 @@ export default function RootLayout({
             </div>
           </Suspense>
           <Analytics />
+          <SpeedInsights />
         </ThemeProvider>
         <Script id="pdf-schema" type="application/ld+json" strategy="afterInteractive">
           {`
