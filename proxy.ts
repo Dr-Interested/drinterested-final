@@ -24,7 +24,18 @@ export function proxy(request: NextRequest) {
 
   // 2. Server-side portal route protection (defense-in-depth)
   if (pathname.startsWith("/dashboard")) {
+    // The password-reset page is self-securing: Supabase itself refuses to update a
+    // password without a valid recovery session, so it doesn't need the portal-session
+    // cookie — which the visitor can't have yet anyway (they're here because they can't
+    // log in). Always let it through.
+    if (pathname === "/dashboard/reset-password") {
+      return NextResponse.next();
+    }
+
     const portalSession = request.cookies.get("portal-session")?.value;
+    // Set on both password sign-in and SSO/OAuth callbacks (see the auth-state-change
+    // listener in app/dashboard/page.tsx) — "login=true" additionally covers the moment
+    // an OAuth provider redirects back before that client-side listener has run yet.
     const isLoginFlow = request.nextUrl.searchParams.get("login") === "true";
 
     if (!portalSession || portalSession !== "authenticated") {
