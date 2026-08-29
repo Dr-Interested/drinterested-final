@@ -4,41 +4,7 @@ import PublicationsClientPage from "./PublicationsClientPage"
 import { supabase } from "@/lib/supabase-client"
 import { resolvePublicationAuthor } from "@/lib/author-backfill"
 import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
-import { webinars as webinarData } from "@/data/webinars"
-import { podcasts as podcastData } from "@/data/podcasts"
-import type { MediaItem } from "./PublicationsClientPage"
-
-// Newest-first by date; both data files use human-readable "Month D, YYYY" strings.
-const byDateDesc = (a: { date: string }, b: { date: string }) =>
-  new Date(b.date).getTime() - new Date(a.date).getTime()
-
-const curatedWebinars: MediaItem[] = [...webinarData]
-  .sort(byDateDesc)
-  .map((w) => ({
-    id: w.id,
-    slug: w.slug,
-    title: w.title,
-    description: w.description,
-    date: w.date,
-    thumbnailPath: w.thumbnailPath,
-    youtubeUrl: w.youtubeUrl,
-    spotifyUrl: w.spotifyUrl,
-    speaker: w.speaker,
-  }))
-
-const curatedPodcasts: MediaItem[] = [...podcastData]
-  .sort(byDateDesc)
-  .map((p) => ({
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    description: p.description,
-    date: p.date,
-    thumbnailPath: p.thumbnailPath,
-    youtubeUrl: p.youtubeUrl,
-    spotifyUrl: p.spotifyUrl,
-    speaker: p.speaker,
-  }))
+import { getEpisodesByCategory } from "@/lib/episodes"
 
 export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 
@@ -58,6 +24,11 @@ export const metadata: Metadata = generateSeoMetadata({
 })
 
 export default async function PublicationsPage() {
+  const [curatedWebinars, curatedPodcasts] = await Promise.all([
+    getEpisodesByCategory("webinar"),
+    getEpisodesByCategory("podcast"),
+  ])
+
   // Fetch all content: blogs, op-eds, and policy work
   const { data: allContentData, error: contentError } = await supabase
     .from("blogs")

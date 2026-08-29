@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase-client"
 import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
-import { webinars as webinarData } from "@/data/webinars"
-import { podcasts as podcastData } from "@/data/podcasts"
+import { getEpisodesByCategory } from "@/lib/episodes"
 
 // Helper function to escape XML special characters
 function escapeXml(unsafe: string): string {
@@ -270,9 +269,16 @@ export async function GET() {
   const { data: blogs } = await supabase.from("blogs").select("*")
   const blogPosts = blogs || []
 
-  // Fetch webinars
-  const { data: webinarsData } = await supabase.from("webinars").select("*")
+  // Admin-announced webinars that are NOT part of the episode archive below (no slug set —
+  // the registration-flow "upcoming webinar" use case, keyed by UUID at /watch/<uuid>).
+  // Excluding slugged rows avoids listing the same underlying row twice under two URLs.
+  const { data: webinarsData } = await supabase.from("webinars").select("*").is("slug", null)
   const webinars = webinarsData || []
+
+  const [archiveWebinars, archivePodcasts] = await Promise.all([
+    getEpisodesByCategory("webinar"),
+    getEpisodesByCategory("podcast"),
+  ])
 
   // Fetch events
   const { data: eventsData } = await supabase.from("events").select("*")
@@ -333,7 +339,7 @@ export async function GET() {
   })
 
   // ===== Curated episode archive (Webinar Series, Code Blue Planet 2026, Podcast) =====
-  webinarData.forEach((w) => {
+  archiveWebinars.forEach((w) => {
     const url = `${baseUrl}/watch/${w.slug}`
     const pubDate = new Date(w.date).toUTCString()
     items.push(`
@@ -357,7 +363,7 @@ export async function GET() {
     </item>`)
   })
 
-  podcastData.forEach((p) => {
+  archivePodcasts.forEach((p) => {
     const url = `${baseUrl}/listen/${p.slug}`
     const pubDate = new Date(p.date).toUTCString()
     items.push(`

@@ -5,8 +5,7 @@ import { getAllMembersCombined } from "@/lib/members-data"
 import galleryManifest from "@/public/medexplore-2026/gallery-manifest.json"
 import documentManifest from "@/public/medexplore-2026/letters-manifest.json"
 import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
-import { webinars as webinarData } from "@/data/webinars"
-import { podcasts as podcastData } from "@/data/podcasts"
+import { getEpisodesByCategory } from "@/lib/episodes"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.drinterested.org"
@@ -202,8 +201,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   })
 
-  // Fetch admin-announced webinars from Supabase (upcoming/completed, registration flow)
-  const { data: dbWebinars } = await supabase.from('webinars').select('id, created_at')
+  // Admin-announced webinars that are NOT part of the episode archive below (no slug set —
+  // the registration-flow "upcoming webinar" use case, keyed by UUID at /watch/<uuid>).
+  // Excluding slugged rows here avoids listing the same row twice under two different URLs.
+  const { data: dbWebinars } = await supabase.from('webinars').select('id, created_at').is('slug', null)
   const dbWatchPages: MetadataRoute.Sitemap = (dbWebinars || []).map((webinar) => ({
     url: `${baseUrl}/watch/${webinar.id}`,
     lastModified: new Date(webinar.created_at),
@@ -211,17 +212,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Curated static episode archive — Dr. Interested Webinar Series, Code Blue Planet 2026, and
-  // the Dr. Interested Podcast, pulled from their YouTube/Spotify sources. Each entry's YouTube
-  // thumbnail is listed as that page's sitemap image (Google Images eligibility).
-  const curatedWatchPages: MetadataRoute.Sitemap = webinarData.map((w) => ({
+  // Episode archive — Dr. Interested Webinar Series, Code Blue Planet 2026, and the Dr.
+  // Interested Podcast — admin-managed in Supabase (see lib/episodes.ts), each entry's
+  // thumbnail listed as that page's sitemap image (Google Images eligibility).
+  const [archiveWebinars, archivePodcasts] = await Promise.all([
+    getEpisodesByCategory("webinar"),
+    getEpisodesByCategory("podcast"),
+  ])
+  const curatedWatchPages: MetadataRoute.Sitemap = archiveWebinars.map((w) => ({
     url: `${baseUrl}/watch/${w.slug}`,
     lastModified: currentDate,
     changeFrequency: "yearly" as const,
     priority: 0.6,
     images: [absoluteUrl(w.thumbnailPath)],
   }))
-  const listenPages: MetadataRoute.Sitemap = podcastData.map((p) => ({
+  const listenPages: MetadataRoute.Sitemap = archivePodcasts.map((p) => ({
     url: `${baseUrl}/listen/${p.slug}`,
     lastModified: currentDate,
     changeFrequency: "yearly" as const,

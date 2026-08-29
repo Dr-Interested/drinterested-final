@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { webinars as webinarData } from "@/data/webinars"
+import { getEpisodesByCategory } from "@/lib/episodes"
 import MediaCard from "@/components/publications/media-card"
 import PageBreadcrumb from "@/components/page-breadcrumb"
 import ScrollToTop from "@/components/scroll-to-top"
@@ -25,8 +25,10 @@ export const metadata: Metadata = {
   },
 }
 
-export default function WebinarsPage() {
-  const sorted = [...webinarData].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+export const revalidate = 300
+
+export default async function WebinarsPage() {
+  const sorted = await getEpisodesByCategory("webinar")
 
   return (
     <div>

@@ -62,18 +62,29 @@ type Timecard = {
 }
 
 // --- ACCESS CONTROL ---
-// Three tiers, resolved from the signed-in member's existing `email`/`role`/`department` fields
-// (no schema change — same pattern the previous isHrOrAdmin/isExec check already used):
-//   - owner:    the account holder — full access to every admin tab, plus Admin Team leadership
-//               (Executive Director / Deputy Executive Director), who co-run the org.
+// Three UI tiers, resolved from the signed-in member's existing `email`/`role`/`department`
+// fields (no schema change — same pattern the previous isHrOrAdmin/isExec check already used):
+//   - owner:    full access to every admin tab. Two kinds of person land here:
+//               (a) the true owner (OWNER_EMAILS) — unrestricted, including the two actions
+//                   below, and
+//               (b) Admin Team leadership (Executive Director / Deputy Executive Director /
+//                   Executive Assistant) — same tab access, but NOT the true owner, so they
+//                   cannot delete members or touch the org-wide Drive/Calendar settings.
+//               Use isTrueOwner() (checked against the live user email, not this tier) to gate
+//               those two actions specifically — never `accessLevel === "owner"` alone.
 //   - director: any other "Director"/"Deputy Director"/"Lead"/"Chair" role — sees ONLY the admin
 //               tab(s) that belong to their own department.
 //   - member:   everyone else (approved, non-director) — punch card, tasks, and shared resources.
 const OWNER_EMAILS = ["mukhiadil2009@gmail.com"]
 
-const OWNER_LEVEL_ROLES = ["Executive Director", "Deputy Executive Director"]
+// Admin Team roles that get full owner-tier tab access without being the true owner.
+const ADMIN_TEAM_LEADERSHIP_ROLES = ["Executive Director", "Deputy Executive Director", "Executive Assistant"]
 const DIRECTOR_ROLE_PATTERN = /Director|President|Chair|Lead/i
 const NON_DIRECTOR_ROLE_PATTERN = /Coordinator|Ambassador|Member of/i
+
+function isTrueOwner(email: string | undefined | null): boolean {
+  return !!email && OWNER_EMAILS.includes(email.toLowerCase())
+}
 
 // Which admin tabs each department's directors get. Departments not listed here (Marketing,
 // Technology, Finance, Ambassadors, Medical Student Advisory Council) don't have a
@@ -110,7 +121,7 @@ function resolveAccess(member: Member | null, userEmail: string | undefined): { 
   if (!member) {
     return { level: "none", tabs: [] }
   }
-  if (department === "Admin Team" && OWNER_LEVEL_ROLES.some((r) => role.includes(r))) {
+  if (department === "Admin Team" && ADMIN_TEAM_LEADERSHIP_ROLES.some((r) => role.includes(r))) {
     return { level: "owner", tabs: OWNER_TABS }
   }
   const isDirector = DIRECTOR_ROLE_PATTERN.test(role) && !NON_DIRECTOR_ROLE_PATTERN.test(role)
@@ -131,6 +142,9 @@ type Task = {
   due_date: string
   status: string
   created_at: string
+  submission_url?: string | null
+  time_spent_minutes?: number | null
+  completed_at?: string | null
 }
 
 export default function DbAdminPage() {
@@ -161,6 +175,12 @@ export default function DbAdminPage() {
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("member")
   const [visibleTabs, setVisibleTabs] = useState<string[]>([])
   const isHrOrAdmin = accessLevel === "owner" || accessLevel === "director"
+  // Deputy Executive Directors / Executive Assistants get the same tabs as the true owner, but
+  // NOT these two: deleting a member, and editing the org-wide Drive/Calendar settings. HR
+  // directors keep member-deletion (it's already their job); nobody else gets either.
+  const userIsTrueOwner = isTrueOwner(currentUser?.email)
+  const canDeleteMembers =
+    userIsTrueOwner || (accessLevel === "director" && (currentMemberProfile?.department === "HR" || currentMemberProfile?.department === "Human Resources"))
 
   // Active Main Tabs
   // Owners see every admin tab; directors see only their department's (+ timesheets/tasks);
@@ -203,6 +223,11 @@ export default function DbAdminPage() {
   const [isCreatingTask, setIsCreatingTask] = useState(false)
   const [taskForm, setTaskForm] = useState<Partial<Task>>({ status: "Pending" })
   const [savingTask, setSavingTask] = useState(false)
+  // Marking a task Completed opens this modal to capture the actual work + time spent,
+  // which also gets auto-logged as a (pending-approval) timecard entry.
+  const [completingTask, setCompletingTask] = useState<Task | null>(null)
+  const [completionForm, setCompletionForm] = useState({ submission_url: "", time_spent_minutes: "" })
+  const [savingCompletion, setSavingCompletion] = useState(false)
 
   // Auth Effect — the single place that syncs isAuthenticated with the actual Supabase
   // session AND keeps the portal-session cookie (read by proxy.ts middleware) in lockstep,
@@ -552,13 +577,22 @@ export default function DbAdminPage() {
     }
   }
 
-  const handleUpdateTaskStatus = async (taskId: string, currentStatus: string) => {
+  const handleUpdateTaskStatus = async (taskId: string, currentStatus: string, task?: Task) => {
     const nextStatusMap: Record<string, string> = {
       "Pending": "In Progress",
       "In Progress": "Completed",
       "Completed": "Pending"
     }
     const nextStatus = nextStatusMap[currentStatus] || "Pending"
+
+    // Marking something Completed captures the actual work + time spent first, rather than
+    // just flipping a status — see handleSubmitTaskCompletion, which does the status update.
+    if (nextStatus === "Completed" && task) {
+      setCompletingTask(task)
+      setCompletionForm({ submission_url: "", time_spent_minutes: "" })
+      return
+    }
+
     try {
       const { error } = await supabase
         .from("tasks")
@@ -571,6 +605,61 @@ export default function DbAdminPage() {
     } catch (err: any) {
       console.error(err)
       alert(`Failed to update task status: ${err.message}`)
+    }
+  }
+
+  const handleSubmitTaskCompletion = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!completingTask || !currentUser) return
+
+    const minutes = parseInt(completionForm.time_spent_minutes, 10)
+    if (!minutes || minutes <= 0) {
+      alert("Please enter how long this took (in minutes).")
+      return
+    }
+
+    setSavingCompletion(true)
+    try {
+      const nowIso = new Date().toISOString()
+
+      const { error: taskError } = await supabase
+        .from("tasks")
+        .update({
+          status: "Completed",
+          submission_url: completionForm.submission_url.trim() || null,
+          time_spent_minutes: minutes,
+          completed_at: nowIso,
+        })
+        .eq("id", completingTask.id)
+      if (taskError) throw taskError
+
+      // Auto-log the time against the member's own timesheet, pending the usual approval.
+      const clockOut = new Date()
+      const clockIn = new Date(clockOut.getTime() - minutes * 60000)
+      const workNote = completionForm.submission_url.trim()
+        ? `Task: ${completingTask.title} — ${completionForm.submission_url.trim()}`
+        : `Task: ${completingTask.title}`
+
+      const { error: timecardError } = await supabase.from("timecards").insert([{
+        member_id: currentUser.id,
+        clock_in: clockIn.toISOString(),
+        clock_out: clockOut.toISOString(),
+        duration_minutes: minutes,
+        description: workNote,
+        approved: false,
+        archived: false,
+      }])
+      if (timecardError) throw timecardError
+
+      setCompletingTask(null)
+      fetchMemberTasks()
+      fetchMemberTimecardHistory()
+      if (isHrOrAdmin) fetchAdminTasks()
+    } catch (err: any) {
+      console.error(err)
+      alert(`Failed to submit completion: ${err.message}`)
+    } finally {
+      setSavingCompletion(false)
     }
   }
 
@@ -650,6 +739,26 @@ export default function DbAdminPage() {
 
       const { error } = await supabase.from("tasks").insert([newTask])
       if (error) throw error
+
+      // Best-effort — a failed notification shouldn't undo the task that was just created.
+      try {
+        const assignee = members.find((m) => m.email?.toLowerCase() === newTask.assigned_to)
+        await fetch("/api/tasks/notify-assigned", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            assignee_email: newTask.assigned_to,
+            assignee_name: assignee?.name,
+            title: newTask.title,
+            description: newTask.description,
+            due_date: newTask.due_date,
+            assigned_by_name: currentMemberProfile?.name,
+          }),
+        })
+      } catch (notifyErr) {
+        console.error("Failed to send task assignment email:", notifyErr)
+      }
+
       setIsCreatingTask(false)
       setTaskForm({ status: "Pending" })
       fetchAdminTasks()
@@ -1321,7 +1430,7 @@ export default function DbAdminPage() {
                 <div key={task.id} className="p-4 border border-gray-150 rounded-xl hover:border-gray-300 transition-colors flex items-start gap-4 justify-between">
                   <div className="flex items-start gap-3">
                     <button
-                      onClick={() => handleUpdateTaskStatus(task.id, task.status)}
+                      onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
                       className={`mt-1 flex-shrink-0 transition-transform active:scale-95 ${task.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}`}
                     >
                       <CheckCircle2 className="w-5 h-5" />
@@ -1339,6 +1448,19 @@ export default function DbAdminPage() {
                         <span className={`inline-block text-[0.75rem] font-bold mt-2 px-2 py-0.5 rounded ${new Date(task.due_date) < new Date() && task.status !== "Completed" ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"}`}>
                           Due {new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </span>
+                      )}
+                      {task.status === "Completed" && (task.submission_url || task.time_spent_minutes) && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          {task.time_spent_minutes && <span>{Math.round((task.time_spent_minutes / 6)) / 10} hrs logged</span>}
+                          {task.submission_url && (
+                            <>
+                              {task.time_spent_minutes && " · "}
+                              <a href={task.submission_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
+                                View submitted work
+                              </a>
+                            </>
+                          )}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -1549,8 +1671,9 @@ export default function DbAdminPage() {
       {isHrOrAdmin && visibleTabs.includes("members") && activeMainTab === "members" && (
         <>
           {/* Site-wide links (Drive folder, shared calendar) shown to every member on the
-              Resources tab — owner-only, since these apply org-wide, not just to HR. */}
-          {accessLevel === "owner" && (
+              Resources tab — true-owner-only (not Admin Team leadership), since these apply
+              org-wide, not just to HR. */}
+          {userIsTrueOwner && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Configure Portal Links</h3>
               <p className="text-xs text-gray-500 mb-4">
@@ -1683,20 +1806,24 @@ export default function DbAdminPage() {
                             >
                               Approve
                             </button>
-                            <button
-                              onClick={() => handleRejectOrRemove(member.id, false)}
-                              className="flex-1 py-2 bg-[#f5f5f5] hover:bg-[#ffebee] text-[#c62828] border border-gray-200 text-sm font-semibold rounded transition-colors"
-                            >
-                              Reject
-                            </button>
+                            {canDeleteMembers && (
+                              <button
+                                onClick={() => handleRejectOrRemove(member.id, false)}
+                                className="flex-1 py-2 bg-[#f5f5f5] hover:bg-[#ffebee] text-[#c62828] border border-gray-200 text-sm font-semibold rounded transition-colors"
+                              >
+                                Reject
+                              </button>
+                            )}
                           </>
                         ) : (
-                          <button
-                            onClick={() => handleRejectOrRemove(member.id, true)}
-                            className="flex-1 py-2 bg-[#f5f5f5] hover:bg-[#ffebee] text-[#c62828] border border-gray-200 text-sm font-semibold rounded transition-colors"
-                          >
-                            Remove
-                          </button>
+                          canDeleteMembers && (
+                            <button
+                              onClick={() => handleRejectOrRemove(member.id, true)}
+                              className="flex-1 py-2 bg-[#f5f5f5] hover:bg-[#ffebee] text-[#c62828] border border-gray-200 text-sm font-semibold rounded transition-colors"
+                            >
+                              Remove
+                            </button>
+                          )
                         )}
                       </div>
                       <button
@@ -1783,6 +1910,62 @@ export default function DbAdminPage() {
       {isHrOrAdmin && visibleTabs.includes("webinars") && activeMainTab === "webinars" && <WebinarsAdmin />}
 
       {/* --- MODAL POPUPS --- */}
+
+      {/* Task Completion Modal — captures the actual work + time spent, which also gets
+          auto-logged as a pending-approval timecard entry. */}
+      {completingTask && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-bold font-bricolage mb-1 text-[#1a1a1a]">Mark as Complete</h2>
+            <p className="text-sm text-gray-500 mb-6">{completingTask.title}</p>
+            <form onSubmit={handleSubmitTaskCompletion} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Link to your work <span className="text-gray-400 font-normal">(optional — e.g. a Canva link)</span>
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://..."
+                  value={completionForm.submission_url}
+                  onChange={(e) => setCompletionForm({ ...completionForm, submission_url: e.target.value })}
+                  className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">How long did this take? (minutes) *</label>
+                <input
+                  type="number"
+                  min={1}
+                  required
+                  placeholder="e.g. 45"
+                  value={completionForm.time_spent_minutes}
+                  onChange={(e) => setCompletionForm({ ...completionForm, time_spent_minutes: e.target.value })}
+                  className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
+                />
+                <p className="text-xs text-gray-400 mt-1">This gets added to your timesheet, pending HR approval.</p>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setCompletingTask(null)}
+                  className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-colors"
+                  disabled={savingCompletion}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingCompletion}
+                  className="flex-1 py-2.5 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                >
+                  {savingCompletion && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Submit & Complete
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit Member Modal */}
       {editingMember && (

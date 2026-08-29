@@ -8,35 +8,44 @@ export const revalidate = 3600; // Revalidate individual webinars every hour (IS
 
 const baseUrl = "https://www.drinterested.org"
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function mapRow(row: any): Webinar {
+  return {
+    id: row.id,
+    slug: row.slug || row.id,
+    title: row.title,
+    description: row.description || "",
+    longDescription: row.description || "",
+    date: row.date || "",
+    views: 0,
+    duration: row.time || "",
+    videoPath: row.video_url && !row.video_url.includes("youtu") ? row.video_url : "",
+    thumbnailPath: row.image || "/logo.png",
+    youtubeUrl: row.video_url && row.video_url.includes("youtu") ? row.video_url : "",
+    spotifyUrl: row.spotify_url || undefined,
+    tags: [],
+    speaker: row.speaker || undefined,
+    host: row.speaker_title || "Dr. Interested Webinar Series",
+  }
+}
+
 /**
  * Resolves a /watch/[id] request against two sources:
- *  1. The Supabase `webinars` table (admin-announced upcoming/completed webinars, keyed by UUID) —
- *     mapped into the full Webinar shape with safe defaults, since the raw row is missing fields
- *     (tags, views, duration, host, youtubeUrl, ...) that the player UI relies on.
- *  2. The curated static archive in data/webinars.ts (past episodes pulled from YouTube/Spotify,
- *     keyed by slug) when no matching Supabase row exists.
+ *  1. The Supabase `webinars` table — admin-managed, covers both admin-announced
+ *     upcoming/completed webinars (keyed by UUID `id`) and the migrated episode archive
+ *     (keyed by `slug`, e.g. /watch/exploring-medicine-early).
+ *  2. The static archive in data/webinars.ts as a fallback, for the window before the
+ *     webinars-podcasts-migration.sql seed has been run against Supabase.
  */
 async function resolveWebinar(id: string): Promise<Webinar | null> {
-  const { data: row } = await supabase.from("webinars").select("*").eq("id", id).maybeSingle()
+  const { data: row } = await supabase
+    .from("webinars")
+    .select("*")
+    .eq(UUID_RE.test(id) ? "id" : "slug", id)
+    .maybeSingle()
 
-  if (row) {
-    return {
-      id: row.id,
-      slug: row.id,
-      title: row.title,
-      description: row.description || "",
-      longDescription: row.description || "",
-      date: row.date || "",
-      views: 0,
-      duration: "",
-      videoPath: row.video_url && !row.video_url.includes("youtu") ? row.video_url : "",
-      thumbnailPath: row.image || "/logo.png",
-      youtubeUrl: row.video_url && row.video_url.includes("youtu") ? row.video_url : "",
-      tags: [],
-      speaker: row.speaker || undefined,
-      host: "Dr. Interested Webinar Series",
-    }
-  }
+  if (row) return mapRow(row)
 
   return getWebinarBySlug(id) || null
 }

@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/keep-alive",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/task-reminders",
+      "schedule": "0 13 * * *"
     }
   ]
 }
