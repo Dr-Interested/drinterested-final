@@ -382,7 +382,7 @@ export async function GET() {
       <content:encoded><![CDATA[
         <img src="${escapeXml(absoluteUrl(p.thumbnailPath))}" alt="${escapeXml(p.title)}" />
         <p>${p.description}</p>
-        <p><a href="${escapeXml(p.youtubeUrl)}">Watch on YouTube</a> &middot; <a href="${escapeXml(p.spotifyUrl)}">Listen on Spotify</a></p>
+        <p><a href="${escapeXml(p.youtubeUrl)}">Watch on YouTube</a>${p.spotifyUrl ? ` &middot; <a href="${escapeXml(p.spotifyUrl)}">Listen on Spotify</a>` : ""}</p>
       ]]></content:encoded>
     </item>`)
   })

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getEpisodesByCategory } from "@/lib/episodes"
 import MediaCard from "@/components/publications/media-card"
 import PageBreadcrumb from "@/components/page-breadcrumb"
+import SeoSchema from "@/components/seo-schema"
 import ScrollToTop from "@/components/scroll-to-top"
 
 export const metadata: Metadata = {
@@ -30,9 +31,28 @@ export const revalidate = 300
 export default async function WebinarsPage() {
   const sorted = await getEpisodesByCategory("webinar")
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Dr. Interested Webinars",
+    description: "Every recording from the Dr. Interested Webinar Series and Code Blue Planet 2026.",
+    url: "https://www.drinterested.org/publications/webinars",
+    isPartOf: { "@type": "WebSite", name: "Dr. Interested", url: "https://www.drinterested.org" },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: sorted.map((item, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `https://www.drinterested.org/watch/${item.slug}`,
+        name: item.title,
+      })),
+    },
+  }
+
   return (
     <div>
       <ScrollToTop />
+      <SeoSchema id="webinars-listing-schema" schema={schema} />
       <section className="bg-[#f5f1eb] py-10 md:py-16">
         <div className="container">
           <PageBreadcrumb

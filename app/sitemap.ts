@@ -236,19 +236,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const watchPages = [...dbWatchPages, ...curatedWatchPages]
 
   const publicationsCategoryPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/publications/webinars`,
-      lastModified: currentDate,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/publications/podcasts`,
-      lastModified: currentDate,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-  ]
+    "webinars", "podcasts", "blog", "op-eds", "policy",
+  ].map((category) => ({
+    url: `${baseUrl}/publications/${category}`,
+    lastModified: currentDate,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }))
 
   // Fetch all members from database using helper. Each member's headshot is listed as that
   // page's sitemap image — pairs the photo with the page whose <h1>/alt text carries their name,

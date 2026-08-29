@@ -1,9 +1,7 @@
 import type { Metadata } from "next"
 import { generateSeoMetadata } from "@/lib/seo-utils"
 import PublicationsClientPage from "./PublicationsClientPage"
-import { supabase } from "@/lib/supabase-client"
-import { resolvePublicationAuthor } from "@/lib/author-backfill"
-import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
+import { getAllPublications } from "@/lib/publications-data"
 import { getEpisodesByCategory } from "@/lib/episodes"
 
 export const revalidate = 300; // Revalidate every 5 minutes (ISR)
@@ -24,108 +22,14 @@ export const metadata: Metadata = generateSeoMetadata({
 })
 
 export default async function PublicationsPage() {
-  const [curatedWebinars, curatedPodcasts] = await Promise.all([
+  const [{ policyWork, opEds, blogs }, curatedWebinars, curatedPodcasts] = await Promise.all([
+    getAllPublications(),
     getEpisodesByCategory("webinar"),
     getEpisodesByCategory("podcast"),
   ])
 
-  // Fetch all content: blogs, op-eds, and policy work
-  const { data: allContentData, error: contentError } = await supabase
-    .from("blogs")
-    .select(`
-      *,
-      author:members (
-        name,
-        bio,
-        image,
-        socials
-      )
-    `)
-    .order("created_at", { ascending: false })
-
-  const formatContent = (contentData: any) => {
-    let authorData = contentData.author || {}
-    if (Array.isArray(authorData)) authorData = authorData[0] || {}
-
-    // Live member → historical roster backup → generic "Publications Team" fallback, so a
-    // departed member's old posts still show a real name/photo instead of "Unknown Author".
-    const author = resolvePublicationAuthor({
-      slug: contentData.slug,
-      authorName: contentData.author_name,
-      liveMember: authorData.name ? authorData : null,
-    })
-
-    return {
-      slug: contentData.slug,
-      title: contentData.title,
-      excerpt: contentData.excerpt,
-      content: contentData.content,
-      coverImage: contentData.cover_image,
-      topic: contentData.topic,
-      readingTime: contentData.reading_time,
-      featured: contentData.featured,
-      contentType: contentData.content_type || "blog",
-      policyType: contentData.policy_type || null, // "report", "joint-statement", "input"
-      date: new Date(contentData.created_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }),
-      author: {
-        name: author.name,
-        image: author.image,
-        bio: author.bio,
-        linkedIn: author.linkedIn || "",
-        twitter: "",
-        instagram: author.instagram || "",
-      }
-    }
-  }
-
-  let policyWork: any[] = []
-  let opEds: any[] = []
-  let blogs: any[] = []
-
-  if (!contentError && allContentData && Array.isArray(allContentData)) {
-    const formattedContent = allContentData.map(formatContent)
-    policyWork = formattedContent.filter(c => c.contentType === "policy")
-    opEds = formattedContent.filter(c => c.contentType === "op-ed")
-    // Publications page only ever shows the latest 6 blog posts (full archive still lives at
-    // each post's own URL and in the sitemap/RSS — this just caps the listing).
-    blogs = formattedContent.filter(c => c.contentType === "blog").slice(0, 6)
-  } else if (contentError) {
-    console.error("Error fetching publications:", contentError)
-  }
-
-  // Manually-curated policy submissions (e.g. UN/OHCHR filings) that live outside the CMS —
-  // their own dedicated page at /publications/policy/[slug] gets richer treatment (PDF page
-  // images + full text + prominent OHCHR links) than the generic blog editor supports.
-  // Prefixing the slug with "policy/" makes the existing card's /publications/${slug} link
-  // resolve straight to that route without needing to change the shared card component.
-  const curatedPolicyWork = POLICY_SUBMISSIONS.map((submission) => ({
-    slug: `policy/${submission.slug}`,
-    title: submission.title,
-    excerpt: submission.summary,
-    content: "",
-    coverImage: submission.documents[0]?.pages[0]?.file || "/websitebanner.jpg",
-    topic: submission.resolution,
-    readingTime: `${submission.documents.reduce((n, d) => n + d.paragraphs.length, 0)} min read`,
-    featured: true,
-    contentType: "policy",
-    policyType: "input",
-    date: submission.date,
-    author: {
-      name: "Dr. Interested",
-      image: "/circle-logo.png",
-      bio: "",
-      linkedIn: "",
-      twitter: "",
-      instagram: "",
-    },
-  }))
-
-  policyWork = [...curatedPolicyWork, ...policyWork]
-
+  // Every list here is the FULL, unsliced set — PublicationsClientPage previews the first 6
+  // of each and links out to that category's own subpage for the rest.
   return (
     <PublicationsClientPage
       policyWork={policyWork}
