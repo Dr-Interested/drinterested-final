@@ -125,8 +125,16 @@ export function generateOrganizationSchema() {
       "https://impact.drinterested.org/2025/annual",
       "https://impact.drinterested.org",
       "https://chess.drinterested.org/",
+      "https://link.drinterested.org",
     ],
     hasPart: [
+      {
+        "@type": "WebSite",
+        name: "Dr. Interested — Links",
+        url: "https://link.drinterested.org",
+        description:
+          "The official Dr. Interested link-in-bio hub — every social profile, program, publication, and policy in one place.",
+      },
       {
         "@type": "WebSite",
         name: "Simmon Chang Chess (Against Cancer) Club",
