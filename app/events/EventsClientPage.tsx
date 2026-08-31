@@ -230,6 +230,15 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
           </p>
         </div>
       </section>
+
+      {/* Media Consent — deliberately small and at the very end, not a callout */}
+      <p className="text-center text-xs text-[#405862]/50 py-4 px-4">
+        Attendees under 18 require a parent/guardian's consent for photos and video at our events — see our{" "}
+        <Link href="/media-consent" className="underline hover:text-[#405862]">
+          Media Consent and Release
+        </Link>
+        .
+      </p>
     </div>
   )
 }

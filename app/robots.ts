@@ -3,17 +3,19 @@ import type { MetadataRoute } from "next"
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // Deny /admin to everything — placed first so it is unambiguous
+      // Wildcard fallback, placed first so it is unambiguous. /dashboard and /volunteer-agreement
+      // are deliberately left crawlable here — they're kept out of search results via a noindex
+      // meta tag instead (see their layout.tsx / page.tsx), since a robots.txt disallow would
+      // stop crawlers from ever seeing that tag and can leave a bare, description-less URL
+      // indexed if anything links to it.
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // ChatGPT and OpenAI crawlers
       {
         userAgent: ["ChatGPT-User", "GPTBot", "GPT-Actions", "OAI-SearchBot"],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // Major search engines
       {
@@ -29,7 +31,6 @@ export default function robots(): MetadataRoute.Robots {
           "PetalBot", // Huawei Petal Search
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // AI and assistant crawlers
       {
@@ -45,7 +46,6 @@ export default function robots(): MetadataRoute.Robots {
           "meta-externalfetcher",
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // Social media crawlers
       {
@@ -58,7 +58,6 @@ export default function robots(): MetadataRoute.Robots {
           "OpenGraphXYZBot",
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // SEO and analytics tools
       {
@@ -76,7 +75,6 @@ export default function robots(): MetadataRoute.Robots {
           "SeekportBot",
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // Monitoring and uptime services
       {
@@ -96,7 +94,6 @@ export default function robots(): MetadataRoute.Robots {
           "Amazon Route 53 Health Check Service",
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // Feed readers and content services
       {
@@ -108,7 +105,6 @@ export default function robots(): MetadataRoute.Robots {
           "Cotoyogi",
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // Ad and marketing crawlers
       {
@@ -122,13 +118,11 @@ export default function robots(): MetadataRoute.Robots {
           "naver-blueno", // Naver preview
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // Security and compliance
       {
         userAgent: ["Detectify", "CookieScript", "Cookiebot", "SBIntuitionsBot"],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
       // Webhook and API services
       {
@@ -146,7 +140,6 @@ export default function robots(): MetadataRoute.Robots {
           "Hookdeck",
         ],
         allow: "/",
-        disallow: ["/dashboard/"],
       },
     ],
     sitemap: [

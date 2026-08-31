@@ -11,6 +11,12 @@ export interface SEOConfig {
   modifiedTime?: string
   author?: string
   section?: string
+  /**
+   * A short, comma-separated list of the article's core topics (Google's legacy
+   * news_keywords meta tag — still an optional signal for Top Stories eligibility on
+   * timely content). Distinct from the general `keywords` list, which is longer/broader.
+   */
+  newsKeywords?: string[]
 }
 
 export function generateSeoMetadata(config: SEOConfig): Metadata {
@@ -25,6 +31,7 @@ export function generateSeoMetadata(config: SEOConfig): Metadata {
     modifiedTime,
     author,
     section,
+    newsKeywords,
   } = config
 
   const metadata: Metadata = {
@@ -71,6 +78,13 @@ export function generateSeoMetadata(config: SEOConfig): Metadata {
   if (url) {
     metadata.alternates = {
       canonical: url,
+    }
+  }
+
+  if (newsKeywords && newsKeywords.length > 0) {
+    metadata.other = {
+      ...metadata.other,
+      news_keywords: newsKeywords.join(", "),
     }
   }
 

@@ -53,6 +53,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     modifiedTime: publication.updated_at || publication.created_at,
     author: publication.author_name || undefined,
     section: publication.topic,
+    // A short, focused set for Google's news_keywords signal — just the topic/type, not the
+    // long tail of title-derived terms already in `keywords` above.
+    newsKeywords: [publication.topic, contentTypeLabel, "Dr. Interested"].filter(Boolean),
   })
 }
 
@@ -99,18 +102,30 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
   const resolvedAuthorName = author.name
 
   const postUrl = `https://www.drinterested.org/publications/${publication.slug}`
+  const absoluteImage = (publication.cover_image || "/websitebanner.jpg").startsWith("http")
+    ? publication.cover_image
+    : `https://www.drinterested.org${publication.cover_image || "/websitebanner.jpg"}`
+  const absoluteAuthorImage = author.image?.startsWith("http")
+    ? author.image
+    : author.image
+      ? `https://www.drinterested.org${author.image}`
+      : undefined
 
+  // NewsArticle (a subtype of Article) is what Google's own docs recommend for Top Stories /
+  // news-result eligibility — same required fields as Article, plus a couple of extra signals
+  // (isAccessibleForFree, absolute image) News specifically looks for.
   const publicationSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "NewsArticle",
     headline: publication.title,
     description: publication.excerpt,
-    image: publication.cover_image,
+    image: [absoluteImage],
     datePublished: publication.created_at,
     dateModified: publication.updated_at || publication.created_at,
     keywords: [publication.topic, publication.content_type, publication.policy_type].filter(Boolean).join(", "),
     articleSection: publication.topic,
     url: postUrl,
+    isAccessibleForFree: true,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": postUrl,
@@ -118,14 +133,16 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
     author: {
       "@type": author.isGenericFallback ? "Organization" : "Person",
       name: resolvedAuthorName,
-      image: author.image,
+      image: absoluteAuthorImage,
     },
     publisher: {
       "@type": "Organization",
       name: "Dr. Interested",
       logo: {
         "@type": "ImageObject",
-        url: "https://www.drinterested.org/logo.png",
+        url: "https://www.drinterested.org/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
       },
     },
   }

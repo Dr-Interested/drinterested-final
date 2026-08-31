@@ -1,6 +1,39 @@
 import type { Metadata } from "next"
 import EventsClientPage from "./EventsClientPage"
 import { supabase } from "@/lib/supabase-client"
+import SeoSchema from "@/components/seo-schema"
+
+const baseUrl = "https://www.drinterested.org"
+
+function toIsoDate(dateStr: string, timeStr?: string): string {
+  const combined = timeStr ? `${dateStr} ${timeStr}` : dateStr
+  const parsed = new Date(combined)
+  if (!isNaN(parsed.getTime())) return parsed.toISOString()
+  const dateOnly = new Date(dateStr)
+  return isNaN(dateOnly.getTime()) ? dateStr : dateOnly.toISOString()
+}
+
+function eventSchema(e: any) {
+  const isVirtual = /virtual|online|zoom|webinar/i.test(e.location || "")
+  return {
+    "@type": "Event",
+    name: e.title,
+    description: e.description,
+    startDate: toIsoDate(e.date, e.time),
+    // schema.org's EventStatusType has no "completed" value — EventScheduled is correct
+    // regardless, and this function is only ever called for upcoming events anyway.
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: isVirtual
+      ? "https://schema.org/OnlineEventAttendanceMode"
+      : "https://schema.org/OfflineEventAttendanceMode",
+    location: isVirtual
+      ? { "@type": "VirtualLocation", url: e.link || baseUrl }
+      : { "@type": "Place", name: e.location, address: e.location },
+    image: e.image ? (e.image.startsWith("http") ? e.image : `${baseUrl}${e.image}`) : `${baseUrl}/websitebanner.jpg`,
+    organizer: { "@type": "Organization", name: "Dr. Interested", url: baseUrl },
+    url: e.link && e.link.startsWith("http") ? e.link : `${baseUrl}/events`,
+  }
+}
 
 export const revalidate = 60; // Revalidate events every 60 seconds (ISR)
 
@@ -58,5 +91,17 @@ export default async function EventsPage() {
   const upcomingEvents = sortEvents(rawUpcoming, true)
   const pastEvents = sortEvents(rawPast, false)
 
-  return <EventsClientPage upcomingEvents={upcomingEvents} pastEvents={pastEvents} />
+  // Only upcoming events get Event structured data — schema.org has no real "completed" status,
+  // and Google's Event rich results are meant for things people can still attend/register for.
+  const eventsListSchema = {
+    "@context": "https://schema.org",
+    "@graph": upcomingEvents.map(eventSchema),
+  }
+
+  return (
+    <>
+      {upcomingEvents.length > 0 && <SeoSchema id="events-schema" schema={eventsListSchema} />}
+      <EventsClientPage upcomingEvents={upcomingEvents} pastEvents={pastEvents} />
+    </>
+  )
 }

@@ -197,6 +197,14 @@ export default function Footer() {
             <Link href="/privacy-policy" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
               Privacy Policy
             </Link>
+            <span className="text-white/50">•</span>
+            <Link href="/ai-policy" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
+              AI Policy
+            </Link>
+            <span className="text-white/50">•</span>
+            <Link href="/safeguarding-policy" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
+              Safeguarding Policy
+            </Link>
             <button
               onClick={scrollToTop}
               className="text-white hover:text-[#4ecdc4] transition-colors bg-[#4f6b75] p-1.5 rounded-full ml-2"

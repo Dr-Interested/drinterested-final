@@ -1238,12 +1238,24 @@ export default function DbAdminPage() {
             <p className="text-sm text-gray-500 mt-1">Logged in as System Admin</p>
           )}
         </div>
-        <button
-          onClick={handleLogout}
-          className="text-[#c62828] hover:text-[#a01a1a] font-semibold border border-red-200 hover:border-red-400 bg-red-50/50 hover:bg-red-50 px-4 py-2 rounded-lg transition-all text-sm"
-        >
-          Sign Out Portal
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Portal-only — the Volunteer Agreement applies to every role in here (member,
+              director, and owner alike are unpaid volunteers under its terms) but is
+              deliberately not linked anywhere public — no footer link, no sitemap entry, and
+              the page itself is noindexed (see app/volunteer-agreement/page.tsx). */}
+          <Link
+            href="/volunteer-agreement"
+            className="text-gray-500 hover:text-[#4CAF7D] font-medium text-sm underline underline-offset-2"
+          >
+            Volunteer Agreement
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="text-[#c62828] hover:text-[#a01a1a] font-semibold border border-red-200 hover:border-red-400 bg-red-50/50 hover:bg-red-50 px-4 py-2 rounded-lg transition-all text-sm"
+          >
+            Sign Out Portal
+          </button>
+        </div>
       </div>
 
       {/* ADMIN NAVIGATION TABS */}

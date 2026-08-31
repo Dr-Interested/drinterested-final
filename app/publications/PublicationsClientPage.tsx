@@ -63,6 +63,10 @@ export default function PublicationsClientPage({
   webinars?: MediaItem[]
   podcasts?: MediaItem[]
 }) {
+  // Every post shown on this page, in on-page order — gives Google a structured list of the
+  // NewsArticle-eligible content here (each item's own page carries the full NewsArticle
+  // schema; this just tells Google what's collected on this listing).
+  const listedPosts = [...policyWork, ...opEds, ...blogs]
   const publicationsListingSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -73,6 +77,15 @@ export default function PublicationsClientPage({
       "@type": "WebSite",
       name: "Dr. Interested",
       url: "https://www.drinterested.org",
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: listedPosts.map((post, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `https://www.drinterested.org/publications/${post.slug}`,
+        name: post.title,
+      })),
     },
   }
 

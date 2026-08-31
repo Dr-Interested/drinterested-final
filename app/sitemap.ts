@@ -166,6 +166,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4,
     },
     {
+      url: `${baseUrl}/ai-policy`,
+      lastModified: currentDate,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/safeguarding-policy`,
+      lastModified: currentDate,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/media-consent`,
+      lastModified: currentDate,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    // /volunteer-agreement intentionally omitted — portal-only, noindexed.
+    {
       url: `${baseUrl}/terms`,
       lastModified: currentDate,
       changeFrequency: "yearly",

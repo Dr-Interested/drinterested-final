@@ -115,6 +115,47 @@ export default function ContactClientPage() {
     },
   }
 
+  // Mirrors the four visible FAQ cards below verbatim — Google requires FAQPage schema to
+  // match what's actually shown on the page, not separately-written copy.
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How can I join Dr. Interested?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Join our Discord to become a regular member, follow us on Instagram, and stay active on Discord to be the first to know when executive applications open!",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Do I need to be pre-med to join?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Not at all! We welcome all high school students interested in healthcare, regardless of their future career plans.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Are your events only for members?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Most of our webinars and educational events are open to all interested students. Some special events may be member-exclusive (meaning they would only be offered to the people on our Discord).",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How many schools collaborate with Dr. Interested?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "We're always open to school partnerships and currently work with several high schools. Contact our Outreach Department for potential collaborations.",
+        },
+      },
+    ],
+  }
+
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -133,6 +174,7 @@ export default function ContactClientPage() {
   return (
     <div>
       <SeoSchema id="contact-schema" schema={contactPageSchema} />
+      <SeoSchema id="faq-schema" schema={faqSchema} />
 
       <section className="hero-section bg-[#f5f1eb] py-10 md:py-16">
         <div className="container">
