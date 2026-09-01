@@ -15,6 +15,12 @@ function toIsoDate(dateStr: string, timeStr?: string): string {
 
 function eventSchema(e: any) {
   const isVirtual = /virtual|online|zoom|webinar/i.test(e.location || "")
+  const registrationUrl = e.link && e.link.startsWith("http") ? e.link : `${baseUrl}/events`
+  // Dr. Interested events are free to attend; availability tracks the registration status.
+  const availability =
+    e.status === "full" || e.status === "closed"
+      ? "https://schema.org/SoldOut"
+      : "https://schema.org/InStock"
   return {
     "@type": "Event",
     name: e.title,
@@ -31,7 +37,16 @@ function eventSchema(e: any) {
       : { "@type": "Place", name: e.location, address: e.location },
     image: e.image ? (e.image.startsWith("http") ? e.image : `${baseUrl}${e.image}`) : `${baseUrl}/websitebanner.jpg`,
     organizer: { "@type": "Organization", name: "Dr. Interested", url: baseUrl },
-    url: e.link && e.link.startsWith("http") ? e.link : `${baseUrl}/events`,
+    performer: { "@type": "Organization", name: "Dr. Interested", url: baseUrl },
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "CAD",
+      availability,
+      url: registrationUrl,
+      validFrom: toIsoDate(e.created_at || e.date),
+    },
+    url: registrationUrl,
   }
 }
 

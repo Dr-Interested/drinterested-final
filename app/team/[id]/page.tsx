@@ -107,48 +107,49 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const memberUrl = `${baseUrl}/team/${member.slug || member.id}`
   const memberImage = member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`
 
-  // schema.org/Person — rich Google Knowledge Panel signals
-  const personSchema = {
+  // schema.org/ProfilePage with the member as its mainEntity — this is the shape Google's
+  // Profile Page rich result expects. (A top-level Person carrying `mainEntityOfPage:
+  // ProfilePage` trips Search Console's "Unrecognized field mainEntityOfPage" warning.)
+  const profilePageSchema = {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "@id": `${memberUrl}#person`,
-    name: member.name,
-    jobTitle: member.role,
-    image: {
-      "@type": "ImageObject",
-      url: memberImage,
-      width: 800,
-      height: 800,
-      caption: `${member.name} - ${member.role} at Dr. Interested`,
-    },
+    "@type": "ProfilePage",
+    "@id": memberUrl,
     url: memberUrl,
-    description: member.bio || undefined,
-    affiliation: {
-      "@type": "Organization",
-      "@id": `${baseUrl}#organization`,
-      name: "Dr. Interested",
-      url: baseUrl,
-    },
-    worksFor: {
-      "@type": "Organization",
-      "@id": `${baseUrl}#organization`,
-      name: "Dr. Interested",
-      url: baseUrl,
-    },
-    sameAs: sameAs.length ? sameAs : undefined,
-    mainEntityOfPage: {
-      "@type": "ProfilePage",
-      "@id": memberUrl,
-      name: `${member.name} | Dr. Interested`,
-      description: member.bio || undefined,
+    name: `${member.name} | Dr. Interested`,
+    ...(member.bio ? { description: member.bio } : {}),
+    mainEntity: {
+      "@type": "Person",
+      "@id": `${memberUrl}#person`,
+      name: member.name,
+      jobTitle: member.role,
+      image: {
+        "@type": "ImageObject",
+        url: memberImage,
+        width: 800,
+        height: 800,
+        caption: `${member.name} - ${member.role} at Dr. Interested`,
+      },
       url: memberUrl,
-      image: memberImage,
+      description: member.bio || undefined,
+      affiliation: {
+        "@type": "Organization",
+        "@id": `${baseUrl}#organization`,
+        name: "Dr. Interested",
+        url: baseUrl,
+      },
+      worksFor: {
+        "@type": "Organization",
+        "@id": `${baseUrl}#organization`,
+        name: "Dr. Interested",
+        url: baseUrl,
+      },
+      sameAs: sameAs.length ? sameAs : undefined,
     },
   }
 
   return (
     <main className="min-h-screen bg-[#f5f1eb]/60 py-8">
-      <SeoSchema id="person-schema" schema={personSchema} />
+      <SeoSchema id="person-schema" schema={profilePageSchema} />
       <div className="container mx-auto max-w-3xl px-4">
         <PageBreadcrumb
           items={[

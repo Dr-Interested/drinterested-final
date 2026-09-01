@@ -77,6 +77,19 @@ const eventJsonLd = {
     name: "Dr. Interested",
     url: SITE_URL,
   },
+  performer: {
+    "@type": "Organization",
+    name: "Dr. Interested",
+    url: SITE_URL,
+  },
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "CAD",
+    availability: "https://schema.org/SoldOut",
+    url: `${SITE_URL}/medx-2026`,
+    validFrom: "2026-06-01T00:00:00-04:00",
+  },
   sponsor: [
     { "@type": "Organization", name: "TakingITGlobal" },
     { "@type": "Organization", name: "Sprout Fellowship" },
