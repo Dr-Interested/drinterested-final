@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
 import { Quote, Users, TrendingUp, Heart, Award, BookOpen, Sparkles, Globe } from "lucide-react"
+import { LiteYouTube, LiteSpotify } from "@/components/lite-embed"
 
 export default function OurWorkPage() {
   const fadeIn = {
@@ -500,17 +501,12 @@ export default function OurWorkPage() {
             </h3>
             <div className="grid md:grid-cols-2 gap-5">
               <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <div className="aspect-video">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src="https://www.youtube.com/embed/8Mp9ulR7L4Y"
-                    title="Dr. Interested Webinar"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  ></iframe>
+                <div className="p-3 pb-0">
+                  <LiteYouTube
+                    id="8Mp9ulR7L4Y"
+                    title="How Youth Can Impact Health Policy"
+                    watchHref="/watch/youth-impact-health-policy"
+                  />
                 </div>
                 <div className="p-3">
                   <h4 className="font-semibold text-[#405862] text-sm mb-1">Healthcare Advocacy & Policy Webinar</h4>
@@ -521,17 +517,12 @@ export default function OurWorkPage() {
               </div>
 
               <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <div className="aspect-video">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src="https://www.youtube.com/embed/dZj0Oi0aKPw"
-                    title="Dr. Interested Webinar"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  ></iframe>
+                <div className="p-3 pb-0">
+                  <LiteYouTube
+                    id="dZj0Oi0aKPw"
+                    title="Pathways to Med School: Master's, PhD, and Gap Year Options"
+                    watchHref="/watch/pathways-to-med-school"
+                  />
                 </div>
                 <div className="p-3">
                   <h4 className="font-semibold text-[#405862] text-sm mb-1">Youth Leadership in Healthcare</h4>
@@ -545,16 +536,11 @@ export default function OurWorkPage() {
             {/* Spotify Webinar */}
             <div className="mt-5 bg-white rounded-xl p-5 shadow-lg">
               <h4 className="font-semibold text-[#405862] mb-3 text-sm">Listen on Spotify</h4>
-              <iframe
-                style={{ borderRadius: "12px" }}
-                src="https://open.spotify.com/embed/episode/4CwnZwJufNXRcB7iGzrObO?utm_source=generator"
-                width="100%"
-                height="152"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-              ></iframe>
+              <LiteSpotify
+                episodeId="4CwnZwJufNXRcB7iGzrObO"
+                title="How Youth Can Impact Health Policy"
+                watchHref="/watch/youth-impact-health-policy"
+              />
             </div>
           </motion.div>
 
@@ -571,17 +557,12 @@ export default function OurWorkPage() {
             </h3>
             <div className="grid md:grid-cols-2 gap-5">
               <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <div className="aspect-video">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src="https://www.youtube.com/embed/dQiELtTYjQs"
-                    title="Dr. Interested Podcast"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  ></iframe>
+                <div className="p-3 pb-0">
+                  <LiteYouTube
+                    id="dQiELtTYjQs"
+                    title="Eye Health and Vision Care — Dr. Interested Podcast"
+                    watchHref="/listen/eye-health-and-vision-care"
+                  />
                 </div>
                 <div className="p-3">
                   <h4 className="font-semibold text-[#405862] text-sm mb-1">Healthcare Insights Podcast</h4>
@@ -593,16 +574,11 @@ export default function OurWorkPage() {
 
               <div className="bg-white rounded-xl p-5 shadow-lg flex flex-col justify-center">
                 <h4 className="font-semibold text-[#405862] mb-3 text-sm">Listen on Spotify</h4>
-                <iframe
-                  style={{ borderRadius: "12px" }}
-                  src="https://open.spotify.com/embed/episode/03vIYvBFFgNplGlVCKUmLm?utm_source=generator"
-                  width="100%"
-                  height="152"
-                  frameBorder="0"
-                  allowFullScreen
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                ></iframe>
+                <LiteSpotify
+                  episodeId="03vIYvBFFgNplGlVCKUmLm"
+                  title="Eye Health and Vision Care — Dr. Interested Podcast"
+                  watchHref="/listen/eye-health-and-vision-care"
+                />
               </div>
             </div>
           </motion.div>

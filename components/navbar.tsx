@@ -178,7 +178,7 @@ export default function Navbar() {
           </Sheet>
           <Link href="/" className="flex items-center gap-2 group">
             <div className="relative w-8 h-8 md:w-9 md:h-9 overflow-hidden rounded-full transition-transform duration-300 group-hover:scale-110">
-              <Image src="/circle-logo.png" alt="Dr. Interested Logo" fill className="rounded-full" priority />
+              <Image src="/circle-logo.png" alt="Dr. Interested Logo" fill sizes="36px" className="rounded-full" priority />
             </div>
             <div className="font-semibold text-base md:text-lg">
               <span className="text-[#405862]">Dr.</span>{" "}

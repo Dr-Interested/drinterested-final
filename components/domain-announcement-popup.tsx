@@ -59,9 +59,11 @@ export function DomainAnnouncementPopup({ onClose, isMainPage = false }: DomainA
             variant="ghost"
             size="sm"
             onClick={handleClose}
+            aria-label="Close announcement"
             className="absolute right-3 top-3 z-10 h-8 w-8 p-0 rounded-full bg-white/80 hover:bg-white/90 shadow-sm"
           >
             <X className="h-4 w-4" />
+            <span className="sr-only">Close announcement</span>
           </Button>
 
           {/* Main Content */}

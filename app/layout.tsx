@@ -192,7 +192,11 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+        {/* enableSystem={false}: the site is light-by-default and only goes dark via the
+            AccessibilityWidget toggle. Letting next-themes also react to the OS
+            prefers-color-scheme made its resolved theme disagree with the inline
+            #theme-init script for OS-dark visitors, producing a hydration mismatch. */}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <AccessibilityWidget />
           <SeoSchema id="organization-schema" schema={generateOrganizationSchema()} />
           <Suspense fallback={null}>

@@ -228,15 +228,19 @@ export default function WatchPageClient({ webinar }: WatchPageClientProps) {
   };
 
   // --- Structured data for SEO ---
-  const structuredData = {
+  const absolute = (path: string) =>
+    path.startsWith("http") ? path : `https://www.drinterested.org${path.startsWith("/") ? "" : "/"}${path}`;
+
+  // "mm:ss" -> ISO 8601 duration; anything else (e.g. an unset Supabase row) is omitted.
+  const durationMatch = /^(\d+):([0-5]?\d)$/.exec(webinar.duration || "");
+  const parsedUploadDate = webinar.date ? new Date(webinar.date) : null;
+
+  const structuredData: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "VideoObject",
     name: webinar.title,
     description: webinar.description,
-    thumbnailUrl: `https://www.drinterested.org${webinar.thumbnailPath}`,
-    uploadDate: new Date(webinar.date).toISOString(),
-    duration: `PT${webinar.duration.replace(":", "M")}S`,
-    contentUrl: `https://www.drinterested.org${webinar.videoPath}`,
+    thumbnailUrl: absolute(webinar.thumbnailPath),
     embedUrl: `https://www.drinterested.org/watch/${webinar.slug}`,
     interactionStatistic: {
       "@type": "InteractionCounter",
@@ -252,6 +256,18 @@ export default function WatchPageClient({ webinar }: WatchPageClientProps) {
       },
     },
   };
+  if (parsedUploadDate && !isNaN(parsedUploadDate.getTime())) {
+    structuredData.uploadDate = parsedUploadDate.toISOString();
+  }
+  if (durationMatch) {
+    structuredData.duration = `PT${Number(durationMatch[1])}M${Number(durationMatch[2])}S`;
+  }
+  if (webinar.videoPath) {
+    structuredData.contentUrl = absolute(webinar.videoPath);
+  }
+  if (webinar.youtubeUrl) {
+    structuredData.url = webinar.youtubeUrl;
+  }
 
   return (
     <>

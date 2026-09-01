@@ -32,6 +32,7 @@ import { Quote, Users, TrendingUp, Heart, Award, BookOpen, Sparkles, Globe } fro
 
 import { DomainAnnouncementPopup } from "@/components/domain-announcement-popup"
 import DiscordIcon from "@/components/icons/discord-icon"
+import { LiteYouTube, LiteSpotify } from "@/components/lite-embed"
 
 export default function HomePage({ recentPost: passedRecentPost, featuredEvent: passedFeaturedEvent, featuredPosts: passedFeaturedPosts }: { recentPost?: any, featuredEvent?: any, featuredPosts?: any[] }) {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -76,7 +77,13 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
 
       {/* Hero Section */}
       <section className="relative py-10 md:py-16 overflow-hidden bg-gradient-to-b from-[#f5f1eb] to-white">
-        <div className="absolute inset-0 bg-[url('/pattern-bg.png')] opacity-5"></div>
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%23405862'/%3E%3C/svg%3E\")",
+          }}
+        ></div>
         <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-[#4ecdc4]/5 via-transparent to-[#405862]/5 opacity-70"></div>
 
         <div className="container relative z-10">
@@ -105,7 +112,7 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
                   href="https://discord.gg/pzbGRgsGXY"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#405862] text-white hover:bg-[#334852] px-5 py-2.5 rounded-md font-medium inline-flex items-center shadow-md hover:shadow-lg transition-all hover:scale-105 duration-300"
+                  className="bg-[#405862] text-white hover:bg-[#334852] px-5 py-2.5 rounded-md font-medium inline-flex items-center shadow-md hover:shadow-lg transition-transform hover:scale-105 duration-300"
                 >
                   Join Our Community
                 </Link>
@@ -408,6 +415,7 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
                   src="/mindsproject.png"
                   alt="Dr. Interested - Resilent Minds Program Photo"
                   fill
+                  sizes="(max-width: 768px) 220px, 280px"
                   className="object-contain rounded-lg transform -rotate-3 hover:rotate-0 transition-transform duration-500"
                   priority
                 />
@@ -785,21 +793,11 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow-md p-4 border border-[#405862]/10">
                 <h4 className="text-base font-semibold text-[#405862] mb-3">Listen on Spotify</h4>
-                <div className="aspect-video w-full rounded-md overflow-hidden">
-                  <iframe
-                    data-testid="embed-iframe"
-                    style={{ borderRadius: "12px" }}
-                    src="https://open.spotify.com/embed/episode/03vIYvBFFgNplGlVCKUmLm/video?utm_source=generator"
-                    width="624"
-                    height="351"
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    title="Dr. Interested Podcast on Spotify - Healthcare Education for High School Students"
-                    className="rounded-md"
-                  ></iframe>
-                </div>
+                <LiteSpotify
+                  episodeId="03vIYvBFFgNplGlVCKUmLm"
+                  title="Eye Health and Vision Care — Dr. Interested Podcast"
+                  watchHref="/listen/eye-health-and-vision-care"
+                />
               </div>
 
               <div className="bg-white rounded-lg shadow-md p-4 border border-[#405862]/10">
@@ -815,19 +813,11 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
                     <span>YouTube Music</span>
                   </Link>
                 </h4>
-                <div className="aspect-video w-full rounded-md overflow-hidden">
-                  <iframe
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/dQiELtTYjQs?si=JxmVEt2x3ZVq6cAF"
-                    title="YouTube video player"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                    className="rounded-md"
-                  ></iframe>
-                </div>
+                <LiteYouTube
+                  id="dQiELtTYjQs"
+                  title="Eye Health and Vision Care — Dr. Interested Podcast"
+                  watchHref="/listen/eye-health-and-vision-care"
+                />
               </div>
             </div>
 

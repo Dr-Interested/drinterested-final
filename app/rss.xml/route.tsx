@@ -28,8 +28,6 @@ export async function GET() {
       "Dr. Interested circular logo variant - Round emblem representing the organization's commitment to youth medical education and healthcare advocacy",
     "/websitebanner.jpg":
       "Dr. Interested website banner - Hero image showcasing the organization's mission to inspire the next generation of healthcare professionals",
-    "/pattern-bg.png":
-      "Decorative background pattern - Subtle medical-themed texture used throughout the Dr. Interested website for visual depth",
 
     // Favicons and app icons
     "/favicon-16x16.png":

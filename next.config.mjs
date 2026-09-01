@@ -9,6 +9,18 @@ const nextConfig = {
         hostname: "**.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      // YouTube video thumbnails — used by webinar/podcast archives (data/webinars.ts,
+      // data/podcasts.ts) and the click-to-load media facades (components/lite-embed.tsx).
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        pathname: "/vi/**",
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+        pathname: "/vi/**",
+      },
     ],
   },
 

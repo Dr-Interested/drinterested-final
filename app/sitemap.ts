@@ -223,13 +223,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Admin-announced webinars that are NOT part of the episode archive below (no slug set —
   // the registration-flow "upcoming webinar" use case, keyed by UUID at /watch/<uuid>).
   // Excluding slugged rows here avoids listing the same row twice under two different URLs.
-  const { data: dbWebinars } = await supabase.from('webinars').select('id, created_at').is('slug', null)
-  const dbWatchPages: MetadataRoute.Sitemap = (dbWebinars || []).map((webinar) => ({
-    url: `${baseUrl}/watch/${webinar.id}`,
-    lastModified: new Date(webinar.created_at),
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }))
+  const { data: dbWebinars } = await supabase
+    .from('webinars')
+    .select('id, created_at, title, description, image, video_url, date')
+    .is('slug', null)
+
+  // Google video sitemap entry — thumbnail_loc + description are required; player_loc points
+  // at the on-site watch/listen page (which carries the VideoObject markup + player).
+  const toVideo = (
+    item: { title?: string | null; description?: string | null; thumbnailPath?: string | null; image?: string | null; date?: string | null },
+    pageUrl: string,
+  ) => {
+    const thumb = item.thumbnailPath || item.image
+    if (!item.title || !thumb) return undefined
+    const published = item.date ? new Date(item.date) : null
+    return [
+      {
+        title: item.title.slice(0, 100),
+        thumbnail_loc: absoluteUrl(thumb),
+        description: (item.description || item.title).slice(0, 2048),
+        player_loc: pageUrl,
+        ...(published && !isNaN(published.getTime())
+          ? { publication_date: published.toISOString() }
+          : {}),
+      },
+    ]
+  }
+
+  const dbWatchPages: MetadataRoute.Sitemap = (dbWebinars || []).map((webinar) => {
+    const url = `${baseUrl}/watch/${webinar.id}`
+    return {
+      url,
+      lastModified: new Date(webinar.created_at),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+      videos: toVideo(webinar, url),
+    }
+  })
 
   // Episode archive — Dr. Interested Webinar Series, Code Blue Planet 2026, and the Dr.
   // Interested Podcast — admin-managed in Supabase (see lib/episodes.ts), each entry's
@@ -238,20 +268,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getEpisodesByCategory("webinar"),
     getEpisodesByCategory("podcast"),
   ])
-  const curatedWatchPages: MetadataRoute.Sitemap = archiveWebinars.map((w) => ({
-    url: `${baseUrl}/watch/${w.slug}`,
-    lastModified: currentDate,
-    changeFrequency: "yearly" as const,
-    priority: 0.6,
-    images: [absoluteUrl(w.thumbnailPath)],
-  }))
-  const listenPages: MetadataRoute.Sitemap = archivePodcasts.map((p) => ({
-    url: `${baseUrl}/listen/${p.slug}`,
-    lastModified: currentDate,
-    changeFrequency: "yearly" as const,
-    priority: 0.6,
-    images: [absoluteUrl(p.thumbnailPath)],
-  }))
+  const curatedWatchPages: MetadataRoute.Sitemap = archiveWebinars.map((w) => {
+    const url = `${baseUrl}/watch/${w.slug}`
+    return {
+      url,
+      lastModified: currentDate,
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
+      images: [absoluteUrl(w.thumbnailPath)],
+      videos: toVideo(w, url),
+    }
+  })
+  const listenPages: MetadataRoute.Sitemap = archivePodcasts.map((p) => {
+    const url = `${baseUrl}/listen/${p.slug}`
+    return {
+      url,
+      lastModified: currentDate,
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
+      images: [absoluteUrl(p.thumbnailPath)],
+      videos: toVideo(p, url),
+    }
+  })
   const watchPages = [...dbWatchPages, ...curatedWatchPages]
 
   const publicationsCategoryPages: MetadataRoute.Sitemap = [
