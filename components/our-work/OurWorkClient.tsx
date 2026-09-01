@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
 import { Quote, Users, TrendingUp, Heart, Award, BookOpen, Sparkles, Globe } from "lucide-react"
 
 export default function OurWorkPage() {
@@ -332,6 +333,47 @@ export default function OurWorkPage() {
                   creativity can drive advocacy in healthcare and medicine. 35+ youth engaged with 20+ text and 15+ art
                   submissions.
                 </p>
+              </div>
+            </motion.div>
+
+            {/* Chess Club */}
+            <motion.div
+              className="grid md:grid-cols-2 gap-6 items-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeInLeft}
+            >
+              <div className="space-y-3">
+                <div className="inline-block bg-[#4ecdc4]/10 text-[#4ecdc4] px-3 py-1.5 rounded-full text-xs font-semibold">
+                  Community Fundraising
+                </div>
+                <h3 className="text-xl font-bold text-[#405862]">
+                  <Link href="https://chess.drinterested.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#4ecdc4] transition-colors">
+                    Simmon Chang Chess (Against Cancer) Club
+                  </Link>
+                </h3>
+                <p className="text-[#405862]/80 text-sm leading-relaxed">
+                  The{" "}
+                  <Link
+                    href="https://chess.drinterested.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#4ecdc4] font-medium hover:underline"
+                  >
+                    Simmon Chang Chess (Against Cancer) Club
+                  </Link>{" "}
+                  runs CFC-rated chess tournaments that donate 100% of proceeds to the Pediatric Cancer Research
+                  Foundation, in honour of Simmon Chang.
+                </p>
+              </div>
+              <div className="relative h-[280px] rounded-xl overflow-hidden shadow-xl">
+                <Image
+                  src="/chessdrint.png"
+                  alt="Simmon Chang Chess (Against Cancer) Club"
+                  fill
+                  className="object-cover hover:scale-105 transition-transform duration-700"
+                />
               </div>
             </motion.div>
           </div>

@@ -115,6 +115,16 @@ export default function Footer() {
                   2025 Annual Impact Report
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="https://chess.drinterested.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-[#4ecdc4] transition-colors"
+                >
+                  Simmon Chang Chess Club
+                </Link>
+              </li>
             </ul>
           </div>
 
