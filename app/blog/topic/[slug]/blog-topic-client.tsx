@@ -139,7 +139,7 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
                           </div>
                         </div>
                         <Link
-                          href={`/blog/${post.slug}`}
+                          href={`/publications/${post.slug}`}
                           className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-medium flex items-center"
                         >
                           Read

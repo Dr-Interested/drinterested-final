@@ -709,7 +709,7 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
                           {recentPost.date}
                         </span>
                       </div>
-                      <Link href={`/blog/${recentPost.slug}`}>
+                      <Link href={`/publications/${recentPost.slug}`}>
                         <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
                           {recentPost.title}
                         </h3>
@@ -729,7 +729,7 @@ export default function HomePage({ recentPost: passedRecentPost, featuredEvent: 
                         <span className="font-medium text-[#405862] text-sm">{recentPost.author.name}</span>
                       </div>
                       <Button className="w-full bg-[#405862] hover:bg-[#334852] group" asChild>
-                        <Link href={`/blog/${recentPost.slug}`}>
+                        <Link href={`/publications/${recentPost.slug}`}>
                           Read Full Article
                           <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                         </Link>

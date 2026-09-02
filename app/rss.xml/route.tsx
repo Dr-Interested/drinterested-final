@@ -286,7 +286,8 @@ export async function GET() {
   const { data: allMembers } = await supabase.from('members').select('*').eq('approved', true)
 
   blogPosts.forEach((post) => {
-    const postUrl = `${baseUrl}/blog/${post.slug}`
+    // Canonical post URL — /blog/<slug> 308-redirects here, so link the feed straight at it.
+    const postUrl = `${baseUrl}/publications/${post.slug}`
     const imageUrl = post.cover_image?.startsWith('http') ? post.cover_image : `${baseUrl}${post.cover_image || '/websitebanner.jpg'}`
     const pubDate = new Date(post.created_at || new Date()).toUTCString()
 
