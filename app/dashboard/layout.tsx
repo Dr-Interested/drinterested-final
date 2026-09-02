@@ -15,6 +15,9 @@ export const metadata: Metadata = {
       follow: false,
     },
   },
+  alternates: {
+    canonical: "https://www.drinterested.org/dashboard",
+  },
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

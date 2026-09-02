@@ -8,6 +8,12 @@ export const metadata: Metadata = {
   title: "Dr. Interested - Inspiring Future Healthcare Leaders",
   description:
     'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+  alternates: {
+    canonical: "https://www.drinterested.org",
+    languages: {
+      "en-US": "https://www.drinterested.org",
+    },
+  },
 }
 
 export default async function Page() {

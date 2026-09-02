@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     index: false,
     follow: true,
   },
+  alternates: {
+    canonical: "https://www.drinterested.org/thank-you",
+  },
   openGraph: {
     title: "Thank You for Subscribing | Dr. Interested",
     description: "Thank you for confirming your subscription to the Dr. Interested newsletter.",

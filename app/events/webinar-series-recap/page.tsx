@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -6,6 +7,23 @@ import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase-client"
 
 export const revalidate = 300; // Revalidate webinars every 5 minutes (ISR)
+
+export const metadata: Metadata = {
+  title: "Dr. Interested Webinar Series",
+  description:
+    "Watch every session from the Dr. Interested Webinar Series — youth, professionals, and experts discussing medicine, healthcare, and research.",
+  alternates: {
+    canonical: "https://www.drinterested.org/events/webinar-series-recap",
+  },
+  openGraph: {
+    title: "Dr. Interested Webinar Series",
+    description:
+      "Watch every session from the Dr. Interested Webinar Series on medicine, healthcare, and research.",
+    url: "https://www.drinterested.org/events/webinar-series-recap",
+    siteName: "Dr. Interested",
+    type: "website",
+  },
+}
 
 export default async function WebinarGalleryPage() {
 

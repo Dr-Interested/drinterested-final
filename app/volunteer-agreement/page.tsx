@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     follow: false,
     googleBot: { index: false, follow: false },
   },
+  alternates: {
+    canonical: "https://www.drinterested.org/volunteer-agreement",
+  },
 }
 
 export default function VolunteerAgreementPage() {

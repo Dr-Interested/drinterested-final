@@ -93,15 +93,10 @@ export const metadata: Metadata = {
     },
     creator: "@DrInterested",
   },
-  alternates: {
-    canonical: "https://www.drinterested.org",
-    languages: {
-      "en-US": "https://www.drinterested.org",
-    },
-    types: {
-      "application/rss+xml": "https://www.drinterested.org/rss.xml",
-    },
-  },
+  // NOTE: no `alternates` here on purpose. `alternates.canonical` set on the root layout
+  // cascades to every page that doesn't override it, which would point the whole site's
+  // canonical at the homepage. Each page declares its own canonical instead; the homepage's
+  // lives in app/page.tsx. RSS discovery is handled by the <link rel="alternate"> in <head>.
   icons: [
     { rel: "icon", url: "/favicon.ico" },
     { rel: "icon", type: "image/png", sizes: "16x16", url: "/favicon-16x16.png" },
