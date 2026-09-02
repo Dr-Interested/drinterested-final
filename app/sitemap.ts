@@ -15,6 +15,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // site-relative path (e.g. "/11.png") rather than a full URL.
   const absoluteUrl = (path: string) => (path.startsWith("http") ? path : `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`)
 
+  // Next.js does NOT XML-escape the text inside <video:title> / <video:description>, so an
+  // "&" in an episode title ("Tips, Tricks & Being Yourself") produces an invalid sitemap
+  // that Search Console rejects with a parsing error. Escape these fields ourselves.
+  const xmlEscape = (s: string) =>
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;")
+
   // Every MedExplore 2026 (MedX 2026) recap photo, letter, and certificate — indexed as an
   // image sitemap entry on the canonical /medx-2026 URL so each one is eligible for Google Images.
   const medExploreGalleryImages = Object.values(
@@ -239,9 +250,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const published = item.date ? new Date(item.date) : null
     return [
       {
-        title: item.title.slice(0, 100),
+        title: xmlEscape(item.title),
         thumbnail_loc: absoluteUrl(thumb),
-        description: (item.description || item.title).slice(0, 2048),
+        description: xmlEscape((item.description || item.title).slice(0, 2048)),
         player_loc: pageUrl,
         ...(published && !isNaN(published.getTime())
           ? { publication_date: published.toISOString() }
