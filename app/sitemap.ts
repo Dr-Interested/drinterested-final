@@ -236,24 +236,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Excluding slugged rows here avoids listing the same row twice under two different URLs.
   const { data: dbWebinars } = await supabase
     .from('webinars')
-    .select('id, created_at, title, description, image, video_url, date')
+    .select('id, created_at')
     .is('slug', null)
 
-  // Google video sitemap entry — thumbnail_loc + description are required; player_loc points
-  // at the on-site watch/listen page (which carries the VideoObject markup + player).
+  // Resolve the actual video source from a stored URL. Google rejects a video entry whose
+  // player_loc/content_loc just points back at the HTML page (the <loc>), so we need either
+  // a real player URL (YouTube embed) or raw media bytes (a hosted .mp4). A playlist link,
+  // an empty value, or anything else we can't resolve => no video entry for that page.
+  const YT_ID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/
+  const videoSource = (rawUrl?: string | null): { player_loc: string } | { content_loc: string } | null => {
+    if (!rawUrl) return null
+    const yt = YT_ID.exec(rawUrl)
+    if (yt) return { player_loc: `https://www.youtube.com/embed/${yt[1]}` }
+    if (/\.(mp4|webm|m4v|mov)(\?|$)/i.test(rawUrl)) return { content_loc: rawUrl }
+    return null
+  }
+
+  // Google video sitemap entry — thumbnail_loc + description are required, plus a real
+  // player_loc or content_loc (see videoSource above). Returns undefined when we can't
+  // resolve a genuine video source, so no bad entry is emitted.
   const toVideo = (
-    item: { title?: string | null; description?: string | null; thumbnailPath?: string | null; image?: string | null; date?: string | null },
-    pageUrl: string,
+    item: {
+      title?: string | null
+      description?: string | null
+      thumbnailPath?: string | null
+      image?: string | null
+      date?: string | null
+      youtubeUrl?: string | null
+      video_url?: string | null
+    },
   ) => {
     const thumb = item.thumbnailPath || item.image
-    if (!item.title || !thumb) return undefined
+    const source = videoSource(item.youtubeUrl || item.video_url)
+    if (!item.title || !thumb || !source) return undefined
     const published = item.date ? new Date(item.date) : null
     return [
       {
         title: xmlEscape(item.title),
         thumbnail_loc: absoluteUrl(thumb),
         description: xmlEscape((item.description || item.title).slice(0, 2048)),
-        player_loc: pageUrl,
+        ...source,
         ...(published && !isNaN(published.getTime())
           ? { publication_date: published.toISOString() }
           : {}),
@@ -261,16 +283,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]
   }
 
-  const dbWatchPages: MetadataRoute.Sitemap = (dbWebinars || []).map((webinar) => {
-    const url = `${baseUrl}/watch/${webinar.id}`
-    return {
-      url,
-      lastModified: new Date(webinar.created_at),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-      videos: toVideo(webinar, url),
-    }
-  })
+  // These UUID-keyed rows are the "no slug yet" case and frequently duplicate a slugged
+  // archive row below (same episode, two URLs). Keep them as plain page entries only — the
+  // video sitemap data is declared once, on the canonical /watch/<slug> URL.
+  const dbWatchPages: MetadataRoute.Sitemap = (dbWebinars || []).map((webinar) => ({
+    url: `${baseUrl}/watch/${webinar.id}`,
+    lastModified: new Date(webinar.created_at),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }))
 
   // Episode archive — Dr. Interested Webinar Series, Code Blue Planet 2026, and the Dr.
   // Interested Podcast — admin-managed in Supabase (see lib/episodes.ts), each entry's
@@ -279,29 +300,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getEpisodesByCategory("webinar"),
     getEpisodesByCategory("podcast"),
   ])
-  const curatedWatchPages: MetadataRoute.Sitemap = archiveWebinars.map((w) => {
-    const url = `${baseUrl}/watch/${w.slug}`
-    return {
-      url,
-      lastModified: currentDate,
-      changeFrequency: "yearly" as const,
-      priority: 0.6,
-      images: [absoluteUrl(w.thumbnailPath)],
-      videos: toVideo(w, url),
-    }
-  })
-  const listenPages: MetadataRoute.Sitemap = archivePodcasts.map((p) => {
-    const url = `${baseUrl}/listen/${p.slug}`
-    return {
-      url,
-      lastModified: currentDate,
-      changeFrequency: "yearly" as const,
-      priority: 0.6,
-      images: [absoluteUrl(p.thumbnailPath)],
-      videos: toVideo(p, url),
-    }
-  })
-  const watchPages = [...dbWatchPages, ...curatedWatchPages]
+  const curatedWatchPages: MetadataRoute.Sitemap = archiveWebinars.map((w) => ({
+    url: `${baseUrl}/watch/${w.slug}`,
+    lastModified: currentDate,
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+    images: [absoluteUrl(w.thumbnailPath)],
+    videos: toVideo(w),
+  }))
+  const listenPages: MetadataRoute.Sitemap = archivePodcasts.map((p) => ({
+    url: `${baseUrl}/listen/${p.slug}`,
+    lastModified: currentDate,
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+    images: [absoluteUrl(p.thumbnailPath)],
+    videos: toVideo(p),
+  }))
+
+  // Dedupe by URL — duplicate Supabase webinar rows (and slug-less completed rows that also
+  // surface as /watch/<uuid>) otherwise list the same page, and the same video, twice.
+  // Prefer whichever entry actually carries video data.
+  const watchListenByUrl = new Map<string, MetadataRoute.Sitemap[number]>()
+  for (const entry of [...dbWatchPages, ...curatedWatchPages, ...listenPages]) {
+    const existing = watchListenByUrl.get(entry.url)
+    if (!existing || (!existing.videos && entry.videos)) watchListenByUrl.set(entry.url, entry)
+  }
+  const watchPages = [...watchListenByUrl.values()]
 
   const publicationsCategoryPages: MetadataRoute.Sitemap = [
     "webinars", "podcasts", "blog", "op-eds", "policy",
@@ -344,7 +368,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...otherPages,
     ...publicationsCategoryPages,
     ...watchPages,
-    ...listenPages,
     ...blogTopicPages,
     ...blogPostPages,
     ...teamPages,
