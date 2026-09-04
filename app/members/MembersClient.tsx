@@ -28,6 +28,14 @@ type MemberType = {
   }
 }
 
+type PreviousMemberType = {
+  id: string
+  slug?: string
+  name: string
+  role: string
+  year: number
+}
+
 type DepartmentType = {
   id: string
   name: string
@@ -57,7 +65,7 @@ export default function MembersClient() {
       try {
         const { data, error } = await supabase
           .from("members")
-          .select("id, name, role, department, bio, image, socials")
+          .select("id, name, role, department, bio, image, socials, archived, archived_at")
           .eq("approved", true)
           .order("created_at", { ascending: true })
 
@@ -111,10 +119,38 @@ export default function MembersClient() {
     return `/${clean}`
   }
 
+  // Slugs must be generated over the SAME member set used by getAllMembersCombined() in
+  // lib/members-data.ts (approved, blog-author excluded, archived included) — that set is
+  // what generateSlug's disambiguation ("second person with this exact name") is computed
+  // against on the /team/[slug] side, so a duplicate-name member would get a different slug
+  // here than there if this used a narrower list. Do NOT swap in activeMembers below.
   const getMemberSlug = (m: MemberType | null | undefined) => {
     if (!m) return ""
     return m.slug || generateSlug(m, dbMembers)
   }
+
+  // The live team roster (leadership/departments/advisors tabs) only ever shows active
+  // members; archived ones move down into the "Previous Members" section instead.
+  const activeMembers = dbMembers.filter((m) => !m.archived)
+
+  const archivedMembers: PreviousMemberType[] = dbMembers
+    .filter((m) => m.archived)
+    .map((m) => ({
+      id: m.id,
+      slug: getMemberSlug(m),
+      name: m.name,
+      role: m.role,
+      year: m.archived_at ? new Date(m.archived_at).getFullYear() : new Date().getFullYear(),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  const archivedByYear = archivedMembers.reduce<Record<number, PreviousMemberType[]>>((acc, m) => {
+    (acc[m.year] ||= []).push(m)
+    return acc
+  }, {})
+  const archivedYearsDesc = Object.keys(archivedByYear)
+    .map(Number)
+    .sort((a, b) => b - a)
 
   // Dynamic distribution of members
   // NOTE: Podcast members are routed into Publications (no separate sub-section per meeting decision)
@@ -136,7 +172,7 @@ export default function MembersClient() {
   }
 
   // Ambassadors — shown as a sub-section inside the HR department card
-  const rawAmbassadors = dbMembers.filter((m) =>
+  const rawAmbassadors = activeMembers.filter((m) =>
     (m.department || "").toLowerCase().includes("ambassador") ||
     (m.role || "").toLowerCase().includes("organizational ambassador")
   )
@@ -150,7 +186,7 @@ export default function MembersClient() {
   }))
 
   // 1. Executive Director / President
-  const rawEd = dbMembers.find((m) => m.role === "Executive Director" || m.role === "President")
+  const rawEd = activeMembers.find((m) => m.role === "Executive Director" || m.role === "President")
   const executiveDirector: MemberType | null = rawEd
     ? {
       id: rawEd.id,
@@ -163,7 +199,7 @@ export default function MembersClient() {
     : null
 
   // 2. Deputy Executive Directors
-  const rawVps = dbMembers.filter((m) => m.role === "Deputy Executive Director")
+  const rawVps = activeMembers.filter((m) => m.role === "Deputy Executive Director")
   const deputyexecdir: MemberType[] = rawVps.map((vp) => ({
     id: vp.id,
     name: vp.name,
@@ -174,7 +210,7 @@ export default function MembersClient() {
   }))
 
   // 2b. Executive Assistants
-  const rawExecAssistants = dbMembers.filter((m) => m.role === "Executive Assistant")
+  const rawExecAssistants = activeMembers.filter((m) => m.role === "Executive Assistant")
   const executiveAssistantsList: MemberType[] = rawExecAssistants.map((ea) => ({
     id: ea.id,
     name: ea.name,
@@ -185,7 +221,7 @@ export default function MembersClient() {
   }))
 
   // 3. Advisors
-  const rawAdvisors = dbMembers.filter(
+  const rawAdvisors = activeMembers.filter(
     (m) =>
       m.department === "Advisory Board" ||
       m.department === "Advisors" ||
@@ -202,7 +238,7 @@ export default function MembersClient() {
 
   // 4. Departments
   const departmentsList: DepartmentType[] = staticDepartments.map((staticDept) => {
-    const deptMembers = dbMembers.filter((m) => getDepartmentMatch(staticDept.id, m.department))
+    const deptMembers = activeMembers.filter((m) => getDepartmentMatch(staticDept.id, m.department))
 
     // Directors (role contains director or lead)
     const rawDirs = deptMembers.filter((m) => (m.role || "").toLowerCase().includes("director"))
@@ -1077,6 +1113,39 @@ export default function MembersClient() {
           </Tabs>
         </div>
       </section>
+
+      {/* Previous Members — archived members (completed their term), grouped by the year they
+          left. Text-only: no photo, just a clickable name so their /team/[slug] page (bio +
+          publication credit) stays reachable. Shown regardless of which tab above is active. */}
+      {archivedMembers.length > 0 && (
+        <section className="py-10 bg-[#f5f1eb]/30 border-t border-[#405862]/10">
+          <div className="container">
+            <h2 className="text-xl font-bold text-center mb-6 text-[#405862] font-bricolage">Previous Members</h2>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {archivedYearsDesc.map((year) => (
+                <div key={year}>
+                  <h3 className="text-sm font-semibold text-[#405862]/70 mb-1">{year}</h3>
+                  <p className="text-sm text-[#405862]/90 leading-relaxed">
+                    {archivedByYear[year].map((m, i) => (
+                      <span key={m.id}>
+                        <Link
+                          href={`/team/${m.slug}`}
+                          className="text-[#405862] hover:text-[#4ecdc4] font-medium transition-colors"
+                        >
+                          {m.name}
+                        </Link>
+                        {" - "}
+                        {m.role}
+                        {i < archivedByYear[year].length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }

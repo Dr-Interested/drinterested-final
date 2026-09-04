@@ -8,6 +8,9 @@ export type UnifiedMember = {
   department?: string
   bio: string
   image: string
+  /** True once an admin has archived this member (completed their term) — still a fully
+   *  resolvable /team/[slug] page and publication byline, just off the live team roster. */
+  archived?: boolean
   socials?: {
     linkedin?: string
     instagram?: string
@@ -40,13 +43,17 @@ export function generateSlug(member: { name: string, role: string }, allMembers:
 }
 
 /**
- * Fetch all approved members directly from Supabase database.
+ * Fetch all approved members (active AND archived) directly from Supabase. Archived members
+ * are intentionally NOT filtered out here — this is what backs getUnifiedMemberById (so
+ * /team/[slug] keeps resolving after someone is archived) and the sitemap's team pages.
+ * Callers that should only show the live roster (e.g. the /members leadership/department
+ * tabs) filter on `.archived` themselves.
  */
 export async function getAllMembersCombined(): Promise<UnifiedMember[]> {
   try {
     const { data: dbMembers, error } = await supabase
       .from("members")
-      .select("id, name, role, department, bio, image, socials")
+      .select("id, name, role, department, bio, image, socials, archived")
       .eq("approved", true)
       .order("created_at", { ascending: true })
 
@@ -57,7 +64,7 @@ export async function getAllMembersCombined(): Promise<UnifiedMember[]> {
 
     const filtered = (dbMembers || [])
       .filter((m) => (m.role || "").toLowerCase() !== "blog author")
-      
+
     return filtered.map((dbm) => ({
       id: dbm.id,
       slug: generateSlug(dbm, filtered),
@@ -66,6 +73,7 @@ export async function getAllMembersCombined(): Promise<UnifiedMember[]> {
       department: dbm.department || undefined,
       bio: dbm.bio || "",
       image: formatImagePath(dbm.image),
+      archived: Boolean(dbm.archived),
       socials: dbm.socials || {},
     }))
   } catch (err) {

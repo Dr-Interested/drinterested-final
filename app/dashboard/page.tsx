@@ -19,6 +19,8 @@ type Member = {
   bio: string
   image: string
   approved: boolean
+  archived: boolean
+  archived_at: string | null
   created_at: string
   socials: {
     website?: string
@@ -189,7 +191,7 @@ export default function DbAdminPage() {
 
   // Members State
   const [members, setMembers] = useState<Member[]>([])
-  const [activeTab, setActiveTab] = useState<"pending" | "approved">("pending")
+  const [activeTab, setActiveTab] = useState<"pending" | "approved" | "archived">("pending")
   const [editingMember, setEditingMember] = useState<Member | null>(null)
   const [editForm, setEditForm] = useState<Partial<Member>>({})
   const [savingEdit, setSavingEdit] = useState(false)
@@ -897,6 +899,24 @@ export default function DbAdminPage() {
     }
   }
 
+  // Archive = the member completed their term in good standing and no longer wants to
+  // continue. Unlike handleRejectOrRemove, this keeps the row: they still show up under
+  // "Previous Members" on the public site and keep their publication byline. Restore
+  // (archive=false) reverses it if it was archived by mistake.
+  const handleArchiveToggle = async (id: string, archive: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("members")
+        .update({ archived: archive, archived_at: archive ? new Date().toISOString() : null })
+        .eq("id", id)
+      if (error) throw error
+      fetchMembers()
+    } catch (error) {
+      console.error(error)
+      alert(archive ? "Failed to archive." : "Failed to restore.")
+    }
+  }
+
   const extractStoragePath = (url: string | null | undefined, bucket: string): string | null => {
     if (!url) return null
     try {
@@ -1214,8 +1234,10 @@ export default function DbAdminPage() {
   }
 
   const pendingMembers = members.filter((m) => !m.approved)
-  const approvedMembers = members.filter((m) => m.approved)
-  const displayMembers = activeTab === "pending" ? pendingMembers : approvedMembers
+  const approvedMembers = members.filter((m) => m.approved && !m.archived)
+  const archivedMembers = members.filter((m) => m.approved && m.archived)
+  const displayMembers =
+    activeTab === "pending" ? pendingMembers : activeTab === "approved" ? approvedMembers : archivedMembers
 
   return (
     <div className="container max-w-6xl mx-auto py-12 px-4 relative">
@@ -1766,6 +1788,19 @@ export default function DbAdminPage() {
                 {approvedMembers.length}
               </span>
             </button>
+            <button
+              onClick={() => setActiveTab("archived")}
+              className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
+                activeTab === "archived"
+                  ? "text-[#4CAF7D] border-[#4CAF7D]"
+                  : "text-gray-500 border-transparent hover:text-[#4CAF7D]"
+              }`}
+            >
+              Archived
+              <span className="bg-gray-400 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                {archivedMembers.length}
+              </span>
+            </button>
           </div>
 
           {loading ? (
@@ -1788,13 +1823,17 @@ export default function DbAdminPage() {
                   />
                   <div className="p-5 flex flex-col flex-grow">
                     <div className="mb-3">
-                      {member.approved ? (
-                        <span className="inline-block bg-[#d4edda] text-[#155724] px-2 py-1 rounded text-xs font-bold">
-                          APPROVED
-                        </span>
-                      ) : (
+                      {!member.approved ? (
                         <span className="inline-block bg-[#fff3cd] text-[#856404] px-2 py-1 rounded text-xs font-bold">
                           PENDING
+                        </span>
+                      ) : member.archived ? (
+                        <span className="inline-block bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs font-bold">
+                          ARCHIVED
+                        </span>
+                      ) : (
+                        <span className="inline-block bg-[#d4edda] text-[#155724] px-2 py-1 rounded text-xs font-bold">
+                          APPROVED
                         </span>
                       )}
                     </div>
@@ -1805,7 +1844,9 @@ export default function DbAdminPage() {
                     <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">{member.bio}</p>
 
                     <div className="text-xs text-gray-400 mb-4">
-                      Applied {new Date(member.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      {member.archived && member.archived_at
+                        ? `Archived ${new Date(member.archived_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                        : `Applied ${new Date(member.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`}
                     </div>
 
                     <div className="mt-auto flex flex-col gap-2 pt-4 border-t border-gray-50">
@@ -1829,12 +1870,20 @@ export default function DbAdminPage() {
                           </>
                         ) : (
                           canDeleteMembers && (
-                            <button
-                              onClick={() => handleRejectOrRemove(member.id, true)}
-                              className="flex-1 py-2 bg-[#f5f5f5] hover:bg-[#ffebee] text-[#c62828] border border-gray-200 text-sm font-semibold rounded transition-colors"
-                            >
-                              Remove
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleArchiveToggle(member.id, !member.archived)}
+                                className="flex-1 py-2 bg-[#f5f5f5] hover:bg-gray-200 text-gray-700 border border-gray-200 text-sm font-semibold rounded transition-colors"
+                              >
+                                {member.archived ? "Restore" : "Archive"}
+                              </button>
+                              <button
+                                onClick={() => handleRejectOrRemove(member.id, true)}
+                                className="flex-1 py-2 bg-[#f5f5f5] hover:bg-[#ffebee] text-[#c62828] border border-gray-200 text-sm font-semibold rounded transition-colors"
+                              >
+                                Remove
+                              </button>
+                            </>
                           )
                         )}
                       </div>
