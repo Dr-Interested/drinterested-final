@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useRef } from "react"
 import { supabase } from "@/lib/supabase-client"
-import { Loader2, X, Clock, Play, Square, Award, FileText, CheckCircle2, User, HelpCircle, ExternalLink, Trash, Edit, Check, Calendar } from "lucide-react"
+import { Loader2, X, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar } from "lucide-react"
 import Link from "next/link"
 import EventsAdmin from "./EventsAdmin"
 import WebinarsAdmin from "./WebinarsAdmin"
 import ReactMarkdown from "react-markdown"
 import ImageUploadField from "@/components/admin/image-upload-field"
+import DriveBrowser from "@/components/dashboard/DriveBrowser"
 
 type Member = {
   id: string
@@ -1323,6 +1324,17 @@ export default function DbAdminPage() {
                 {tab === "timesheets" ? "Timesheets (Shifts)" : tab === "tasks" ? "Assign Tasks" : `Manage ${tab}`}
               </button>
             ))}
+            {/* Drive & Calendar isn't a department-scoped admin tool — everyone (owner,
+                director, or plain member) gets it, so it's appended here rather than being
+                part of resolveAccess()'s per-role visibleTabs list. */}
+            <button
+              onClick={() => setActiveMainTab("shared")}
+              className={`px-5 py-2 rounded-md font-semibold text-sm transition-all whitespace-nowrap ${
+                activeMainTab === "shared" ? "bg-white text-[#4CAF7D] shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Drive & Calendar
+            </button>
           </div>
         </>
       ) : (
@@ -1512,69 +1524,58 @@ export default function DbAdminPage() {
         </div>
       )}
 
-      {/* 3. Resources Tab */}
-      {!isHrOrAdmin && activeMainTab === "shared" && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center mb-4">
-                <HelpCircle className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Team Google Drive</h3>
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">Access all community documentation, design templates, and shared folders directly via the central Google Drive workspace link.</p>
-            </div>
-            <Link
-              href={googleDriveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-lg text-center transition-all flex items-center justify-center gap-2 text-sm"
-            >
-              Open Google Drive <ExternalLink className="w-4 h-4" />
-            </Link>
-          </div>
+      {/* 3. Resources Tab — visible to everyone (owner, director, and plain members alike;
+          see the "Drive & Calendar" button appended to both tab bars above). Drive browsing
+          is the primary tool here, so it gets the full-width top spot; the two calendar
+          links are secondary and sit side by side below it. */}
+      {activeMainTab === "shared" && (
+        <div className="space-y-6">
+          <DriveBrowser />
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center mb-4">
-                <Calendar className="w-6 h-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center mb-4">
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Shared Team Calendar</h3>
+                <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+                  {sharedCalendarUrl
+                    ? "Open the shared team calendar to see meetings, deadlines, and department schedules."
+                    : "The owner hasn't linked a shared calendar yet — check back soon."}
+                </p>
               </div>
-              <h3 className="font-bold text-lg mb-2">Shared Team Calendar</h3>
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                {sharedCalendarUrl
-                  ? "Open the shared team calendar to see meetings, deadlines, and department schedules."
-                  : "The owner hasn't linked a shared calendar yet — check back soon."}
-              </p>
+              {sharedCalendarUrl ? (
+                <Link
+                  href={sharedCalendarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold rounded-lg text-center transition-all flex items-center justify-center gap-2 text-sm"
+                >
+                  Open Shared Calendar <ExternalLink className="w-4 h-4" />
+                </Link>
+              ) : (
+                <span className="w-full py-2.5 bg-gray-50 text-gray-400 font-semibold rounded-lg text-center text-sm cursor-not-allowed">
+                  Not linked yet
+                </span>
+              )}
             </div>
-            {sharedCalendarUrl ? (
+
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Official Operations Calendar</h3>
+                <p className="text-gray-500 text-sm mb-6 leading-relaxed">Check deadlines, events schedule, and upcoming department webinars in our central Operations Calendar.</p>
+              </div>
               <Link
-                href={sharedCalendarUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold rounded-lg text-center transition-all flex items-center justify-center gap-2 text-sm"
+                href="/events"
+                className="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-center transition-all flex items-center justify-center gap-2 text-sm"
               >
-                Open Shared Calendar <ExternalLink className="w-4 h-4" />
+                View Events Schedule <ExternalLink className="w-4 h-4" />
               </Link>
-            ) : (
-              <span className="w-full py-2.5 bg-gray-50 text-gray-400 font-semibold rounded-lg text-center text-sm cursor-not-allowed">
-                Not linked yet
-              </span>
-            )}
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4">
-                <Clock className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Official Operations Calendar</h3>
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">Check deadlines, events schedule, and upcoming department webinars in our central Operations Calendar.</p>
             </div>
-            <Link
-              href="/events"
-              className="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-center transition-all flex items-center justify-center gap-2 text-sm"
-            >
-              View Events Schedule <ExternalLink className="w-4 h-4" />
-            </Link>
           </div>
         </div>
       )}
