@@ -1,4 +1,4 @@
-import { JWT } from "google-auth-library"
+import { OAuth2Client } from "google-auth-library"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 export type DriveItem = {
@@ -20,13 +20,21 @@ export type DriveFolderListing = {
 }
 
 // Full `drive` scope (not `drive.readonly`) — required for creating folders/files, copying
-// templates, and uploads. This is the ONE service account the whole portal shares, so every
-// write capability that touches Drive MUST go through the functions in this file, and this
-// file intentionally implements NO delete/trash function. Do not add one: the org's explicit
-// requirement is that nothing reachable through the portal can delete a Drive file, and since
-// members never hold this credential themselves (see lib/portal-auth.ts), omitting the
-// function here is what actually enforces that, not the Drive share/role.
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
+// templates, and uploads. This is the ONE Google account (connected via OAuth — see
+// app/api/drive/oauth/*) the whole portal shares, so every write capability that touches
+// Drive MUST go through the functions in this file, and this file intentionally implements NO
+// delete/trash function. Do not add one: the org's explicit requirement is that nothing
+// reachable through the portal can delete a Drive file, and since members never hold this
+// credential themselves (see lib/portal-auth.ts), omitting the function here is what actually
+// enforces that, not the connected account's role.
+//
+// This uses a real, OAuth-connected Google account rather than a service account on purpose:
+// service accounts have zero Drive storage quota of their own, so creating/copying/uploading
+// a file — which makes the service account its owner — fails immediately with "storage quota
+// exceeded" unless the folder lives in a Google Workspace Shared Drive. A regular account has
+// real quota, so this only works at all when the connected account is a normal Gmail/Workspace
+// user (ideally the one that already owns the shared folder, so no re-sharing is needed).
+export const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
 const DRIVE_API_BASE = "https://www.googleapis.com/drive/v3/files"
 const DRIVE_UPLOAD_BASE = "https://www.googleapis.com/upload/drive/v3/files"
 const FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
@@ -45,38 +53,6 @@ export type CreatableGoogleType = keyof typeof CREATABLE_GOOGLE_TYPES
 // through our server (never a raw credential handed to the browser), so this is a hard cap.
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024
 
-let jwtClient: JWT | null = null
-
-/** Lazily builds (and reuses) the service-account JWT client — google-auth-library caches
- *  and refreshes the underlying access token internally across calls on the same instance. */
-function getJwtClient(): JWT {
-  if (jwtClient) return jwtClient
-
-  const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64
-  if (!encoded) {
-    throw new Error(
-      "GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 is not set — see .env.example for how to create and encode a Drive service account key."
-    )
-  }
-
-  let credentials: { client_email?: string; private_key?: string }
-  try {
-    credentials = JSON.parse(Buffer.from(encoded, "base64").toString("utf-8"))
-  } catch {
-    throw new Error("GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 is not valid base64-encoded JSON.")
-  }
-  if (!credentials.client_email || !credentials.private_key) {
-    throw new Error("The decoded service account JSON is missing client_email/private_key.")
-  }
-
-  jwtClient = new JWT({
-    email: credentials.client_email,
-    key: credentials.private_key,
-    scopes: [DRIVE_SCOPE],
-  })
-  return jwtClient
-}
-
 /** A Drive API error the route handler can safely turn into a user-facing message. */
 export class DriveApiError extends Error {
   status: number
@@ -86,10 +62,41 @@ export class DriveApiError extends Error {
   }
 }
 
+export function getOAuthClientCredentials() {
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET
+  if (!clientId || !clientSecret) {
+    throw new DriveApiError(500, "Server is missing GOOGLE_OAUTH_CLIENT_ID/GOOGLE_OAUTH_CLIENT_SECRET.")
+  }
+  return { clientId, clientSecret }
+}
+
+let oauthClient: OAuth2Client | null = null
+
+/** Lazily builds (and reuses) the OAuth client for the one connected Google account —
+ *  google-auth-library caches and silently refreshes the access token internally across calls
+ *  on the same instance using the long-lived refresh token. */
+function getConnectedDriveClient(): OAuth2Client {
+  if (oauthClient) return oauthClient
+
+  const { clientId, clientSecret } = getOAuthClientCredentials()
+  const refreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN
+  if (!refreshToken) {
+    throw new DriveApiError(
+      500,
+      "Google Drive isn't connected yet. A true owner needs to visit /api/drive/oauth/start to connect an account, then set GOOGLE_DRIVE_REFRESH_TOKEN from the result."
+    )
+  }
+
+  oauthClient = new OAuth2Client({ clientId, clientSecret })
+  oauthClient.setCredentials({ refresh_token: refreshToken })
+  return oauthClient
+}
+
 /** Exposed so routes that need to talk to the Drive API directly (e.g. the thumbnail proxy)
- *  can, without re-implementing the service-account auth dance. */
+ *  can, without re-implementing the OAuth token-refresh dance. */
 export async function getDriveAccessToken(): Promise<string> {
-  const client = getJwtClient()
+  const client = getConnectedDriveClient()
   const { token } = await client.getAccessToken()
   if (!token) throw new DriveApiError(500, "Could not obtain a Google Drive access token.")
   return token

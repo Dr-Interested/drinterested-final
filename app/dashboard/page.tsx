@@ -1811,6 +1811,34 @@ export default function DbAdminPage() {
             </div>
           )}
 
+          {/* One-time Google account connection that creating/copying/uploading in the Drive
+              browser runs as (see lib/google-drive.ts for why this can't be a service account).
+              Sign in as whichever Google account already owns the shared Drive folder to skip
+              re-sharing it. */}
+          {userIsTrueOwner && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+              <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Google Drive Connection</h3>
+              <p className="text-xs text-gray-500 mb-4">
+                New folders/Docs/Sheets/Forms, template copies, and uploads made in the Drive
+                browser are created by whichever Google account is connected here. Connect the
+                same account that owns the shared Drive folder so nothing needs re-sharing.
+              </p>
+              <a
+                href="/api/drive/oauth/start"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-5 py-2.5 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg text-sm transition-colors"
+              >
+                Connect Google Drive Account
+              </a>
+              <p className="text-xs text-gray-400 mt-2">
+                Opens Google's sign-in in a new tab. Once you grant access, copy the refresh
+                token shown there into the <code>GOOGLE_DRIVE_REFRESH_TOKEN</code> environment
+                variable and redeploy.
+              </p>
+            </div>
+          )}
+
           {/* Drive "New" templates — when set, clicking New Doc/Sheet/Slides/Form in the Drive
               browser copies this file instead of creating a blank one, so new files start from
               the org's house template. Falls back to a blank file if left empty. */}
