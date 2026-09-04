@@ -168,6 +168,15 @@ export default function DbAdminPage() {
     "https://calendar.google.com/calendar/u/0/embed?src=3d7733d92a09a4aa58dd1ea18913131ce2e3d2d67477a0dce617044538d5b755@group.calendar.google.com&ctz=America/Toronto"
   )
   const [isSavingCalendarUrl, setIsSavingCalendarUrl] = useState(false)
+  // Template files (settings keys drive_template_<type>) that "New" in the Drive browser
+  // copies from instead of creating a blank file — see app/api/drive/create-file/route.ts.
+  const [driveTemplates, setDriveTemplates] = useState<Record<"document" | "spreadsheet" | "presentation" | "form", string>>({
+    document: "",
+    spreadsheet: "",
+    presentation: "",
+    form: "",
+  })
+  const [savingTemplateType, setSavingTemplateType] = useState<string | null>(null)
 
   // Current Logged-in User Data
   const [currentUser, setCurrentUser] = useState<any | null>(null)
@@ -362,6 +371,45 @@ export default function DbAdminPage() {
     }
   }
 
+  const DRIVE_TEMPLATE_TYPES = ["document", "spreadsheet", "presentation", "form"] as const
+
+  const fetchDriveTemplates = async () => {
+    try {
+      const { data } = await supabase
+        .from("settings")
+        .select("key, value")
+        .in("key", DRIVE_TEMPLATE_TYPES.map((t) => `drive_template_${t}`))
+      if (data) {
+        setDriveTemplates((prev) => {
+          const next = { ...prev }
+          data.forEach((row: { key: string; value: string }) => {
+            const type = row.key.replace("drive_template_", "") as keyof typeof next
+            if (type in next) next[type] = row.value || ""
+          })
+          return next
+        })
+      }
+    } catch (err) {
+      console.error("Error fetching Drive template links:", err)
+    }
+  }
+
+  const handleUpdateTemplate = async (type: (typeof DRIVE_TEMPLATE_TYPES)[number], url: string) => {
+    setSavingTemplateType(type)
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .upsert({ key: `drive_template_${type}`, value: url })
+      if (error) throw error
+      alert("Template link updated!")
+    } catch (err: any) {
+      console.error(err)
+      alert("Failed to update template link: " + err.message)
+    } finally {
+      setSavingTemplateType(null)
+    }
+  }
+
 
   // Data Fetching Effect for Admins and Members
   useEffect(() => {
@@ -369,6 +417,7 @@ export default function DbAdminPage() {
 
     fetchGoogleDriveUrl()
     fetchSharedCalendarUrl()
+    fetchDriveTemplates()
 
     if (isHrOrAdmin && visibleTabs.includes(activeMainTab)) {
       if (activeMainTab === "members") {
@@ -1758,6 +1807,48 @@ export default function DbAdminPage() {
                     </p>
                   )}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Drive "New" templates — when set, clicking New Doc/Sheet/Slides/Form in the Drive
+              browser copies this file instead of creating a blank one, so new files start from
+              the org's house template. Falls back to a blank file if left empty. */}
+          {userIsTrueOwner && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+              <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Drive "New" Templates</h3>
+              <p className="text-xs text-gray-500 mb-4">
+                Paste the link to an existing Doc/Sheet/Slides/Form to use as the template. When a
+                member clicks "New" in the Drive browser, they get a copy of this file instead of a
+                blank one. Leave blank to create blank files for that type.
+              </p>
+              <div className="space-y-3">
+                {[
+                  { type: "document" as const, label: "Google Doc Template", placeholder: "https://docs.google.com/document/d/.../edit" },
+                  { type: "spreadsheet" as const, label: "Google Sheet Template", placeholder: "https://docs.google.com/spreadsheets/d/.../edit" },
+                  { type: "presentation" as const, label: "Google Slides Template", placeholder: "https://docs.google.com/presentation/d/.../edit" },
+                  { type: "form" as const, label: "Google Form Template", placeholder: "https://docs.google.com/forms/d/.../edit" },
+                ].map(({ type, label, placeholder }) => (
+                  <div key={type}>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <input
+                        type="url"
+                        value={driveTemplates[type]}
+                        onChange={(e) => setDriveTemplates((prev) => ({ ...prev, [type]: e.target.value }))}
+                        className="flex-1 p-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
+                        placeholder={placeholder}
+                      />
+                      <button
+                        onClick={() => handleUpdateTemplate(type, driveTemplates[type])}
+                        disabled={savingTemplateType === type}
+                        className="px-5 py-2.5 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg text-sm transition-colors disabled:opacity-75 flex-shrink-0"
+                      >
+                        {savingTemplateType === type ? "Saving..." : "Update Link"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
