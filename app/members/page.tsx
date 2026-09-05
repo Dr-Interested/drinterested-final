@@ -4,7 +4,7 @@ import MembersClient from "./MembersClient"
 export const metadata: Metadata = {
   title: "Our Team",
   description:
-    "Meet the talented team behind Dr. Interested - dedicated executives and advisors inspiring the next generation of healthcare professionals across 50+ countries.",
+    "Meet the talented team behind Dr. Interested - 367+ executives and advisors inspiring the next generation of healthcare professionals across 106 countries, having impacted 160,000+ youth and reached 3.7M+ people.",
   keywords: [
     "Dr. Interested team",
     "healthcare education leaders",

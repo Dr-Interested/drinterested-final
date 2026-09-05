@@ -26,6 +26,8 @@ import {
   Scissors,
   ClipboardPaste,
   X,
+  List,
+  LayoutGrid,
   type LucideIcon,
 } from "lucide-react"
 
@@ -139,6 +141,7 @@ export default function DriveBrowser() {
   const [newMenuOpen, setNewMenuOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [clipboard, setClipboard] = useState<ClipboardState>(null)
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -464,6 +467,25 @@ export default function DriveBrowser() {
           </button>
           <input ref={fileInputRef} type="file" onChange={handleFileSelected} className="hidden" />
 
+          <div className="flex items-center rounded-lg border border-gray-200 overflow-hidden">
+            <button
+              onClick={() => setViewMode("list")}
+              title="List view"
+              aria-label="List view"
+              className={`p-1.5 ${viewMode === "list" ? "bg-gray-200 text-gray-700" : "bg-white text-gray-400 hover:text-gray-600"}`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("grid")}
+              title="Tile view"
+              aria-label="Tile view"
+              className={`p-1.5 ${viewMode === "grid" ? "bg-gray-200 text-gray-700" : "bg-white text-gray-400 hover:text-gray-600"}`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
+
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 ml-1 pl-3 border-l border-gray-200">
               <span className="text-xs font-semibold text-gray-500">{selectedIds.size} selected</span>
@@ -525,6 +547,64 @@ export default function DriveBrowser() {
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-16 text-gray-400 text-sm">This folder is empty.</div>
+      ) : viewMode === "grid" ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {items.map((item) => {
+            const { icon: Icon, color } = styleFor(item)
+            const selected = selectedIds.has(item.id)
+            return (
+              <div
+                key={item.id}
+                className={`relative group rounded-xl border p-3 transition-colors ${
+                  selected ? "border-blue-300 bg-blue-50" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  onChange={() => toggleSelect(item.id)}
+                  className={`absolute top-2 left-2 z-10 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${
+                    selected ? "" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                  aria-label={`Select ${item.name}`}
+                />
+                <div className="absolute top-1.5 right-1.5 z-10 flex opacity-0 group-hover:opacity-100">
+                  {!item.isFolder && (
+                    <button
+                      onClick={() => copyItems([item.id])}
+                      title={`Copy "${item.name}"`}
+                      aria-label={`Copy ${item.name}`}
+                      className="p-1 text-gray-400 hover:text-blue-500 bg-white/80 rounded"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => cutItems([item.id])}
+                    title={`Move "${item.name}"`}
+                    aria-label={`Move ${item.name}`}
+                    className="p-1 text-gray-400 hover:text-amber-500 bg-white/80 rounded"
+                  >
+                    <Scissors className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <button
+                  onClick={() => (item.isFolder ? openFolder(item) : openFile(item))}
+                  className="w-full flex flex-col items-center gap-2 text-center"
+                >
+                  <div className="h-16 w-full flex items-center justify-center">
+                    {!item.isFolder && item.hasThumbnail ? (
+                      <DriveThumbnail item={item} />
+                    ) : (
+                      <Icon className={`w-9 h-9 ${color}`} />
+                    )}
+                  </div>
+                  <span className="w-full text-xs text-gray-700 line-clamp-2 break-words">{item.name}</span>
+                </button>
+              </div>
+            )
+          })}
+        </div>
       ) : (
         <div className="divide-y divide-gray-100">
           {items.map((item) => {
@@ -537,7 +617,7 @@ export default function DriveBrowser() {
                   checked={selected}
                   onChange={() => toggleSelect(item.id)}
                   className={`ml-2 shrink-0 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${
-                    selected ? "" : "opacity-0 group-hover:opacity-100"
+                    selected ? "" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                   }`}
                   aria-label={`Select ${item.name}`}
                 />
@@ -552,7 +632,7 @@ export default function DriveBrowser() {
                   )}
                   <span className="flex-1 min-w-0 text-sm text-gray-700 truncate">{item.name}</span>
                 </button>
-                <div className="flex items-center opacity-0 group-hover:opacity-100 shrink-0">
+                <div className="flex items-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0">
                   {!item.isFolder && (
                     <button
                       onClick={() => copyItems([item.id])}

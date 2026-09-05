@@ -11,6 +11,7 @@ import ImageUploadField from "@/components/admin/image-upload-field"
 import DriveBrowser from "@/components/dashboard/DriveBrowser"
 import MemberSettingsTab from "@/components/dashboard/MemberSettingsTab"
 import PortalFirstVisitPrompts from "@/components/dashboard/PortalFirstVisitPrompts"
+import PortalTabSelector from "@/components/dashboard/PortalTabSelector"
 
 type Member = {
   id: string
@@ -1291,6 +1292,21 @@ export default function DbAdminPage() {
   const displayMembers =
     activeTab === "pending" ? pendingMembers : activeTab === "approved" ? approvedMembers : archivedMembers
 
+  const adminTabLabel = (tab: string) =>
+    tab === "timesheets" ? "Timesheets (Shifts)" : tab === "tasks" ? "Assign Tasks" : `Manage ${tab}`
+  const adminTabs: { id: string; label: string }[] = [
+    ...visibleTabs.map((tab) => ({ id: tab, label: adminTabLabel(tab) })),
+    { id: "shared", label: "Drive & Calendar" },
+    { id: "settings", label: "Settings" },
+    ...(userIsTrueOwner ? [{ id: "admin", label: "Admin" }] : []),
+  ]
+  const memberTabs: { id: string; label: string }[] = [
+    { id: "punchcard", label: "Punch Card" },
+    { id: "mytasks", label: "My Tasks" },
+    { id: "shared", label: "Drive & Calendar" },
+    { id: "settings", label: "Settings" },
+  ]
+
   return (
     <div className="container max-w-6xl mx-auto py-12 px-4 relative">
       <PortalFirstVisitPrompts />
@@ -1364,59 +1380,10 @@ export default function DbAdminPage() {
             </p>
           )}
 
-          <div className="flex gap-4 mb-8 bg-gray-100 p-1 rounded-lg w-fit overflow-x-auto">
-            {visibleTabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveMainTab(tab)}
-                className={`px-5 py-2 rounded-md font-semibold text-sm transition-all whitespace-nowrap capitalize ${
-                  activeMainTab === tab ? "bg-white text-[#4CAF7D] shadow-sm" : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                {tab === "timesheets" ? "Timesheets (Shifts)" : tab === "tasks" ? "Assign Tasks" : `Manage ${tab}`}
-              </button>
-            ))}
-            {/* Drive & Calendar isn't a department-scoped admin tool — everyone (owner,
-                director, or plain member) gets it, so it's appended here rather than being
-                part of resolveAccess()'s per-role visibleTabs list. */}
-            <button
-              onClick={() => setActiveMainTab("shared")}
-              className={`px-5 py-2 rounded-md font-semibold text-sm transition-all whitespace-nowrap ${
-                activeMainTab === "shared" ? "bg-white text-[#4CAF7D] shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Drive & Calendar
-            </button>
-            <button
-              onClick={() => setActiveMainTab("settings")}
-              className={`px-5 py-2 rounded-md font-semibold text-sm transition-all whitespace-nowrap ${
-                activeMainTab === "settings" ? "bg-white text-[#4CAF7D] shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Settings
-            </button>
-          </div>
+          <PortalTabSelector tabs={adminTabs} active={activeMainTab} onSelect={setActiveMainTab} />
         </>
       ) : (
-        /* MEMBER NAVIGATION TABS */
-        <div className="flex gap-4 mb-8 bg-gray-100 p-1 rounded-lg w-fit overflow-x-auto">
-          {[
-            { id: "punchcard", label: "Punch Card" },
-            { id: "mytasks", label: "My Tasks" },
-            { id: "shared", label: "Drive & Calendar" },
-            { id: "settings", label: "Settings" }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveMainTab(tab.id)}
-              className={`px-6 py-2 rounded-md font-semibold text-sm transition-all whitespace-nowrap ${
-                activeMainTab === tab.id ? "bg-white text-[#4CAF7D] shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <PortalTabSelector tabs={memberTabs} active={activeMainTab} onSelect={setActiveMainTab} />
       )}
 
       {/* --- RENDER MEMBER VIEWS --- */}
@@ -1767,13 +1734,16 @@ export default function DbAdminPage() {
 
       {/* --- RENDER ORIGINAL ADMIN TAB CONTENTS (STILL FULLY SUPPORTED) --- */}
 
-      {/* 6. Original Members Tab */}
-      {isHrOrAdmin && visibleTabs.includes("members") && activeMainTab === "members" && (
+      {/* 6. Original Members Tab (+ the true-owner-only Admin tab, which reuses this block for
+          the org-wide settings cards that used to sit on top of the Members list). */}
+      {isHrOrAdmin && visibleTabs.includes("members") && (activeMainTab === "members" || activeMainTab === "admin") && (
         <>
-          {/* Site-wide links (Drive folder, shared calendar) shown to every member on the
-              Resources tab — true-owner-only (not Admin Team leadership), since these apply
-              org-wide, not just to HR. */}
-          {userIsTrueOwner && (
+          {activeMainTab === "admin" && (
+            <h2 className="text-xl font-bold font-bricolage text-[#1a1a1a] mb-6">Admin Settings</h2>
+          )}
+          {/* Site-wide links (Drive folder, shared calendar) — true-owner-only (not Admin Team
+              leadership), since these apply org-wide, not just to HR. Now on their own Admin tab. */}
+          {userIsTrueOwner && activeMainTab === "admin" && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Configure Portal Links</h3>
               <p className="text-xs text-gray-500 mb-4">
@@ -1831,7 +1801,7 @@ export default function DbAdminPage() {
               browser runs as (see lib/google-drive.ts for why this can't be a service account).
               Sign in as whichever Google account already owns the shared Drive folder to skip
               re-sharing it. */}
-          {userIsTrueOwner && (
+          {userIsTrueOwner && activeMainTab === "admin" && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Google Drive Connection</h3>
               <p className="text-xs text-gray-500 mb-4">
@@ -1858,7 +1828,7 @@ export default function DbAdminPage() {
           {/* Drive "New" templates — when set, clicking New Doc/Sheet/Slides/Form in the Drive
               browser copies this file instead of creating a blank one, so new files start from
               the org's house template. Falls back to a blank file if left empty. */}
-          {userIsTrueOwner && (
+          {userIsTrueOwner && activeMainTab === "admin" && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Drive "New" Templates</h3>
               <p className="text-xs text-gray-500 mb-4">
@@ -1897,7 +1867,9 @@ export default function DbAdminPage() {
             </div>
           )}
 
-          <div className="flex gap-4 border-b-2 border-gray-200 mb-8">
+          {activeMainTab === "members" && (
+          <>
+          <div className="flex gap-4 border-b-2 border-gray-200 mb-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab("pending")}
               className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
@@ -2034,6 +2006,8 @@ export default function DbAdminPage() {
                 </div>
               ))}
             </div>
+          )}
+          </>
           )}
         </>
       )}

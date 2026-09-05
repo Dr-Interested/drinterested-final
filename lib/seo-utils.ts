@@ -98,7 +98,7 @@ export function generateOrganizationSchema() {
     name: "Dr. Interested",
     alternateName: ["Dr Interested", "Doctor Interested", "Dr. Int"],
     description:
-      "A youth-led global pre-med community helping students explore the vast world of healthcare, research, and advocacy. We support youth in finding their unique 'spark' in medicine through interactive programs, publishing opportunities, and leadership development.",
+      "A youth-led global pre-med community that has impacted 160,000+ youth and reached 3.7M+ people across 106 countries, with 1,400+ members and 367+ executives. We help students explore healthcare, research, and advocacy and find their unique 'spark' in medicine through interactive programs, publishing opportunities, and leadership development.",
     url: "https://www.drinterested.org",
     logo: "https://www.drinterested.org/android-chrome-512x512.png",
     image: "https://www.drinterested.org/websitebanner.jpg",
@@ -146,7 +146,7 @@ export function generateOrganizationSchema() {
         "@type": "WebSite",
         "name": "2025 Annual Impact Report",
         "url": "https://impact.drinterested.org/2025/annual",
-        "description": "Dr. Interested's 2025 Annual Impact Report showcasing impact metrics including 160,000+ youth impacted, 106 countries reached, 1,400+ members, 20+ events, 400+ mentor hours, and 900 volunteers.",
+        "description": "Dr. Interested's 2025 Annual Impact Report showcasing impact metrics including 160,000+ youth impacted, 3.7M+ people reached, 106 countries reached, 1,400+ members, 367+ executives, 400+ mentor hours, and 600+ service hours earned.",
       },
     ],
     contactPoint: [

@@ -109,7 +109,7 @@ export default function SponsorshipsPage() {
               </div>
               <h3 className="text-lg font-semibold text-[#405862] mb-2">Social Media Visibility</h3>
               <p className="text-sm text-muted-foreground">
-                Your logo featured across our Instagram, LinkedIn, and other platforms reaching 55,000+ youth globally
+                Your logo featured across our Instagram, LinkedIn, and other platforms — 3.7M+ content impressions and 160,000+ youth impacted globally
               </p>
             </div>
 

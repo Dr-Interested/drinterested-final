@@ -1116,8 +1116,8 @@ export default function MembersClient() {
 
       {/* Previous Members — archived members (completed their term), grouped by the year they
           left. Text-only: no photo, just a clickable name so their /team/[slug] page (bio +
-          publication credit) stays reachable. Shown regardless of which tab above is active. */}
-      {archivedMembers.length > 0 && (
+          publication credit) stays reachable. Only shown on the Departments tab. */}
+      {activeTab === "departments" && archivedMembers.length > 0 && (
         <section className="py-10 bg-[#f5f1eb]/30 border-t border-[#405862]/10">
           <div className="container">
             <h2 className="text-xl font-bold text-center mb-6 text-[#405862] font-bricolage">Previous Members</h2>

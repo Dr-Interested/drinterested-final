@@ -596,7 +596,7 @@ export default function OurWorkPage() {
             >
               <h2 className="text-3xl font-bold text-[#405862] mb-3">Join Our Thriving Community</h2>
               <p className="text-[#405862]/80 mb-5 text-sm leading-relaxed">
-                Our Discord server is the heart of Dr. Interested—a safe, inclusive space where 1100+ members connect,
+                Our Discord server is the heart of Dr. Interested—a safe, inclusive space where 1,400+ members connect,
                 collaborate, and support each other daily. With a 106% weekly growth rate, we're building something
                 special.
               </p>
@@ -665,7 +665,7 @@ export default function OurWorkPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}>
             <h2 className="text-3xl md:text-4xl font-bold mb-3">Ready to Make an Impact?</h2>
             <p className="text-white/90 mb-6 text-base leading-relaxed max-w-2xl mx-auto">
-              Join 1100+ youth from around the world who are discovering their passion in healthcare and making a
+              Join 1,400+ youth from around the world who are discovering their passion in healthcare and making a
               difference in their communities.
             </p>
             <div className="flex flex-wrap justify-center gap-3">

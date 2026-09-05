@@ -1,12 +1,16 @@
 import type { Metadata } from "next"
 import OurWorkClient from "@/components/our-work/OurWorkClient"
 
+const OUR_WORK_DESCRIPTION =
+  "Dr. Interested has impacted 160,000+ youth and reached 3.7M+ people across 106 countries through healthcare education programs, mentorship, research competitions, and a 1,400+ member community. See our impact, events, and initiatives."
+
 export const metadata: Metadata = {
   title: "Our Work",
-  description:
-    "Discover how Dr. Interested is empowering 55,000+ youth across 50+ countries through innovative healthcare education programs, mentorship, research competitions, and community building. View our impact, events, and initiatives.",
+  description: OUR_WORK_DESCRIPTION,
   keywords: [
     "Dr. Interested impact",
+    "160000 youth impacted",
+    "3.7 million reached",
     "youth healthcare programs",
     "medical education initiatives",
     "healthcare mentorship",
@@ -21,8 +25,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Our Work | Dr. Interested",
-    description:
-      "Discover how Dr. Interested is empowering 55,000+ youth across 50+ countries through innovative healthcare education programs, mentorship, and community building.",
+    description: OUR_WORK_DESCRIPTION,
     url: "https://www.drinterested.org/our-work",
     siteName: "Dr. Interested",
     images: [
@@ -39,8 +42,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Our Work | Dr. Interested",
-    description:
-      "Discover how Dr. Interested is empowering 55,000+ youth across 50+ countries through innovative healthcare education programs and mentorship.",
+    description: OUR_WORK_DESCRIPTION,
     images: ["https://www.drinterested.org/og-image.png"],
   },
   alternates: {
