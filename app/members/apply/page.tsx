@@ -202,11 +202,9 @@ export default function DbApplyPage() {
       return
     }
 
-    let finalRole = formData.get("role") as string
-    const teamName = formData.get("teamName") as string
-    if (teamName && teamName.trim() !== "") {
-      finalRole = `${finalRole} - ${teamName.trim()}`
-    }
+    // Role is one of the presets from ROLES_BY_DEPARTMENT — no free text. Sub-teams are
+    // assigned later in the portal by a director/HR (members don't know their sub-team yet).
+    const finalRole = formData.get("role") as string
 
     const newMember = {
       name: formData.get("name") as string,
@@ -445,19 +443,6 @@ export default function DbApplyPage() {
             />
           )}
         </div>
-
-        {["Marketing", "Publications", "HR", "Events", "Technology", "Finance"].includes(selectedDepartment) && (
-          <div>
-            <label htmlFor="teamName" className="block font-medium mb-1 text-[#1a1a1a]">Team Name (Optional)</label>
-            <input
-              type="text"
-              id="teamName"
-              name="teamName"
-              placeholder="e.g., Systems and Automation"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
-            />
-          </div>
-        )}
 
         <div>
           <label htmlFor="bio" className="block font-medium mb-1 text-[#1a1a1a]">Bio *</label>

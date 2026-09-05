@@ -65,7 +65,7 @@ export default function MembersClient() {
       try {
         const { data, error } = await supabase
           .from("members")
-          .select("id, name, role, department, bio, image, socials, archived, archived_at")
+          .select("id, name, role, department, team, bio, image, socials, archived, archived_at")
           .eq("approved", true)
           .order("created_at", { ascending: true })
 
@@ -152,6 +152,16 @@ export default function MembersClient() {
     .map(Number)
     .sort((a, b) => b - a)
 
+  // Sub-teams (members.team) are internal-only and never shown here, BUT they're used to keep
+  // the two historically-separate public groupings intact after the roster was folded into
+  // departments: Ambassadors (now team "Ambassadors Team" under Human Resources) still render
+  // as a sub-section inside HR; Podcast (team "Podcast Production Team" under Publications)
+  // still fold into Publications like before.
+  const isAmbassador = (m: any) =>
+    (m.team || "").toLowerCase().includes("ambassador") ||
+    (m.department || "").toLowerCase().includes("ambassador") ||
+    (m.role || "").toLowerCase().includes("organizational ambassador")
+
   // Dynamic distribution of members
   // NOTE: Podcast members are routed into Publications (no separate sub-section per meeting decision)
   // NOTE: Ambassadors are excluded from the generic dept match — rendered as a sub-section inside HR
@@ -172,10 +182,7 @@ export default function MembersClient() {
   }
 
   // Ambassadors — shown as a sub-section inside the HR department card
-  const rawAmbassadors = activeMembers.filter((m) =>
-    (m.department || "").toLowerCase().includes("ambassador") ||
-    (m.role || "").toLowerCase().includes("organizational ambassador")
-  )
+  const rawAmbassadors = activeMembers.filter(isAmbassador)
   const ambassadorsList: MemberType[] = rawAmbassadors.map((a) => ({
     id: a.id,
     name: a.name,
@@ -238,7 +245,9 @@ export default function MembersClient() {
 
   // 4. Departments
   const departmentsList: DepartmentType[] = staticDepartments.map((staticDept) => {
-    const deptMembers = activeMembers.filter((m) => getDepartmentMatch(staticDept.id, m.department))
+    const deptMembers = activeMembers.filter(
+      (m) => getDepartmentMatch(staticDept.id, m.department) && !(staticDept.id === "hr" && isAmbassador(m))
+    )
 
     // Directors (role contains director or lead)
     const rawDirs = deptMembers.filter((m) => (m.role || "").toLowerCase().includes("director"))

@@ -12,6 +12,11 @@ import DriveBrowser from "@/components/dashboard/DriveBrowser"
 import MemberSettingsTab from "@/components/dashboard/MemberSettingsTab"
 import PortalFirstVisitPrompts from "@/components/dashboard/PortalFirstVisitPrompts"
 import PortalTabSelector from "@/components/dashboard/PortalTabSelector"
+import DirectoryTab from "@/components/dashboard/DirectoryTab"
+import AttendanceTab from "@/components/dashboard/AttendanceTab"
+import StrikesTab from "@/components/dashboard/StrikesTab"
+import YourStandingCard from "@/components/dashboard/YourStandingCard"
+import { PRESET_ROLES, subteamsFor } from "@/lib/teams"
 
 type Member = {
   id: string
@@ -25,6 +30,7 @@ type Member = {
   approved: boolean
   archived: boolean
   archived_at: string | null
+  team?: string | null
   created_at: string
   socials: {
     website?: string
@@ -111,32 +117,43 @@ const OWNER_TABS = ["members", "blogs", "events", "webinars", "timesheets", "tas
 // "none" = signed in (valid Supabase session) but no recognized account — e.g. someone who
 // signs in via SSO with an email that was never approved through /members/apply. They get
 // signed straight back out; this is NOT a tier that grants any dashboard access.
-type AccessLevel = "owner" | "director" | "member" | "none"
+// "deputy" = Deputy Director. Same "sees the admin shell, not full owner tabs" idea as
+// "director", but scoped to their own sub-team (member.team) for the Directory. Split out
+// from "director" so the Directory / Attendance / Strikes tabs can apply the tighter scope.
+type AccessLevel = "owner" | "director" | "deputy" | "member" | "none"
 
-function resolveAccess(member: Member | null, userEmail: string | undefined): { level: AccessLevel; tabs: string[] } {
+type Access = { level: AccessLevel; tabs: string[]; department: string; team: string | null }
+
+function resolveAccess(member: Member | null, userEmail: string | undefined): Access {
   const email = userEmail?.toLowerCase()
-  const role = member?.role || ""
+  const role = (member?.role || "").trim()
   const department = member?.department || ""
+  const team = member?.team || null
 
   // Owner is decided ONLY by the allowlisted email — never by "no member row found". A missing
   // row must never imply elevated access, or anyone who can authenticate (e.g. via SSO with any
   // email) would land here and get full owner access to every tab.
   if (email && OWNER_EMAILS.includes(email)) {
-    return { level: "owner", tabs: OWNER_TABS }
+    return { level: "owner", tabs: OWNER_TABS, department, team }
   }
   if (!member) {
-    return { level: "none", tabs: [] }
+    return { level: "none", tabs: [], department: "", team: null }
   }
   if (department === "Admin Team" && ADMIN_TEAM_LEADERSHIP_ROLES.some((r) => role.includes(r))) {
-    return { level: "owner", tabs: OWNER_TABS }
+    return { level: "owner", tabs: OWNER_TABS, department, team }
   }
-  const isDirector = DIRECTOR_ROLE_PATTERN.test(role) && !NON_DIRECTOR_ROLE_PATTERN.test(role)
+  const isDeputy = /^deputy director/i.test(role)
+  const isDirector =
+    !isDeputy && DIRECTOR_ROLE_PATTERN.test(role) && !NON_DIRECTOR_ROLE_PATTERN.test(role)
   if (isDirector) {
     const deptTabs = DEPARTMENT_TABS[department] || []
     const tabs = Array.from(new Set([...deptTabs, ...DIRECTOR_BASELINE_TABS]))
-    return { level: "director", tabs }
+    return { level: "director", tabs, department, team }
   }
-  return { level: "member", tabs: [] }
+  if (isDeputy) {
+    return { level: "deputy", tabs: [], department, team }
+  }
+  return { level: "member", tabs: [], department, team }
 }
 
 type Task = {
@@ -189,13 +206,30 @@ export default function DbAdminPage() {
   // admin tab list — see resolveAccess() above.
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("member")
   const [visibleTabs, setVisibleTabs] = useState<string[]>([])
-  const isHrOrAdmin = accessLevel === "owner" || accessLevel === "director"
+  // Deputy Directors get the admin shell (tab strip + Directory) too, just with an empty
+  // visibleTabs list and a sub-team-scoped Directory.
+  const isHrOrAdmin = accessLevel === "owner" || accessLevel === "director" || accessLevel === "deputy"
   // Deputy Executive Directors / Executive Assistants get the same tabs as the true owner, but
   // NOT these two: deleting a member, and editing the org-wide Drive/Calendar settings. HR
   // directors keep member-deletion (it's already their job); nobody else gets either.
   const userIsTrueOwner = isTrueOwner(currentUser?.email)
   const canDeleteMembers =
     userIsTrueOwner || (accessLevel === "director" && (currentMemberProfile?.department === "HR" || currentMemberProfile?.department === "Human Resources"))
+
+  // --- Attendance / Strikes / Directory access ---
+  // HR (any role, incl. coordinators) share one attendance view; only HR leadership starts /
+  // finalizes meetings. Directors + deputies get a department- / sub-team-scoped Directory.
+  const profileDept = (currentMemberProfile?.department || "").trim()
+  const profileTeam = currentMemberProfile?.team || null
+  const deptIsHR = /^(hr|human resources)$/i.test(profileDept)
+  const canSeeDirectory =
+    accessLevel === "owner" || accessLevel === "director" || accessLevel === "deputy" || deptIsHR
+  const canSeeAttendance = accessLevel === "owner" || deptIsHR
+  const canSeeStrikesTab = accessLevel === "owner" || deptIsHR
+  const canStartMeeting =
+    accessLevel === "owner" || (deptIsHR && (accessLevel === "director" || accessLevel === "deputy"))
+  const canFinalizeMeeting = accessLevel === "owner" || (deptIsHR && accessLevel === "director")
+  const canAssignSubteam = accessLevel === "owner" || deptIsHR || accessLevel === "director"
 
   // Active Main Tabs
   // Owners see every admin tab; directors see only their department's (+ timesheets/tasks);
@@ -301,7 +335,9 @@ export default function DbAdminPage() {
           const { level, tabs } = resolveAccess(profile || null, user.email)
           setAccessLevel(level)
           setVisibleTabs(tabs)
-          setActiveMainTab(tabs.length > 0 ? tabs[0] : "punchcard")
+          setActiveMainTab(
+            tabs.length > 0 ? tabs[0] : level === "deputy" ? "directory" : "punchcard"
+          )
         }
       } catch (err) {
         console.error("Error loading user profile:", err)
@@ -1020,6 +1056,7 @@ export default function DbAdminPage() {
           discord_username: editForm.discord_username?.trim() || null,
           role: editForm.role,
           department: editForm.department,
+          team: editForm.team ?? null,
           bio: editForm.bio,
           image: editForm.image,
           socials: editForm.socials
@@ -1294,8 +1331,14 @@ export default function DbAdminPage() {
 
   const adminTabLabel = (tab: string) =>
     tab === "timesheets" ? "Timesheets (Shifts)" : tab === "tasks" ? "Assign Tasks" : `Manage ${tab}`
+  const accountabilityTabs: { id: string; label: string }[] = [
+    ...(canSeeDirectory ? [{ id: "directory", label: "Directory" }] : []),
+    ...(canSeeAttendance ? [{ id: "attendance", label: "Attendance" }] : []),
+    ...(canSeeStrikesTab ? [{ id: "strikes", label: "Strikes" }] : []),
+  ]
   const adminTabs: { id: string; label: string }[] = [
     ...visibleTabs.map((tab) => ({ id: tab, label: adminTabLabel(tab) })),
+    ...accountabilityTabs,
     { id: "shared", label: "Drive & Calendar" },
     { id: "settings", label: "Settings" },
     ...(userIsTrueOwner ? [{ id: "admin", label: "Admin" }] : []),
@@ -1303,6 +1346,7 @@ export default function DbAdminPage() {
   const memberTabs: { id: string; label: string }[] = [
     { id: "punchcard", label: "Punch Card" },
     { id: "mytasks", label: "My Tasks" },
+    ...accountabilityTabs,
     { id: "shared", label: "Drive & Calendar" },
     { id: "settings", label: "Settings" },
   ]
@@ -1610,7 +1654,34 @@ export default function DbAdminPage() {
 
       {/* Settings — every signed-in member (owner, director, or plain member) gets this, same
           as Drive & Calendar above; it's self-service profile/preferences, not an admin tool. */}
-      {activeMainTab === "settings" && <MemberSettingsTab />}
+      {activeMainTab === "settings" && (
+        <div className="space-y-6">
+          <YourStandingCard />
+          <MemberSettingsTab />
+        </div>
+      )}
+
+      {/* Directory / Attendance / Strikes — see resolveAccess() + the can* flags above. */}
+      {activeMainTab === "directory" && canSeeDirectory && (
+        <DirectoryTab
+          accessLevel={accessLevel}
+          department={profileDept}
+          team={profileTeam}
+          isHr={deptIsHR}
+          canAssignSubteam={canAssignSubteam}
+          myEmail={(currentUser?.email || "").toLowerCase()}
+        />
+      )}
+      {activeMainTab === "attendance" && canSeeAttendance && (
+        <AttendanceTab
+          canStartMeeting={canStartMeeting}
+          canFinalizeMeeting={canFinalizeMeeting}
+          myEmail={(currentUser?.email || "").toLowerCase()}
+        />
+      )}
+      {activeMainTab === "strikes" && canSeeStrikesTab && (
+        <StrikesTab myEmail={(currentUser?.email || "").toLowerCase()} />
+      )}
 
       {/* --- RENDER HR & ADMIN CONTROL VIEWS --- */}
 
@@ -2173,24 +2244,56 @@ export default function DbAdminPage() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Department</label>
-                  <input
-                    type="text"
+                  <select
                     value={editForm.department || ""}
-                    onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                  />
+                    onChange={(e) => setEditForm({ ...editForm, department: e.target.value, team: null })}
+                    className="w-full p-2 border border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
+                  >
+                    <option value="">—</option>
+                    {Array.from(new Set([
+                      "Admin Team", "Events", "Finance", "Human Resources", "Marketing",
+                      "Publications", "Technology", "Medical Student Advisory Council", "Advisory Board",
+                      ...(editForm.department ? [editForm.department] : []),
+                    ])).map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Role</label>
-                  <input
-                    type="text"
+                  <select
                     value={editForm.role || ""}
                     onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                  />
+                    className="w-full p-2 border border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
+                  >
+                    <option value="">—</option>
+                    {Array.from(new Set([
+                      ...PRESET_ROLES,
+                      ...(editForm.role ? [editForm.role] : []),
+                    ])).map((r) => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Sub-team</label>
+                  <select
+                    value={editForm.team || ""}
+                    onChange={(e) => setEditForm({ ...editForm, team: e.target.value || null })}
+                    disabled={subteamsFor(editForm.department).length === 0}
+                    className="w-full p-2 border border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] disabled:bg-gray-50 disabled:text-gray-400"
+                  >
+                    <option value="">None</option>
+                    {Array.from(new Set([
+                      ...subteamsFor(editForm.department),
+                      ...(editForm.team ? [editForm.team] : []),
+                    ])).map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>

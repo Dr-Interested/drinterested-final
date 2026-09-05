@@ -8,6 +8,8 @@ export type UnifiedMember = {
   department?: string
   bio: string
   image: string
+  /** Internal-only sub-team (portal). Never rendered on public pages. */
+  team?: string | null
   /** True once an admin has archived this member (completed their term) — still a fully
    *  resolvable /team/[slug] page and publication byline, just off the live team roster. */
   archived?: boolean
@@ -53,7 +55,7 @@ export async function getAllMembersCombined(): Promise<UnifiedMember[]> {
   try {
     const { data: dbMembers, error } = await supabase
       .from("members")
-      .select("id, name, role, department, bio, image, socials, archived")
+      .select("id, name, role, department, team, bio, image, socials, archived")
       .eq("approved", true)
       .order("created_at", { ascending: true })
 
@@ -71,6 +73,7 @@ export async function getAllMembersCombined(): Promise<UnifiedMember[]> {
       name: dbm.name,
       role: dbm.role,
       department: dbm.department || undefined,
+      team: dbm.team || null,
       bio: dbm.bio || "",
       image: formatImagePath(dbm.image),
       archived: Boolean(dbm.archived),
