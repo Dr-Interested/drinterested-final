@@ -507,6 +507,20 @@ img.loading {
 .dark [class*="text-gray-400"] { color: #8b867e; }
 .dark [class*="text-gray-500"],
 .dark [class*="text-gray-600"] { color: #a49f97; }
+/* hover states — Tailwind's hover:bg-gray-* / hover:bg-white flash near-white in dark mode
+   because the :hover selector outranks the plain .dark [class*="bg-gray-*"] rules above. */
+.dark [class*="hover:bg-gray-50"]:hover,
+.dark [class*="hover:bg-gray-100"]:hover,
+.dark [class*="hover:bg-gray-200"]:hover,
+.dark [class*="hover:bg-white"]:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+/* Checkboxes are near-invisible on dark surfaces with just a dark border — give them a
+   visible outline (accent color still shows through when checked). */
+.dark input[type="checkbox"]:not(:checked) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+}
 .dark [class*="text-gray-700"],
 .dark [class*="text-gray-800"],
 .dark [class*="text-gray-900"],
@@ -701,8 +715,7 @@ img.loading {
   color: #f1ece7;
 }
 .dark [class*="bg-[#4f6b75]"] {
-  background-color: #4CAF7D;
-  color: #fff;
+  background-color: #3f5560;
 }
 
 /* Portal green stays as-is (bg-[#4CAF7D] is already high-contrast on dark); just make sure

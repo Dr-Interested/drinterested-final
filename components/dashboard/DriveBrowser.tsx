@@ -556,7 +556,9 @@ export default function DriveBrowser() {
               <div
                 key={item.id}
                 className={`relative group rounded-xl border p-3 transition-colors ${
-                  selected ? "border-blue-300 bg-blue-50" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                  selected
+                    ? "border-blue-400 bg-blue-50 dark:bg-blue-500/15"
+                    : "border-gray-200 dark:border-white/10 hover:border-gray-300 hover:bg-gray-50 dark:hover:border-white/20 dark:hover:bg-white/5"
                 }`}
               >
                 <input
@@ -614,14 +616,12 @@ export default function DriveBrowser() {
                   type="checkbox"
                   checked={selected}
                   onChange={() => toggleSelect(item.id)}
-                  className={`ml-2 shrink-0 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${
-                    selected ? "" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                  }`}
+                  className="ml-2 shrink-0 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   aria-label={`Select ${item.name}`}
                 />
                 <button
                   onClick={() => (item.isFolder ? openFolder(item) : openFile(item))}
-                  className="flex-1 min-w-0 flex items-center gap-3 py-1.5 px-2 hover:bg-gray-50 rounded-lg text-left transition-colors"
+                  className="flex-1 min-w-0 flex items-center gap-3 py-1.5 px-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg text-left transition-colors"
                 >
                   {!item.isFolder && item.hasThumbnail ? (
                     <DriveThumbnail item={item} />
