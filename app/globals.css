@@ -718,6 +718,16 @@ img.loading {
   background-color: #3f5560;
 }
 
+/* Footer "Portal Dashboard" pill — its hover:bg-[#4ecdc4] / hover:text-[#405862] utilities
+   get swept up by the mint-chip override above (which matches the class substring and ignores
+   the hover: prefix), leaving the label #405862 dark-on-dark. Pin the resting + hover colours. */
+.dark a.portal-dashboard-link {
+  color: #ffffff !important;
+}
+.dark a.portal-dashboard-link:hover {
+  color: #405862 !important;
+}
+
 /* Portal green stays as-is (bg-[#4CAF7D] is already high-contrast on dark); just make sure
    its disabled/subtle variants and the pale portal grays read right — handled above. */
 

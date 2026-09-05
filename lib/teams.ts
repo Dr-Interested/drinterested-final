@@ -1,8 +1,9 @@
-// Fixed sub-team ("team") lists per department, taken from the 2026-27 roster sheet.
-// This is the single source of truth for the sub-team <select> in the portal's
-// "Edit Member" modal and Directory tab. Sub-teams are internal only — they are never
-// rendered on the public /members page. Keys match both spellings of the HR department
-// name that exist in the data ("HR" and "Human Resources").
+// Fixed team lists per department (the org hierarchy is Department > Team > Sub-team; this
+// is the "Team" level — `members.team`). Taken from the 2026-27 roster sheet. Single source
+// of truth for the Team <select> in the portal's "Edit Member" modal and Directory tab.
+// Teams are internal only — never rendered on the public /members page. Keys match both
+// spellings of the HR department name that exist in the data ("HR" and "Human Resources").
+// (The only true "Sub-teams" are Ambassadors and Podcast — see MembersClient / DirectoryTab.)
 
 export const DEPARTMENT_SUBTEAMS: Record<string, string[]> = {
   Events: ["Logistics Team", "Planning Team", "Outreach Team", "Support Team"],

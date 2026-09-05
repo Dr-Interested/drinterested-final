@@ -82,17 +82,36 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
     [strikes],
   )
 
+  // Podcast is a sub-team of Publications and Ambassadors a sub-team of Human Resources —
+  // fold any member still tagged with the old standalone department (or only a matching
+  // sub-team) into the parent department so they group correctly.
+  const resolvedMembers = useMemo(
+    () =>
+      members.map((m) => {
+        const dept = normalizeDepartmentName(m.department)
+        const t = (m.team || "").toLowerCase()
+        const role = (m.role || "").toLowerCase()
+        if (dept.toLowerCase().includes("podcast") || t.includes("podcast")) {
+          return { ...m, department: "Publications", team: m.team || "Podcast Production Team" }
+        }
+        if (dept.toLowerCase().includes("ambassador") || t.includes("ambassador") || role.includes("organizational ambassador")) {
+          return { ...m, department: "Human Resources", team: m.team || "Ambassadors Team" }
+        }
+        return { ...m, department: dept }
+      }),
+    [members],
+  )
+
   // --- scope ---
   const myDept = normalizeDepartmentName(department)
   const scoped = useMemo(() => {
-    if (accessLevel === "owner" || isHr) return members
-    if (accessLevel === "director") return members.filter((m) => normalizeDepartmentName(m.department) === myDept)
+    const base = resolvedMembers
+    if (accessLevel === "owner" || isHr) return base
+    if (accessLevel === "director") return base.filter((m) => m.department === myDept)
     if (accessLevel === "deputy")
-      return members.filter(
-        (m) => normalizeDepartmentName(m.department) === myDept && (m.team || "") === (team || ""),
-      )
-    return members
-  }, [members, accessLevel, isHr, myDept, team])
+      return base.filter((m) => m.department === myDept && (m.team || "") === (team || ""))
+    return base
+  }, [resolvedMembers, accessLevel, isHr, myDept, team])
 
   const showAllDepartments = accessLevel === "owner" || isHr
 
@@ -141,7 +160,7 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
       if (error) throw error
       setMembers((prev) => prev.map((x) => (x.id === m.id ? { ...x, team: newTeam || null } : x)))
     } catch (err: any) {
-      alert("Failed to change sub-team: " + err.message)
+      alert("Failed to change team: " + err.message)
     } finally {
       setBusyId(null)
     }
@@ -183,7 +202,7 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
               onChange={(e) => assignTeam(m, e.target.value)}
               className="shrink-0 text-xs p-1 border border-gray-300 rounded bg-white max-w-[9rem]"
             >
-              <option value="">No sub-team</option>
+              <option value="">No team</option>
               {Array.from(new Set([...deptSubteams, ...(m.team ? [m.team] : [])])).map((t) => (
                 <option key={t} value={t}>
                   {t}
@@ -242,7 +261,7 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
       if (g.length) groups.push({ label: t, members: g })
     }
     const noTeam = rest.filter((m) => !m.team)
-    if (noTeam.length) groups.push({ label: "No sub-team", members: noTeam })
+    if (noTeam.length) groups.push({ label: "No team", members: noTeam })
 
     return (
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
@@ -286,10 +305,19 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
     )
   }
 
+  // The Medical Student Advisory Council is shown as a team inside the Admin Team card.
+  const isMsac = (m: MemberRow) =>
+    (m.department || "").toLowerCase().includes("advisory council") ||
+    (m.role || "").toLowerCase().includes("advisory council")
+
   // Admin-by-rank (owner / HR view only)
   const admins = showAllDepartments
     ? scoped
-        .filter((m) => normalizeDepartmentName(m.department) === "Admin Team" || LEADERSHIP_RANK.includes(m.role))
+        .filter(
+          (m) =>
+            !isMsac(m) &&
+            (normalizeDepartmentName(m.department) === "Admin Team" || LEADERSHIP_RANK.includes(m.role)),
+        )
         .sort((a, b) => {
           const ia = LEADERSHIP_RANK.indexOf(a.role)
           const ib = LEADERSHIP_RANK.indexOf(b.role)
@@ -297,10 +325,17 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
         })
     : []
 
+  const msacMembers = showAllDepartments
+    ? scoped
+        .filter(isMsac)
+        .sort((a, b) => Number(/chair/i.test(b.role)) - Number(/chair/i.test(a.role)) || a.name.localeCompare(b.name))
+    : []
+
   const deptNames = showAllDepartments
     ? (() => {
         const seen = new Set(DEPT_ORDER)
         const extras = scoped
+          .filter((m) => !isMsac(m))
           .map((m) => normalizeDepartmentName(m.department))
           .filter((d) => d && d !== "Admin Team" && !seen.has(d))
         return [...DEPT_ORDER, ...Array.from(new Set(extras))]
@@ -315,7 +350,7 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
           {showAllDepartments
             ? `${scoped.length} members`
             : accessLevel === "deputy"
-              ? `${myDept} · ${team || "your sub-team"}`
+              ? `${myDept} · ${team || "your team"}`
               : myDept}
         </span>
       </div>
@@ -323,7 +358,7 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
       {accessLevel === "deputy" ? (
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-4">
           {scoped.length === 0 ? (
-            <p className="text-gray-500 py-8 text-center text-sm">No one is in your sub-team yet.</p>
+            <p className="text-gray-500 py-8 text-center text-sm">No one is in your team yet.</p>
           ) : (
             scoped
               .sort((a, b) => Number(isDeputyRole(b.role)) - Number(isDeputyRole(a.role)) || a.name.localeCompare(b.name))
@@ -332,7 +367,7 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
         </div>
       ) : (
         <>
-          {admins.length > 0 && (
+          {(admins.length > 0 || msacMembers.length > 0) && (
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
                 <h3 className="font-bold text-gray-900">Admin Team</h3>
@@ -342,6 +377,16 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
                   <MemberLine key={m.id} m={m} canEditTeam={false} />
                 ))}
               </div>
+              {msacMembers.length > 0 && (
+                <div className="px-4 border-t border-gray-100">
+                  <p className="text-[11px] uppercase tracking-wide text-gray-400 font-semibold pt-2">
+                    Medical Student Advisory Council
+                  </p>
+                  {msacMembers.map((m) => (
+                    <MemberLine key={m.id} m={m} canEditTeam={false} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
           {deptNames.map((d) => (

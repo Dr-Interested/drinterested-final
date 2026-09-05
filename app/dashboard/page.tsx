@@ -151,7 +151,13 @@ function resolveAccess(member: Member | null, userEmail: string | undefined): Ac
     return { level: "director", tabs, department, team }
   }
   if (isDeputy) {
-    return { level: "deputy", tabs: [], department, team }
+    // Deputy Directors manage the same department tools as their department's Director
+    // (Publications deputy → blogs + webinars/podcasts, HR deputy → members, Events deputy →
+    // events, plus timesheets/tasks) — the Directory/Attendance scoping still treats them as
+    // "deputy" (their own team only).
+    const deptTabs = DEPARTMENT_TABS[department] || []
+    const tabs = Array.from(new Set([...deptTabs, ...DIRECTOR_BASELINE_TABS]))
+    return { level: "deputy", tabs, department, team }
   }
   return { level: "member", tabs: [], department, team }
 }
@@ -217,18 +223,16 @@ export default function DbAdminPage() {
     userIsTrueOwner || (accessLevel === "director" && (currentMemberProfile?.department === "HR" || currentMemberProfile?.department === "Human Resources"))
 
   // --- Attendance / Strikes / Directory access ---
-  // HR (any role, incl. coordinators) share one attendance view; only HR leadership starts /
-  // finalizes meetings. Directors + deputies get a department- / sub-team-scoped Directory.
+  // Owner + all HR (the "full group") see every department/team and can run org-wide meetings.
+  // Every director runs attendance for their whole department + all its teams; every deputy
+  // runs their department + only their own team. AttendanceTab enforces the per-meeting scope.
   const profileDept = (currentMemberProfile?.department || "").trim()
   const profileTeam = currentMemberProfile?.team || null
   const deptIsHR = /^(hr|human resources)$/i.test(profileDept)
-  const canSeeDirectory =
-    accessLevel === "owner" || accessLevel === "director" || accessLevel === "deputy" || deptIsHR
-  const canSeeAttendance = accessLevel === "owner" || deptIsHR
+  const isDirectorOrDeputy = accessLevel === "director" || accessLevel === "deputy"
+  const canSeeDirectory = accessLevel === "owner" || isDirectorOrDeputy || deptIsHR
+  const canSeeAttendance = accessLevel === "owner" || deptIsHR || isDirectorOrDeputy
   const canSeeStrikesTab = accessLevel === "owner" || deptIsHR
-  const canStartMeeting =
-    accessLevel === "owner" || (deptIsHR && (accessLevel === "director" || accessLevel === "deputy"))
-  const canFinalizeMeeting = accessLevel === "owner" || (deptIsHR && accessLevel === "director")
   const canAssignSubteam = accessLevel === "owner" || deptIsHR || accessLevel === "director"
 
   // Active Main Tabs
@@ -1416,9 +1420,14 @@ export default function DbAdminPage() {
             </div>
           </div>
 
-          {accessLevel === "director" && (
+          {(accessLevel === "director" || accessLevel === "deputy") && (
             <p className="text-sm text-gray-500 mb-4 -mt-2">
-              You have director access for <span className="font-semibold text-gray-700">{currentMemberProfile?.department}</span> only.
+              You have {accessLevel === "deputy" ? "deputy director" : "director"} access for{" "}
+              <span className="font-semibold text-gray-700">{currentMemberProfile?.department}</span>
+              {accessLevel === "deputy" && currentMemberProfile?.team ? (
+                <> · <span className="font-semibold text-gray-700">{currentMemberProfile.team}</span></>
+              ) : null}{" "}
+              only.
               {visibleTabs.length <= DIRECTOR_BASELINE_TABS.length &&
                 " There's no department-specific tool built for this department yet — ask the owner if you need one."}
             </p>
@@ -1674,8 +1683,11 @@ export default function DbAdminPage() {
       )}
       {activeMainTab === "attendance" && canSeeAttendance && (
         <AttendanceTab
-          canStartMeeting={canStartMeeting}
-          canFinalizeMeeting={canFinalizeMeeting}
+          accessLevel={accessLevel}
+          department={profileDept}
+          team={profileTeam}
+          isHr={deptIsHR}
+          isOwner={userIsTrueOwner || accessLevel === "owner"}
           myEmail={(currentUser?.email || "").toLowerCase()}
         />
       )}
@@ -2279,7 +2291,7 @@ export default function DbAdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Sub-team</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Team</label>
                   <select
                     value={editForm.team || ""}
                     onChange={(e) => setEditForm({ ...editForm, team: e.target.value || null })}

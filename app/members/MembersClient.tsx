@@ -162,6 +162,15 @@ export default function MembersClient() {
     (m.department || "").toLowerCase().includes("ambassador") ||
     (m.role || "").toLowerCase().includes("organizational ambassador")
 
+  const isPodcast = (m: any) =>
+    (m.team || "").toLowerCase().includes("podcast") ||
+    (m.department || "").toLowerCase().includes("podcast") ||
+    (m.role || "").toLowerCase().includes("podcast")
+
+  // Directors AND Deputy Directors of a sub-team belong up with the department's Director,
+  // not down in the compact sub-team list.
+  const isDirectorish = (m: any) => (m.role || "").toLowerCase().includes("director")
+
   // Dynamic distribution of members
   // NOTE: Podcast members are routed into Publications (no separate sub-section per meeting decision)
   // NOTE: Ambassadors are excluded from the generic dept match — rendered as a sub-section inside HR
@@ -181,8 +190,9 @@ export default function MembersClient() {
     return false
   }
 
-  // Ambassadors — shown as a sub-section inside the HR department card
-  const rawAmbassadors = activeMembers.filter(isAmbassador)
+  // Ambassadors — compact sub-section inside the HR department card (deputy/director of the
+  // sub-team are pulled up with the HR Director instead — see isDirectorish).
+  const rawAmbassadors = activeMembers.filter((m) => isAmbassador(m) && !isDirectorish(m))
   const ambassadorsList: MemberType[] = rawAmbassadors.map((a) => ({
     id: a.id,
     name: a.name,
@@ -190,6 +200,17 @@ export default function MembersClient() {
     image: formatImagePath(a.image),
     bio: a.bio || "",
     socialLinks: a.socials || {},
+  }))
+
+  // Podcast — same treatment, compact sub-section inside the Publications department card.
+  const rawPodcast = activeMembers.filter((m) => isPodcast(m) && !isDirectorish(m))
+  const podcastList: MemberType[] = rawPodcast.map((p) => ({
+    id: p.id,
+    name: p.name,
+    role: p.role,
+    image: formatImagePath(p.image),
+    bio: p.bio || "",
+    socialLinks: p.socials || {},
   }))
 
   // 1. Executive Director / President
@@ -246,11 +267,23 @@ export default function MembersClient() {
   // 4. Departments
   const departmentsList: DepartmentType[] = staticDepartments.map((staticDept) => {
     const deptMembers = activeMembers.filter(
-      (m) => getDepartmentMatch(staticDept.id, m.department) && !(staticDept.id === "hr" && isAmbassador(m))
+      (m) =>
+        getDepartmentMatch(staticDept.id, m.department) &&
+        !(staticDept.id === "hr" && isAmbassador(m) && !isDirectorish(m)) &&
+        !(staticDept.id === "publications" && isPodcast(m) && !isDirectorish(m))
     )
 
-    // Directors (role contains director or lead)
-    const rawDirs = deptMembers.filter((m) => (m.role || "").toLowerCase().includes("director"))
+    // Directors (role contains director or lead). The full Director always sorts ahead of
+    // Deputy Directors so the department head shows first.
+    const dirRank = (role: string) => {
+      const r = (role || "").toLowerCase()
+      if (r.startsWith("deputy")) return 2
+      if (r === "director" || r.startsWith("director")) return 0
+      return 1
+    }
+    const rawDirs = deptMembers
+      .filter((m) => (m.role || "").toLowerCase().includes("director"))
+      .sort((a, b) => dirRank(a.role) - dirRank(b.role))
     const directors: MemberType[] = rawDirs.map((dir) => ({
       id: dir.id,
       name: dir.name,
@@ -767,6 +800,60 @@ export default function MembersClient() {
                                       )}
                                       {ambassador.socialLinks?.instagram && (
                                         <Link href={ambassador.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-[#405862]/50 hover:text-[#4ecdc4] transition-colors">
+                                          <Instagram className="h-3 w-3" />
+                                        </Link>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Podcast sub-section — shown inside the Publications department card, same
+                          compact treatment as Organizational Ambassadors under HR. */}
+                      {department.id === "publications" && podcastList.length > 0 && (
+                        <div className="p-4 border-t border-[#405862]/10">
+                          <div className="flex items-center gap-2 mb-3">
+                            <h4 className="text-sm font-semibold text-[#405862]/80 font-bricolage">Podcast Team</h4>
+                            <span className="text-[10px] bg-[#4ecdc4]/15 text-[#405862] px-1.5 py-0.5 rounded-full font-medium border border-[#4ecdc4]/25">
+                              Sub-team
+                            </span>
+                          </div>
+                          <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+                            {podcastList.map((pod) => {
+                              if (!pod) return null;
+                              return (
+                                <div
+                                  key={pod.id}
+                                  className="flex items-center gap-2 p-2 rounded-lg bg-[#f5f1eb]/40 border border-[#405862]/10 hover:border-[#4ecdc4]/40 transition-colors"
+                                >
+                                  <Link href={`/team/${getMemberSlug(pod)}`} className="relative h-7 w-7 rounded-full overflow-hidden flex-shrink-0 group/img">
+                                    <Image
+                                      src={pod.image}
+                                      alt={pod.name}
+                                      fill
+                                      sizes="28px"
+                                      className="object-cover group-hover/img:scale-110 transition-transform"
+                                    />
+                                  </Link>
+                                  <div className="min-w-0">
+                                    <Link href={`/team/${getMemberSlug(pod)}`} className="block hover:text-[#4ecdc4] transition-colors">
+                                      <p className="font-medium text-xs text-[#405862] hover:text-[#4ecdc4] truncate font-bricolage">{pod.name}</p>
+                                    </Link>
+                                    <p className="text-[10px] text-[#405862]/60 truncate">{pod.role}</p>
+                                  </div>
+                                  {(pod.socialLinks?.linkedin || pod.socialLinks?.instagram) && (
+                                    <div className="flex gap-1 ml-auto shrink-0">
+                                      {pod.socialLinks?.linkedin && (
+                                        <Link href={pod.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#405862]/50 hover:text-[#4ecdc4] transition-colors">
+                                          <Linkedin className="h-3 w-3" />
+                                        </Link>
+                                      )}
+                                      {pod.socialLinks?.instagram && (
+                                        <Link href={pod.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-[#405862]/50 hover:text-[#4ecdc4] transition-colors">
                                           <Instagram className="h-3 w-3" />
                                         </Link>
                                       )}

@@ -28,14 +28,44 @@ type Meeting = {
 type AttendanceRow = { member_id: string; status: "present" | "excused" }
 
 type Props = {
-  canStartMeeting: boolean
-  canFinalizeMeeting: boolean
+  accessLevel: string
+  department: string
+  team: string | null
+  isHr: boolean
+  isOwner: boolean
   myEmail: string
 }
 
 const DEPT_ORDER = ["Events", "Finance", "Human Resources", "Marketing", "Publications", "Technology"]
 
-export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myEmail }: Props) {
+export default function AttendanceTab({ accessLevel, department, team, isHr, isOwner, myEmail }: Props) {
+  const myDept = normalizeDepartmentName(department)
+  const isDirector = accessLevel === "director"
+  const isDeputy = accessLevel === "deputy"
+  // "Full group" — owner + all HR: every department/team + org-wide meetings.
+  const fullGroup = isOwner || isHr
+  // HR leadership can also run org-wide meetings; HR coordinators only fill.
+  const canOrgWide = isOwner || (isHr && (isDirector || isDeputy))
+  // Anyone who can create/finalize meetings at all (scope enforced per-meeting below).
+  const canManage = isOwner || isDirector || isDeputy || (isHr && (isDirector || isDeputy))
+
+  const allowedScopes: ("org" | "department" | "team")[] = canOrgWide
+    ? ["org", "department", "team"]
+    : canManage
+      ? ["department", "team"]
+      : []
+
+  /** Can this user create/finalize/fill attendance for a given meeting? */
+  const canManageMeeting = (mt: Meeting) => {
+    if (fullGroup && (isOwner || (isHr && (isDirector || isDeputy)))) return true
+    if (fullGroup && isHr) return true // HR coordinators can fill any meeting
+    if (!(isDirector || isDeputy)) return false
+    if (mt.scope === "org") return false
+    if (normalizeDepartmentName(mt.department) !== myDept) return false
+    if (isDeputy && mt.scope === "team") return (mt.team || "") === (team || "")
+    return true
+  }
+
   const [meetings, setMeetings] = useState<Meeting[]>([])
   const [members, setMembers] = useState<MemberRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -43,7 +73,13 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
   const [attendance, setAttendance] = useState<AttendanceRow[]>([])
   const [busy, setBusy] = useState(false)
   const [creating, setCreating] = useState(false)
-  const [form, setForm] = useState({ title: "", date: new Date().toISOString().slice(0, 10), scope: "org", department: "Events", team: "" })
+  const [form, setForm] = useState({
+    title: "",
+    date: new Date().toISOString().slice(0, 10),
+    scope: (allowedScopes[0] || "team") as string,
+    department: fullGroup ? "Events" : myDept,
+    team: !fullGroup && isDeputy ? team || "" : "",
+  })
 
   const loadLists = useCallback(async () => {
     setLoading(true)
@@ -119,14 +155,26 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
 
   async function createMeeting() {
     if (!form.title.trim()) return
+    if (!allowedScopes.includes(form.scope as any)) return
+    // Non-full-group leaders are locked to their own department (and deputies to their team).
+    const dept = form.scope === "org" ? null : fullGroup ? form.department : myDept
+    let teamVal: string | null = null
+    if (form.scope === "team") {
+      teamVal = !fullGroup && isDeputy ? team || null : form.team || null
+      if (!teamVal) {
+        setBusy(false)
+        alert("Pick a team for this meeting.")
+        return
+      }
+    }
     setBusy(true)
     try {
       const payload = {
         title: form.title.trim(),
         meeting_date: form.date,
         scope: form.scope,
-        department: form.scope === "org" ? null : form.department,
-        team: form.scope === "team" ? form.team || null : null,
+        department: dept,
+        team: teamVal,
         created_by: myEmail,
       }
       const { data, error } = await supabase.from("meetings").insert(payload).select().single()
@@ -252,7 +300,7 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
             {selected.finalized ? " — missed members were struck." : ""}
           </p>
 
-          {canFinalizeMeeting && (
+          {canManageMeeting(selected) && (
             <div className="mt-3">
               {selected.finalized ? (
                 <button onClick={unfinalize} disabled={busy} className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50">
@@ -284,7 +332,7 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
                   <button
                     key={opt}
                     onClick={() => setStatus(m.id, opt)}
-                    disabled={busy || selected.finalized}
+                    disabled={busy || selected.finalized || !canManageMeeting(selected)}
                     className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize transition-colors disabled:opacity-60 ${
                       st === opt
                         ? opt === "present"
@@ -309,7 +357,7 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">Meeting Attendance</h2>
-        {canStartMeeting && (
+        {canManage && allowedScopes.length > 0 && (
           <button
             onClick={() => setCreating((v) => !v)}
             className="px-4 py-2 text-sm font-semibold rounded-lg bg-[#4CAF7D] hover:bg-[#2d8659] text-white"
@@ -335,22 +383,38 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
               onChange={(e) => setForm({ ...form, date: e.target.value })}
               className="p-2 border border-gray-300 rounded"
             />
-            <select value={form.scope} onChange={(e) => setForm({ ...form, scope: e.target.value })} className="p-2 border border-gray-300 rounded bg-white">
-              <option value="org">Whole org</option>
-              <option value="department">One department</option>
-              <option value="team">One sub-team</option>
+            <select
+              value={form.scope}
+              onChange={(e) => setForm({ ...form, scope: e.target.value })}
+              className="p-2 border border-gray-300 rounded bg-white"
+            >
+              {allowedScopes.map((s) => (
+                <option key={s} value={s}>
+                  {s === "org" ? "Whole org" : s === "department" ? "One department" : "One team"}
+                </option>
+              ))}
             </select>
             {form.scope !== "org" && (
-              <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value, team: "" })} className="p-2 border border-gray-300 rounded bg-white">
-                {DEPT_ORDER.map((d) => (
+              <select
+                value={fullGroup ? form.department : myDept}
+                disabled={!fullGroup}
+                onChange={(e) => setForm({ ...form, department: e.target.value, team: "" })}
+                className="p-2 border border-gray-300 rounded bg-white disabled:bg-gray-50 disabled:text-gray-500"
+              >
+                {(fullGroup ? DEPT_ORDER : [myDept]).map((d) => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
             )}
             {form.scope === "team" && (
-              <select value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} className="p-2 border border-gray-300 rounded bg-white">
-                <option value="">Select sub-team</option>
-                {subteamsFor(form.department).map((t) => (
+              <select
+                value={!fullGroup && isDeputy ? team || "" : form.team}
+                disabled={!fullGroup && isDeputy}
+                onChange={(e) => setForm({ ...form, team: e.target.value })}
+                className="p-2 border border-gray-300 rounded bg-white disabled:bg-gray-50 disabled:text-gray-500"
+              >
+                <option value="">Select team</option>
+                {subteamsFor(fullGroup ? form.department : myDept).map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
@@ -362,11 +426,13 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
         </div>
       )}
 
-      {meetings.length === 0 ? (
+      {(() => {
+        const visibleMeetings = fullGroup ? meetings : meetings.filter(canManageMeeting)
+        return visibleMeetings.length === 0 ? (
         <p className="text-gray-500 py-10 text-center">No meetings yet.</p>
       ) : (
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm divide-y divide-gray-100">
-          {meetings.map((m) => (
+          {visibleMeetings.map((m) => (
             <button key={m.id} onClick={() => openMeeting(m)} className="w-full text-left p-4 hover:bg-gray-50 flex items-center justify-between gap-3">
               <div>
                 <p className="font-medium text-gray-900">{m.title}</p>
@@ -381,7 +447,8 @@ export default function AttendanceTab({ canStartMeeting, canFinalizeMeeting, myE
             </button>
           ))}
         </div>
-      )}
+      )
+      })()}
     </div>
   )
 }

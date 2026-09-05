@@ -197,7 +197,7 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs order-1 md:order-2">
             <Link
               href="/dashboard?login=true"
-              className="bg-[#4f6b75] hover:bg-[#4ecdc4] hover:text-[#405862] text-white px-2.5 py-1 rounded transition-all font-medium"
+              className="portal-dashboard-link bg-[#4f6b75] hover:bg-[#4ecdc4] hover:text-[#405862] text-white px-2.5 py-1 rounded transition-all font-medium"
             >
               Portal Dashboard
             </Link>
