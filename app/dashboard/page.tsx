@@ -9,6 +9,8 @@ import WebinarsAdmin from "./WebinarsAdmin"
 import ReactMarkdown from "react-markdown"
 import ImageUploadField from "@/components/admin/image-upload-field"
 import DriveBrowser from "@/components/dashboard/DriveBrowser"
+import MemberSettingsTab from "@/components/dashboard/MemberSettingsTab"
+import PortalFirstVisitPrompts from "@/components/dashboard/PortalFirstVisitPrompts"
 
 type Member = {
   id: string
@@ -1291,7 +1293,8 @@ export default function DbAdminPage() {
 
   return (
     <div className="container max-w-6xl mx-auto py-12 px-4 relative">
-      
+      <PortalFirstVisitPrompts />
+
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-gray-100 pb-6">
         <div>
@@ -1384,6 +1387,14 @@ export default function DbAdminPage() {
             >
               Drive & Calendar
             </button>
+            <button
+              onClick={() => setActiveMainTab("settings")}
+              className={`px-5 py-2 rounded-md font-semibold text-sm transition-all whitespace-nowrap ${
+                activeMainTab === "settings" ? "bg-white text-[#4CAF7D] shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Settings
+            </button>
           </div>
         </>
       ) : (
@@ -1392,7 +1403,8 @@ export default function DbAdminPage() {
           {[
             { id: "punchcard", label: "Punch Card" },
             { id: "mytasks", label: "My Tasks" },
-            { id: "shared", label: "Drive & Calendar" }
+            { id: "shared", label: "Drive & Calendar" },
+            { id: "settings", label: "Settings" }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1628,6 +1640,10 @@ export default function DbAdminPage() {
           </div>
         </div>
       )}
+
+      {/* Settings — every signed-in member (owner, director, or plain member) gets this, same
+          as Drive & Calendar above; it's self-service profile/preferences, not an admin tool. */}
+      {activeMainTab === "settings" && <MemberSettingsTab />}
 
       {/* --- RENDER HR & ADMIN CONTROL VIEWS --- */}
 

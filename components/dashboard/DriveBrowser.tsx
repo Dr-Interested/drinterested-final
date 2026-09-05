@@ -23,6 +23,8 @@ import {
   FolderPlus,
   Upload,
   Copy,
+  Scissors,
+  ClipboardPaste,
   X,
   type LucideIcon,
 } from "lucide-react"
@@ -37,8 +39,9 @@ type DriveItem = {
 }
 
 type Crumb = { id: string | null; name: string }
-type ClipboardFile = { id: string; name: string }
 type CreatableType = "document" | "spreadsheet" | "presentation" | "form"
+type ClipboardEntry = { id: string; name: string; isFolder: boolean }
+type ClipboardState = { mode: "copy" | "move"; items: ClipboardEntry[]; sourceFolderId: string | null } | null
 
 // Distinct icon + color per type so a Form doesn't look like a Doc doesn't look like a Sheet —
 // roughly matching each type's own Google branding color for quick recognition.
@@ -117,13 +120,15 @@ function DriveThumbnail({ item }: { item: DriveItem }) {
 }
 
 /**
- * Browses the org's shared Google Drive folder from inside the portal, using the server's
- * service-account connection (app/api/drive/*) rather than the signed-in member's own Drive
+ * Browses the org's shared Google Drive folder from inside the portal, using the portal's own
+ * connected Google account (app/api/drive/*) rather than the signed-in member's own Drive
  * permissions — that's what lets everyone see (and now organize) the folder structure
  * regardless of what's individually shared with them. Opening a file still hands off to
  * Google's own webViewLink, so Google's normal per-file sharing still governs whether it
  * actually opens for them. There is intentionally no delete action anywhere in this UI — see
- * the comment at the top of lib/google-drive.ts.
+ * the comment at the top of lib/google-drive.ts. Moving a file is not deleting it: it's a
+ * single atomic re-parent call, so nothing is ever removed from its source without a confirmed
+ * successful landing at the destination.
  */
 export default function DriveBrowser() {
   const [crumbs, setCrumbs] = useState<Crumb[]>([{ id: null, name: "Drive" }])
@@ -132,10 +137,13 @@ export default function DriveBrowser() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [newMenuOpen, setNewMenuOpen] = useState(false)
-  const [clipboard, setClipboard] = useState<ClipboardFile | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [clipboard, setClipboard] = useState<ClipboardState>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const currentFolderId = crumbs[crumbs.length - 1]?.id ?? null
+  const currentFolderName = crumbs[crumbs.length - 1]?.name ?? "this folder"
 
   const loadFolder = useCallback(async (folderId: string | null, isRoot: boolean) => {
     setLoading(true)
@@ -174,12 +182,14 @@ export default function DriveBrowser() {
   const refresh = () => loadFolder(currentFolderId, false)
 
   const openFolder = (item: DriveItem) => {
+    setSelectedIds(new Set())
     setCrumbs((prev) => [...prev, { id: item.id, name: item.name }])
     loadFolder(item.id, false)
   }
 
   const goToCrumb = (index: number) => {
     const target = crumbs[index]
+    setSelectedIds(new Set())
     setCrumbs((prev) => prev.slice(0, index + 1))
     loadFolder(target.id, false)
   }
@@ -254,22 +264,144 @@ export default function DriveBrowser() {
     await runAction(() => fetch("/api/drive/upload", { method: "POST", headers: { Authorization: bearer }, body: fd }))
   }
 
-  const handlePasteHere = async () => {
-    if (!clipboard || !currentFolderId) return
-    const bearer = await getBearer().catch((err) => { alert(err.message); return null })
-    if (!bearer) return
-    const copied = await runAction(() =>
-      fetch("/api/drive/copy", {
-        method: "POST",
-        headers: { Authorization: bearer, "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: clipboard.id, parentId: currentFolderId }),
-      })
-    )
-    if (copied) setClipboard(null)
+  // --- Selection ---
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
 
+  const selectAll = () => {
+    if (items.length === 0) return
+    setSelectedIds(new Set(items.map((i) => i.id)))
+  }
+
+  const clearSelection = () => setSelectedIds(new Set())
+
+  // --- Clipboard (Copy / Cut / Paste) ---
+
+  const copyItems = (ids: string[]) => {
+    const chosen = items.filter((i) => ids.includes(i.id) && !i.isFolder)
+    if (chosen.length === 0) {
+      alert("Folders can't be copied (Drive only makes an empty copy, not the contents) — use Move instead.")
+      return
+    }
+    if (chosen.length < ids.length) {
+      alert(`${ids.length - chosen.length} folder(s) in your selection were skipped — only files can be copied.`)
+    }
+    setClipboard({
+      mode: "copy",
+      items: chosen.map(({ id, name, isFolder }) => ({ id, name, isFolder })),
+      sourceFolderId: currentFolderId,
+    })
+  }
+
+  const cutItems = (ids: string[]) => {
+    const chosen = items.filter((i) => ids.includes(i.id))
+    if (chosen.length === 0) return
+    setClipboard({
+      mode: "move",
+      items: chosen.map(({ id, name, isFolder }) => ({ id, name, isFolder })),
+      sourceFolderId: currentFolderId,
+    })
+  }
+
+  const pasteClipboard = async () => {
+    if (!clipboard || !currentFolderId) return
+    if (clipboard.mode === "move" && clipboard.sourceFolderId === currentFolderId) {
+      alert("That's already where these are.")
+      return
+    }
+
+    const count = clipboard.items.length
+    if (count > 1) {
+      const verb = clipboard.mode === "copy" ? "Copy" : "Move"
+      const ok = window.confirm(`${verb} ${count} items into "${currentFolderName}"?`)
+      if (!ok) return
+    }
+
+    setBusy(true)
+    try {
+      const bearer = await getBearer()
+
+      if (clipboard.mode === "copy") {
+        const results = await Promise.allSettled(
+          clipboard.items.map((item) =>
+            fetch("/api/drive/copy", {
+              method: "POST",
+              headers: { Authorization: bearer, "Content-Type": "application/json" },
+              body: JSON.stringify({ fileId: item.id, parentId: currentFolderId }),
+            }).then(async (res) => {
+              if (!res.ok) throw new Error((await res.json().catch(() => null))?.error || "Copy failed.")
+            })
+          )
+        )
+        const failed = results.filter((r) => r.status === "rejected")
+        if (failed.length > 0) {
+          alert(`${count - failed.length} of ${count} copied. ${failed.length} failed.`)
+        }
+        // Copy clipboard persists — you can paste the same items into another folder too.
+      } else {
+        const res = await fetch("/api/drive/move", {
+          method: "POST",
+          headers: { Authorization: bearer, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fileIds: clipboard.items.map((i) => i.id),
+            fromParentId: clipboard.sourceFolderId,
+            toParentId: currentFolderId,
+          }),
+        })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body?.error || "Move failed.")
+        if (body.failed?.length > 0) {
+          alert(`${body.moved?.length || 0} of ${count} moved. ${body.failed.length} failed — they're untouched in their original folder.`)
+        }
+        setClipboard(null)
+        setSelectedIds(new Set())
+      }
+      refresh()
+    } catch (err: any) {
+      alert(err?.message || "That action failed.")
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  // --- Keyboard shortcuts (Ctrl/Cmd+A/C/X/V) — ignored while typing in an input elsewhere on
+  // the page, and naturally scoped to whenever this component is mounted (i.e. the Drive &
+  // Calendar tab is open).
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const active = document.activeElement as HTMLElement | null
+      const isTyping = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)
+      if (isTyping || !(e.ctrlKey || e.metaKey)) return
+
+      const key = e.key.toLowerCase()
+      if (key === "a") {
+        e.preventDefault()
+        selectAll()
+      } else if (key === "c" && selectedIds.size > 0) {
+        e.preventDefault()
+        copyItems([...selectedIds])
+      } else if (key === "x" && selectedIds.size > 0) {
+        e.preventDefault()
+        cutItems([...selectedIds])
+      } else if (key === "v" && clipboard) {
+        e.preventDefault()
+        pasteClipboard()
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIds, clipboard, currentFolderId, items])
+
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+    <div ref={containerRef} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="font-bold text-lg mb-4">Browse Team Drive</h3>
 
       <div className="flex items-center gap-1 flex-wrap text-sm mb-4 text-gray-500">
@@ -292,7 +424,7 @@ export default function DriveBrowser() {
       </div>
 
       {!loading && !error && (
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
           <div className="relative">
             <button
               onClick={() => setNewMenuOpen((o) => !o)}
@@ -332,6 +464,27 @@ export default function DriveBrowser() {
           </button>
           <input ref={fileInputRef} type="file" onChange={handleFileSelected} className="hidden" />
 
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 ml-1 pl-3 border-l border-gray-200">
+              <span className="text-xs font-semibold text-gray-500">{selectedIds.size} selected</span>
+              <button
+                onClick={() => copyItems([...selectedIds])}
+                className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-md transition-colors"
+              >
+                <Copy className="w-3.5 h-3.5" /> Copy
+              </button>
+              <button
+                onClick={() => cutItems([...selectedIds])}
+                className="flex items-center gap-1 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-semibold rounded-md transition-colors"
+              >
+                <Scissors className="w-3.5 h-3.5" /> Move
+              </button>
+              <button onClick={clearSelection} className="text-gray-400 hover:text-gray-600" aria-label="Clear selection">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           {busy && <Loader2 className="w-4 h-4 animate-spin text-gray-400 ml-1" />}
         </div>
       )}
@@ -339,17 +492,21 @@ export default function DriveBrowser() {
       {clipboard && (
         <div className="flex items-center justify-between gap-3 mb-4 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
           <span className="truncate">
-            Copied: <strong>{clipboard.name}</strong> — browse to a folder and paste it here
+            {clipboard.mode === "copy" ? "Copied" : "Cut"}:{" "}
+            <strong>
+              {clipboard.items.length === 1 ? clipboard.items[0].name : `${clipboard.items.length} items`}
+            </strong>{" "}
+            — browse to a folder and paste it here
           </span>
           <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={handlePasteHere}
+              onClick={pasteClipboard}
               disabled={busy}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-semibold disabled:opacity-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-semibold disabled:opacity-50 transition-colors"
             >
-              Paste copy here
+              <ClipboardPaste className="w-3.5 h-3.5" /> Paste here
             </button>
-            <button onClick={() => setClipboard(null)} className="text-blue-400 hover:text-blue-600" aria-label="Cancel copy">
+            <button onClick={() => setClipboard(null)} className="text-blue-400 hover:text-blue-600" aria-label="Cancel">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -372,8 +529,18 @@ export default function DriveBrowser() {
         <div className="divide-y divide-gray-100">
           {items.map((item) => {
             const { icon: Icon, color } = styleFor(item)
+            const selected = selectedIds.has(item.id)
             return (
-              <div key={item.id} className="flex items-center gap-1 py-1 group">
+              <div key={item.id} className={`flex items-center gap-1 py-1 group rounded-lg ${selected ? "bg-blue-50" : ""}`}>
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  onChange={() => toggleSelect(item.id)}
+                  className={`ml-2 shrink-0 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${
+                    selected ? "" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                  aria-label={`Select ${item.name}`}
+                />
                 <button
                   onClick={() => (item.isFolder ? openFolder(item) : openFile(item))}
                   className="flex-1 min-w-0 flex items-center gap-3 py-1.5 px-2 hover:bg-gray-50 rounded-lg text-left transition-colors"
@@ -385,19 +552,27 @@ export default function DriveBrowser() {
                   )}
                   <span className="flex-1 min-w-0 text-sm text-gray-700 truncate">{item.name}</span>
                 </button>
-                {!item.isFolder && (
-                  <>
+                <div className="flex items-center opacity-0 group-hover:opacity-100 shrink-0">
+                  {!item.isFolder && (
                     <button
-                      onClick={() => setClipboard({ id: item.id, name: item.name })}
+                      onClick={() => copyItems([item.id])}
                       title={`Copy "${item.name}"`}
                       aria-label={`Copy ${item.name}`}
-                      className="p-1.5 text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                      className="p-1.5 text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
-                    <ExternalLink className="w-3.5 h-3.5 text-gray-300 shrink-0 mr-2" />
-                  </>
-                )}
+                  )}
+                  <button
+                    onClick={() => cutItems([item.id])}
+                    title={`Move "${item.name}"`}
+                    aria-label={`Move ${item.name}`}
+                    className="p-1.5 text-gray-300 hover:text-amber-500 hover:bg-amber-50 rounded-md transition-colors"
+                  >
+                    <Scissors className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {!item.isFolder && <ExternalLink className="w-3.5 h-3.5 text-gray-300 shrink-0 mr-2" />}
               </div>
             )
           })}

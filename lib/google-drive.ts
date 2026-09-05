@@ -232,6 +232,21 @@ export async function uploadDriveFile(parentId: string, filename: string, mimeTy
   return toDriveItem(await res.json())
 }
 
+/** Moves a file OR folder to a new parent folder. This is NOT a delete — re-parenting is a
+ *  single atomic Drive API call (add the new parent, remove the old one, in one request), so a
+ *  file is never removed from its source without confirmation it landed at the destination: if
+ *  this call fails, the file is untouched and still exactly where it started. Unlike copy,
+ *  moving a folder works fine — its contents aren't duplicated, they just travel with it since
+ *  only the folder's own parent link changes. */
+export async function moveDriveFile(fileId: string, fromParentId: string, toParentId: string): Promise<DriveItem> {
+  const moved = await driveFetch(
+    `/${fileId}`,
+    { fields: ITEM_FIELDS, addParents: toParentId, removeParents: fromParentId },
+    { method: "PATCH" }
+  )
+  return toDriveItem(moved)
+}
+
 /** Fetches a file's small preview image (if Google has generated one) as raw bytes, for
  *  /api/drive/thumbnail to relay to the browser — the file's thumbnailLink isn't a public URL,
  *  it requires the same Bearer token the rest of this module uses. */
