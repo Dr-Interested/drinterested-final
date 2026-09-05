@@ -563,12 +563,10 @@ export default function DriveBrowser() {
                   type="checkbox"
                   checked={selected}
                   onChange={() => toggleSelect(item.id)}
-                  className={`absolute top-2 left-2 z-10 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer ${
-                    selected ? "" : "opacity-0 group-hover:opacity-100"
-                  }`}
+                  className="absolute top-2 left-2 z-10 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   aria-label={`Select ${item.name}`}
                 />
-                <div className="absolute top-1.5 right-1.5 z-10 flex opacity-0 group-hover:opacity-100">
+                <div className="absolute top-1.5 right-1.5 z-10 flex opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
                   {!item.isFolder && (
                     <button
                       onClick={() => copyItems([item.id])}

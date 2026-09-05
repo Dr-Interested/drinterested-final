@@ -189,35 +189,33 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-5 border-t border-[#4f6b75] flex flex-col md:flex-row justify-between items-center gap-3">
-          <div className="text-xs text-white/70">© {new Date().getFullYear()} Dr. Interested. All rights reserved.</div>
+        <div className="mt-8 pt-5 border-t border-[#4f6b75] flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-xs text-white/70 text-center md:text-left order-2 md:order-1">
+            © {new Date().getFullYear()} Dr. Interested. All rights reserved.
+          </div>
 
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs order-1 md:order-2">
             <Link
               href="/dashboard?login=true"
               className="bg-[#4f6b75] hover:bg-[#4ecdc4] hover:text-[#405862] text-white px-2.5 py-1 rounded transition-all font-medium"
             >
               Portal Dashboard
             </Link>
-            <span className="text-white/50">•</span>
             <Link href="/terms" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
-              Terms & Conditions
+              Terms &amp; Conditions
             </Link>
-            <span className="text-white/50">•</span>
             <Link href="/privacy-policy" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
               Privacy Policy
             </Link>
-            <span className="text-white/50">•</span>
             <Link href="/ai-policy" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
               AI Policy
             </Link>
-            <span className="text-white/50">•</span>
             <Link href="/safeguarding-policy" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
               Safeguarding Policy
             </Link>
             <button
               onClick={scrollToTop}
-              className="text-white hover:text-[#4ecdc4] transition-colors bg-[#4f6b75] p-1.5 rounded-full ml-2"
+              className="text-white hover:text-[#4ecdc4] transition-colors bg-[#4f6b75] p-1.5 rounded-full"
               aria-label="Scroll to top"
             >
               <ArrowUp className="h-4 w-4" />

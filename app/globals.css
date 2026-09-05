@@ -645,6 +645,69 @@ img.loading {
   background-color: #D0F3F0;
 }
 
+/* ---- Dark mode: broader coverage so pages aren't half-light ---- */
+
+/* Tailwind gradients render as background-image, which none of the bg-color overrides above
+   catch — flatten them so hero/section/badge gradients don't stay light. A universal solid
+   fallback (rather than just background-image:none) keeps gradient buttons/pills from going
+   transparent. Section-level wrappers get a darker fill. */
+.dark [class*="bg-gradient-to"] {
+  background-image: none !important;
+  background-color: #33454e;
+}
+.dark section[class*="bg-gradient-to"],
+.dark main[class*="bg-gradient-to"],
+.dark [class*="min-h-screen"][class*="bg-gradient-to"],
+.dark div[class*="bg-gradient-to-b"] {
+  background-color: #0f1218;
+}
+/* decorative full-bleed gradient overlays — hide rather than paint a slate slab over content */
+.dark [class*="absolute"][class*="inset-0"][class*="bg-gradient-to"] {
+  background-color: transparent;
+  opacity: 0.15;
+}
+
+/* Light mint / teal accent surfaces (badges, "Join Us" pill, keynote cards, CTA chips). */
+.dark [class*="bg-[#EDFAF9]"],
+.dark [class*="bg-[#D0F3F0]"],
+.dark [class*="bg-[#e8f8f6]"],
+.dark [class*="bg-[#EDFAF9]/"],
+.dark [class*="bg-[#4ecdc4]/5"],
+.dark [class*="bg-[#4ecdc4]/10"],
+.dark [class*="bg-[#4ecdc4]/15"],
+.dark [class*="bg-[#4ecdc4]/20"],
+.dark [class*="bg-[#4ecdc4]/30"] {
+  background-color: rgba(78, 205, 196, 0.14);
+  color: #e9e5df;
+}
+/* ...but a mint chip with dark brand text needs its text lightened to stay readable. */
+.dark [class*="bg-[#4ecdc4]/10"][class*="text-[#405862]"],
+.dark [class*="bg-[#4ecdc4]/15"][class*="text-[#405862]"],
+.dark [class*="bg-[#4ecdc4]/20"][class*="text-[#405862]"],
+.dark [class*="bg-[#EDFAF9]"][class*="text-[#405862]"] {
+  color: #d8f5f2 !important;
+}
+.dark [class*="border-[#4ecdc4]"] {
+  border-color: rgba(78, 205, 196, 0.4);
+}
+
+/* Solid brand slate used for the newsletter band, footer, and CTA sections — keep it slate
+   in dark mode (readable, on-brand) rather than letting it collapse to near-black. Also pull
+   the little media-consent note and any bare section onto that same slate. */
+.dark [class*="bg-[#405862]"],
+.dark .newsletter-band,
+.dark .media-consent-note {
+  background-color: #33454e;
+  color: #f1ece7;
+}
+.dark [class*="bg-[#4f6b75]"] {
+  background-color: #4CAF7D;
+  color: #fff;
+}
+
+/* Portal green stays as-is (bg-[#4CAF7D] is already high-contrast on dark); just make sure
+   its disabled/subtle variants and the pale portal grays read right — handled above. */
+
 @media (max-width: 1024px) {
   html,
   body {

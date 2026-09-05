@@ -64,9 +64,9 @@ export default function SponsorshipsPage() {
             Sponsorships & Donations
           </h1>
           <p className="text-lg text-[#405862]/80 max-w-2xl mx-auto text-pretty">
-            Support youth healthcare education and leadership while gaining visibility across our global community of
-            60,000+ engaged students. Join our sponsors or donate to help inspire the next generation of healthcare
-            professionals.
+            Support youth healthcare education and leadership while gaining visibility across a global community that has
+            impacted 160,000+ youth and reached 3.7M+ people across 106 countries. Join our sponsors or donate to help
+            inspire the next generation of healthcare professionals.
           </p>
         </div>
       </section>
