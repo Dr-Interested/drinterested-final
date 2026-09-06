@@ -834,25 +834,9 @@ export default function DbAdminPage() {
 
       const { error } = await supabase.from("tasks").insert([newTask])
       if (error) throw error
-
-      // Best-effort — a failed notification shouldn't undo the task that was just created.
-      try {
-        const assignee = members.find((m) => m.email?.toLowerCase() === newTask.assigned_to)
-        await fetch("/api/tasks/notify-assigned", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            assignee_email: newTask.assigned_to,
-            assignee_name: assignee?.name,
-            title: newTask.title,
-            description: newTask.description,
-            due_date: newTask.due_date,
-            assigned_by_name: currentMemberProfile?.name,
-          }),
-        })
-      } catch (notifyErr) {
-        console.error("Failed to send task assignment email:", notifyErr)
-      }
+      // The assignment email is sent by the Supabase "tasks INSERT" webhook -> /api/tasks/on-insert
+      // (with the daily cron as a backfill), so every task — UI, SQL, or script — is covered the
+      // same way. Nothing to do here.
 
       setIsCreatingTask(false)
       setTaskForm({ status: "Pending" })
