@@ -12,8 +12,11 @@ export const dynamic = "force-dynamic"
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET
   if (cronSecret) {
-    const incomingSecret = request.headers.get("x-cron-secret")
-    if (incomingSecret !== cronSecret) {
+    // Accept either an external scheduler's "x-cron-secret: <secret>" header OR Vercel Cron's
+    // automatic "Authorization: Bearer <CRON_SECRET>" header (Vercel does NOT send x-cron-secret).
+    const headerSecret = request.headers.get("x-cron-secret")
+    const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
+    if (headerSecret !== cronSecret && bearer !== cronSecret) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
   }
