@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { supabase } from "@/lib/supabase-client"
-import { Loader2, X, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar } from "lucide-react"
+import { Loader2, X, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import EventsAdmin from "./EventsAdmin"
 import WebinarsAdmin from "./WebinarsAdmin"
@@ -273,6 +273,7 @@ export default function DbAdminPage() {
 
   // Tasks State
   const [myTasks, setMyTasks] = useState<Task[]>([])
+  const [myTasksShowDone, setMyTasksShowDone] = useState(false)
   const [allTasks, setAllTasks] = useState<Task[]>([])
   const [isCreatingTask, setIsCreatingTask] = useState(false)
   const [taskForm, setTaskForm] = useState<Partial<Task>>({ status: "Pending" })
@@ -665,6 +666,7 @@ export default function DbAdminPage() {
         .from("tasks")
         .select("*")
         .eq("assigned_to", currentUser.email?.toLowerCase())
+        .eq("archived", false)
         .order("created_at", { ascending: false })
 
       if (error) throw error
@@ -675,6 +677,8 @@ export default function DbAdminPage() {
   }
 
   const handleUpdateTaskStatus = async (taskId: string, currentStatus: string, task?: Task) => {
+    // "Incomplete" is a terminal state an assigner set — members can't cycle out of it.
+    if (currentStatus === "Incomplete") return
     const nextStatusMap: Record<string, string> = {
       "Pending": "In Progress",
       "In Progress": "Completed",
@@ -693,7 +697,7 @@ export default function DbAdminPage() {
     try {
       const { error } = await supabase
         .from("tasks")
-        .update({ status: nextStatus })
+        .update({ status: nextStatus, completed_at: nextStatus === "Pending" ? null : undefined })
         .eq("id", taskId)
 
       if (error) throw error
@@ -1532,7 +1536,63 @@ export default function DbAdminPage() {
       )}
 
       {/* 2. Member Tasks */}
-      {activeMainTab === "mytasks" && (
+      {activeMainTab === "mytasks" && (() => {
+        const FINISHED = ["Completed", "Incomplete"]
+        const activeTasks = myTasks.filter((t) => !FINISHED.includes(t.status))
+        const doneTasks = myTasks.filter((t) => FINISHED.includes(t.status))
+        const renderCard = (task: Task) => {
+          const isDone = FINISHED.includes(task.status)
+          return (
+            <div key={task.id} className="p-4 border border-gray-150 rounded-xl hover:border-gray-300 transition-colors flex items-start gap-4 justify-between">
+              <div className="flex items-start gap-3">
+                <button
+                  onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
+                  disabled={task.status === "Incomplete"}
+                  className={`mt-1 flex-shrink-0 transition-transform active:scale-95 ${task.status === "Completed" ? "text-green-500" : task.status === "Incomplete" ? "text-gray-300 cursor-default" : "text-gray-300 hover:text-gray-400"}`}
+                >
+                  <CheckCircle2 className="w-5 h-5" />
+                </button>
+                <div>
+                  <h3 className={`font-semibold text-[0.95rem] ${isDone ? "line-through text-gray-400" : "text-gray-800"}`}>
+                    {task.title}
+                  </h3>
+                  {task.description && (
+                    <p className={`text-sm mt-1 ${isDone ? "text-gray-300" : "text-gray-500"}`}>{task.description}</p>
+                  )}
+                  {task.status === "Incomplete" && (
+                    <p className="text-xs text-gray-400 mt-1 italic">Closed by a director — no longer needs to be done.</p>
+                  )}
+                  {task.due_date && (
+                    <span className={`inline-block text-[0.75rem] font-bold mt-2 px-2 py-0.5 rounded ${new Date(task.due_date) < new Date() && !isDone ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"}`}>
+                      Due {new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                  )}
+                  {task.status === "Completed" && (task.submission_url || task.time_spent_minutes) && (
+                    <p className="text-xs text-gray-400 mt-2">
+                      {task.time_spent_minutes && <span>{Math.round(task.time_spent_minutes / 6) / 10} hrs logged</span>}
+                      {task.submission_url && (
+                        <>
+                          {task.time_spent_minutes && " · "}
+                          <a href={task.submission_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
+                            View submitted work
+                          </a>
+                        </>
+                      )}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div>
+                <span className={`inline-block px-2.5 py-1 rounded-full text-[0.75rem] font-bold uppercase tracking-wider ${
+                  task.status === "Completed" ? "bg-green-100 text-green-800" : task.status === "Incomplete" ? "bg-gray-200 text-gray-600" : task.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
+                }`}>
+                  {task.status}
+                </span>
+              </div>
+            </div>
+          )
+        }
+        return (
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl font-bold font-bricolage mb-6 text-[#1a1a1a] flex items-center gap-2">
             <FileText className="text-[#4CAF7D] w-5 h-5" /> Assigned Tasks Checklist
@@ -1542,57 +1602,29 @@ export default function DbAdminPage() {
             <div className="text-center py-10 text-gray-400 text-sm">No tasks currently assigned to you! Check back later.</div>
           ) : (
             <div className="space-y-4">
-              {myTasks.map((task) => (
-                <div key={task.id} className="p-4 border border-gray-150 rounded-xl hover:border-gray-300 transition-colors flex items-start gap-4 justify-between">
-                  <div className="flex items-start gap-3">
-                    <button
-                      onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
-                      className={`mt-1 flex-shrink-0 transition-transform active:scale-95 ${task.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}`}
-                    >
-                      <CheckCircle2 className="w-5 h-5" />
-                    </button>
-                    <div>
-                      <h3 className={`font-semibold text-[0.95rem] ${task.status === "Completed" ? "line-through text-gray-400" : "text-gray-800"}`}>
-                        {task.title}
-                      </h3>
-                      {task.description && (
-                        <p className={`text-sm mt-1 ${task.status === "Completed" ? "text-gray-300" : "text-gray-500"}`}>
-                          {task.description}
-                        </p>
-                      )}
-                      {task.due_date && (
-                        <span className={`inline-block text-[0.75rem] font-bold mt-2 px-2 py-0.5 rounded ${new Date(task.due_date) < new Date() && task.status !== "Completed" ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"}`}>
-                          Due {new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                        </span>
-                      )}
-                      {task.status === "Completed" && (task.submission_url || task.time_spent_minutes) && (
-                        <p className="text-xs text-gray-400 mt-2">
-                          {task.time_spent_minutes && <span>{Math.round((task.time_spent_minutes / 6)) / 10} hrs logged</span>}
-                          {task.submission_url && (
-                            <>
-                              {task.time_spent_minutes && " · "}
-                              <a href={task.submission_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
-                                View submitted work
-                              </a>
-                            </>
-                          )}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <span className={`inline-block px-2.5 py-1 rounded-full text-[0.75rem] font-bold uppercase tracking-wider ${
-                      task.status === "Completed" ? "bg-green-100 text-green-800" : task.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
-                    }`}>
-                      {task.status}
-                    </span>
-                  </div>
+              {activeTasks.length === 0 ? (
+                <div className="text-center py-6 text-gray-400 text-sm">All caught up — nothing active right now.</div>
+              ) : (
+                activeTasks.map(renderCard)
+              )}
+
+              {doneTasks.length > 0 && (
+                <div className="border-t border-gray-100 pt-3">
+                  <button
+                    onClick={() => setMyTasksShowDone((v) => !v)}
+                    className="flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-700"
+                  >
+                    <ChevronRight className={`w-4 h-4 transition-transform ${myTasksShowDone ? "rotate-90" : ""}`} />
+                    Completed ({doneTasks.length})
+                  </button>
+                  {myTasksShowDone && <div className="space-y-3 mt-3">{doneTasks.map(renderCard)}</div>}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
-      )}
+        )
+      })()}
 
       {/* 3. Resources Tab — visible to everyone (owner, director, and plain members alike;
           see the "Drive & Calendar" button appended to both tab bars above). Drive browsing

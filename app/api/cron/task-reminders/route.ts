@@ -15,7 +15,10 @@ const fmtDate = (d: string) =>
  *      tasks created in bulk / via SQL that never went through the portal's notify call)
  *   2. "due tomorrow" reminder
  *   3. "due today" reminder
+ * Plus a pass 0: archive tasks that have been Completed/Incomplete for 14+ days (only the
+ * owner sees archived tasks, in the Assign Tasks panel's Archive section).
  */
+const FINISHED = ["Completed", "Incomplete"]
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET
   if (cronSecret) {
@@ -32,9 +35,21 @@ export async function GET(request: Request) {
   const today = toDateStr(new Date())
   const tomorrow = toDateStr(new Date(Date.now() + 24 * 60 * 60 * 1000))
 
-  const results = { newAssignments: 0, dayBefore: 0, dueToday: 0, errors: [] as string[] }
+  const results = { archived: 0, newAssignments: 0, dayBefore: 0, dueToday: 0, errors: [] as string[] }
 
   try {
+    // Pass 0 — archive tasks finished (Completed or Incomplete) 14+ days ago.
+    const archiveCutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+    const { data: archivedRows, error: archErr } = await supabase
+      .from("tasks")
+      .update({ archived: true, archived_at: new Date().toISOString() })
+      .eq("archived", false)
+      .in("status", FINISHED)
+      .lt("completed_at", archiveCutoff)
+      .select("id")
+    if (archErr) results.errors.push(archErr.message)
+    else results.archived = archivedRows?.length || 0
+
     const { data: members } = await supabase.from("members").select("email, name")
     const nameByEmail = new Map((members || []).map((m: any) => [String(m.email).toLowerCase(), m.name]))
 
@@ -46,7 +61,8 @@ export async function GET(request: Request) {
       const { data: tasks, error } = await supabase
         .from("tasks")
         .select("*")
-        .neq("status", "Completed")
+        .not("status", "in", `(${FINISHED.join(",")})`)
+        .eq("archived", false)
         .is("assigned_email_sent_at", null)
         .gte("created_at", assignCutoff)
 
@@ -85,7 +101,8 @@ export async function GET(request: Request) {
         .from("tasks")
         .select("*")
         .eq("due_date", dueDate)
-        .neq("status", "Completed")
+        .not("status", "in", `(${FINISHED.join(",")})`)
+        .eq("archived", false)
         .is(column, null)
 
       if (error) {

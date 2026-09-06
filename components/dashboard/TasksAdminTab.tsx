@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
-import { Loader2, CheckCircle2, Trash, ChevronRight, Users } from "lucide-react"
+import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle } from "lucide-react"
 
 type TaskRow = {
   id: string
@@ -16,8 +16,16 @@ type TaskRow = {
   department: string | null
   team: string | null
   assignment_batch: string | null
+  archived: boolean
+  archived_at: string | null
+  completed_at: string | null
   created_at: string
 }
+
+// A task is "finished" once it's Completed or Incomplete. A group is finished (moves to the
+// Completed section) only when every row in it is finished.
+const FINISHED = ["Completed", "Incomplete"]
+const isFinished = (s: string) => FINISHED.includes(s)
 
 type MemberRow = {
   id: string
@@ -47,7 +55,12 @@ const ROLE_ORDER = [
   "Coordinator",
   "Ambassador",
 ]
-const STATUS_NEXT: Record<string, string> = { Pending: "In Progress", "In Progress": "Completed", Completed: "Pending" }
+const STATUS_NEXT: Record<string, string> = {
+  Pending: "In Progress",
+  "In Progress": "Completed",
+  Completed: "Pending",
+  Incomplete: "Pending",
+}
 
 export default function TasksAdminTab({ accessLevel, isTrueOwner, department, team, myEmail, myUserId }: Props) {
   const myDept = normalizeDepartmentName(department)
@@ -75,8 +88,10 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
   const load = useCallback(async () => {
     setLoading(true)
     try {
+      let taskQuery = supabase.from("tasks").select("*").order("created_at", { ascending: false })
+      if (!isTrueOwner) taskQuery = taskQuery.eq("archived", false) // only the owner sees the archive
       const [{ data: t }, { data: m }] = await Promise.all([
-        supabase.from("tasks").select("*").order("created_at", { ascending: false }),
+        taskQuery,
         supabase
           .from("members")
           .select("id, name, role, department, team, email")
@@ -91,7 +106,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isTrueOwner])
 
   useEffect(() => {
     load()
@@ -115,12 +130,22 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     [tasks, memberByEmail],
   )
 
-  const scoped = useMemo(() => {
-    if (isAdminLevel) return resolved
-    if (isDirector) return resolved.filter((t) => t._dept === myDept)
-    if (isDeputy) return resolved.filter((t) => t._dept === myDept && (t._team || "") === (team || ""))
-    return resolved
-  }, [resolved, isAdminLevel, isDirector, isDeputy, myDept, team])
+  const inScope = useCallback(
+    (t: (typeof resolved)[number]) => {
+      if (isAdminLevel) return true
+      if (isDirector) return t._dept === myDept
+      if (isDeputy) return t._dept === myDept && (t._team || "") === (team || "")
+      return true
+    },
+    [isAdminLevel, isDirector, isDeputy, myDept, team],
+  )
+
+  // Main view = non-archived, in-scope. The Archive section (owner only) is everything archived.
+  const scoped = useMemo(() => resolved.filter((t) => !t.archived && inScope(t)), [resolved, inScope])
+  const archivedTasks = useMemo(
+    () => resolved.filter((t) => t.archived && inScope(t)).sort((a, b) => (b.archived_at || "").localeCompare(a.archived_at || "")),
+    [resolved, inScope],
+  )
 
   // Group identical tasks (title + description + due date).
   type Group = { key: string; title: string; description: string | null; due_date: string | null; rows: typeof scoped }
@@ -157,13 +182,22 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     return groups
   }, [members])
 
-  async function toggleStatus(id: string, status: string) {
-    const next = STATUS_NEXT[status] || "Pending"
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status: next } : t)))
-    const { error } = await supabase.from("tasks").update({ status: next }).eq("id", id)
+  async function setStatus(id: string, next: string) {
+    const patch: Record<string, any> = { status: next }
+    // completed_at drives the 14-day auto-archive clock — set it on any finished state, clear
+    // it when a task is reopened.
+    patch.completed_at = isFinished(next) ? new Date().toISOString() : null
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)))
+    const { error } = await supabase.from("tasks").update(patch).eq("id", id)
     if (error) {
       alert("Failed to update status: " + error.message)
       load()
+    }
+  }
+  const toggleStatus = (id: string, status: string) => setStatus(id, STATUS_NEXT[status] || "Pending")
+  const markIncomplete = (id: string) => {
+    if (window.confirm("Mark this Incomplete? It moves to Completed as \"not done / no longer needed\".")) {
+      setStatus(id, "Incomplete")
     }
   }
 
@@ -253,7 +287,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     : [myDept]
 
   const GroupCard = ({ g }: { g: Group }) => {
-    const done = g.rows.filter((r) => r.status === "Completed").length
+    const done = g.rows.filter((r) => isFinished(r.status)).length
     const gk = "g:" + g.key
     return (
       <div className="border border-gray-200 rounded-xl">
@@ -295,7 +329,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
                   <button
                     onClick={() => toggleStatus(r.id, r.status)}
                     className={r.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}
-                    title={r.status}
+                    title={r.status === "Completed" || r.status === "Incomplete" ? "Reopen" : "Mark complete"}
                   >
                     <CheckCircle2 className="w-4 h-4" />
                   </button>
@@ -304,14 +338,25 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
                     className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                       r.status === "Completed"
                         ? "bg-green-100 text-green-800"
-                        : r.status === "In Progress"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-amber-100 text-amber-800"
+                        : r.status === "Incomplete"
+                          ? "bg-gray-200 text-gray-600"
+                          : r.status === "In Progress"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-amber-100 text-amber-800"
                     }`}
                   >
                     {r.status}
                   </span>
-                  <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600">
+                  {!isFinished(r.status) && (
+                    <button
+                      onClick={() => markIncomplete(r.id)}
+                      className="text-gray-400 hover:text-gray-700"
+                      title="Mark incomplete (won't be done)"
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600" title="Delete">
                     <Trash className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -319,6 +364,38 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
           </div>
         )}
       </div>
+    )
+  }
+
+  const isGroupFinished = (g: Group) => g.rows.every((r) => isFinished(r.status))
+
+  // Renders a team's groups: active ones first, then a collapsible "Completed" pile for
+  // groups where everyone is finished (Completed or Incomplete).
+  const GroupList = ({ groups, ckey }: { groups: Group[]; ckey: string }) => {
+    const active = groups.filter((g) => !isGroupFinished(g))
+    const done = groups.filter(isGroupFinished)
+    const ck = "c:" + ckey
+    return (
+      <>
+        {active.map((g) => (
+          <GroupCard key={g.key} g={g} />
+        ))}
+        {active.length === 0 && done.length > 0 && (
+          <p className="text-xs text-gray-400 px-1 py-1">No active tasks here.</p>
+        )}
+        {done.length > 0 && (
+          <div className="border border-gray-100 rounded-lg bg-gray-50/60">
+            <button
+              onClick={() => setOpen((o) => ({ ...o, [ck]: !o[ck] }))}
+              className="w-full flex items-center gap-2 p-2 text-left text-xs font-semibold text-gray-500 hover:text-gray-700"
+            >
+              <ChevronRight className={`w-3.5 h-3.5 transition-transform ${open[ck] ? "rotate-90" : ""}`} />
+              Completed ({done.length})
+            </button>
+            {open[ck] && <div className="p-2 pt-0 space-y-2">{done.map((g) => <GroupCard key={g.key} g={g} />)}</div>}
+          </div>
+        )}
+      </>
     )
   }
 
@@ -439,7 +516,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       )}
 
       {scoped.length === 0 ? (
-        <p className="text-center py-10 text-gray-400 text-sm">No tasks yet.</p>
+        archivedTasks.length === 0 ? <p className="text-center py-10 text-gray-400 text-sm">No tasks yet.</p> : null
       ) : (
         <div className="space-y-3">
           {deptSections.map((dept) => {
@@ -468,7 +545,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
                       const groups = teamMap.get(tm) || []
                       if (!groups.length) return null
                       if (tm === "") {
-                        return groups.map((g) => <GroupCard key={g.key} g={g} />)
+                        return <GroupList key="noteam" groups={groups} ckey={dept + "|noteam"} />
                       }
                       const tk = "t:" + dept + ":" + tm
                       return (
@@ -485,9 +562,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
                           </button>
                           {open[tk] && (
                             <div className="p-2.5 pt-0 space-y-2">
-                              {groups.map((g) => (
-                                <GroupCard key={g.key} g={g} />
-                              ))}
+                              <GroupList groups={groups} ckey={dept + ":" + tm} />
                             </div>
                           )}
                         </div>
@@ -498,6 +573,58 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Archive — owner only. Tasks auto-archive 14 days after they're Completed/Incomplete. */}
+      {isTrueOwner && archivedTasks.length > 0 && (
+        <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden">
+          <button
+            onClick={() => setOpen((o) => ({ ...o, archive: !o.archive }))}
+            className="w-full flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 text-left"
+          >
+            <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${open.archive ? "rotate-90" : ""}`} />
+            <span className="font-bold text-gray-900">Archive</span>
+            <span className="text-xs text-gray-400">
+              {archivedTasks.length} task{archivedTasks.length === 1 ? "" : "s"}
+            </span>
+          </button>
+          {open.archive && (
+            <div className="divide-y divide-gray-100">
+              {archivedTasks.map((r) => (
+                <div key={r.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+                  <span className="flex-1 min-w-0 truncate text-gray-600">
+                    {r.title} <span className="text-gray-400">· {r._name}</span>
+                    {r._dept !== "Unassigned" && (
+                      <span className="text-gray-400">
+                        {" "}· {r._dept}
+                        {r._team ? ` / ${r._team}` : ""}
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
+                      r.status === "Completed" ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {r.status}
+                  </span>
+                  <span className="text-[11px] text-gray-400 shrink-0">
+                    {r.archived_at ? new Date(r.archived_at).toLocaleDateString() : ""}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      await supabase.from("tasks").update({ archived: false, archived_at: null }).eq("id", r.id)
+                      load()
+                    }}
+                    className="text-xs text-[#4CAF7D] hover:underline shrink-0"
+                  >
+                    Restore
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
