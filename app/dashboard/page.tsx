@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { Loader2, X, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar, ChevronRight } from "lucide-react"
 import Link from "next/link"
@@ -57,23 +57,6 @@ type Blog = {
   created_at: string
 }
 
-type Timecard = {
-  id: string
-  member_id: string
-  clock_in: string
-  clock_out: string | null
-  duration_minutes: number | null
-  description: string
-  approved: boolean
-  archived: boolean
-  created_at: string
-  member?: {
-    name: string
-    role: string
-    department: string
-  }
-}
-
 // --- ACCESS CONTROL ---
 // Three UI tiers, resolved from the signed-in member's existing `email`/`role`/`department`
 // fields (no schema change — same pattern the previous isHrOrAdmin/isExec check already used):
@@ -87,7 +70,7 @@ type Timecard = {
 //               those two actions specifically — never `accessLevel === "owner"` alone.
 //   - director: any other "Director"/"Deputy Director"/"Lead"/"Chair" role — sees ONLY the admin
 //               tab(s) that belong to their own department.
-//   - member:   everyone else (approved, non-director) — punch card, tasks, and shared resources.
+//   - member:   everyone else (approved, non-director) — tasks and shared resources.
 const OWNER_EMAILS = ["mukhiadil2009@gmail.com"]
 
 // Admin Team roles that get full owner-tier tab access without being the true owner.
@@ -102,18 +85,18 @@ function isTrueOwner(email: string | undefined | null): boolean {
 // Which admin tabs each department's directors get. Departments not listed here (Marketing,
 // Technology, Finance, Ambassadors, Medical Student Advisory Council) don't have a
 // department-specific tool built yet — their directors still get the cross-cutting
-// timesheets/tasks tools below.
+// tasks tool below.
 const DEPARTMENT_TABS: Record<string, string[]> = {
-  "HR": ["members", "timesheets", "tasks"],
-  "Human Resources": ["members", "timesheets", "tasks"],
+  "HR": ["members", "tasks"],
+  "Human Resources": ["members", "tasks"],
   "Events": ["events"],
   "Publications": ["blogs", "webinars"],
   "Podcast": ["blogs", "webinars"],
 }
-// Every director gets these regardless of department — approving shifts and assigning tasks
-// for your own team is a director-level responsibility everywhere, not just in HR.
-const DIRECTOR_BASELINE_TABS = ["timesheets", "tasks"]
-const OWNER_TABS = ["members", "blogs", "events", "webinars", "timesheets", "tasks"]
+// Every director gets these regardless of department — assigning tasks for your own team is a
+// director-level responsibility everywhere, not just in HR.
+const DIRECTOR_BASELINE_TABS = ["tasks"]
+const OWNER_TABS = ["members", "blogs", "events", "webinars", "tasks"]
 
 // "none" = signed in (valid Supabase session) but no recognized account — e.g. someone who
 // signs in via SSO with an email that was never approved through /members/apply. They get
@@ -154,7 +137,7 @@ function resolveAccess(member: Member | null, userEmail: string | undefined): Ac
   if (isDeputy) {
     // Deputy Directors manage the same department tools as their department's Director
     // (Publications deputy → blogs + webinars/podcasts, HR deputy → members, Events deputy →
-    // events, plus timesheets/tasks) — the Directory/Attendance scoping still treats them as
+    // events, plus tasks) — the Directory/Attendance scoping still treats them as
     // "deputy" (their own team only).
     const deptTabs = DEPARTMENT_TABS[department] || []
     const tabs = Array.from(new Set([...deptTabs, ...DIRECTOR_BASELINE_TABS]))
@@ -209,7 +192,7 @@ export default function DbAdminPage() {
   const [currentUser, setCurrentUser] = useState<any | null>(null)
   const [currentMemberProfile, setCurrentMemberProfile] = useState<Member | null>(null)
   // accessLevel: "owner" (full access) | "director" (department-scoped admin tabs) | "member"
-  // (punch card / tasks / shared resources only). visibleTabs is the director/owner's allowed
+  // (tasks / shared resources only). visibleTabs is the director/owner's allowed
   // admin tab list — see resolveAccess() above.
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("member")
   const [visibleTabs, setVisibleTabs] = useState<string[]>([])
@@ -237,9 +220,9 @@ export default function DbAdminPage() {
   const canAssignSubteam = accessLevel === "owner" || deptIsHR || accessLevel === "director"
 
   // Active Main Tabs
-  // Owners see every admin tab; directors see only their department's (+ timesheets/tasks);
-  // members see: punchcard, mytasks, shared
-  const [activeMainTab, setActiveMainTab] = useState<string>("punchcard")
+  // Owners see every admin tab; directors see only their department's (+ tasks);
+  // members see: mytasks, shared, settings
+  const [activeMainTab, setActiveMainTab] = useState<string>("mytasks")
 
   // Members State
   const [members, setMembers] = useState<Member[]>([])
@@ -263,14 +246,6 @@ export default function DbAdminPage() {
     totalEvents: 0
   })
 
-  // Timecard (Punch Card) State
-  const [activeTimecard, setActiveTimecard] = useState<Timecard | null>(null)
-  const [clockInInput, setClockInInput] = useState("")
-  const [elapsedTime, setElapsedTime] = useState("00:00:00")
-  const [timecardsList, setTimecardsList] = useState<Timecard[]>([])
-  const [allTimecards, setAllTimecards] = useState<Timecard[]>([]) // for HR approvals
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-
   // Tasks State
   const [myTasks, setMyTasks] = useState<Task[]>([])
   const [myTasksShowDone, setMyTasksShowDone] = useState(false)
@@ -279,7 +254,7 @@ export default function DbAdminPage() {
   const [taskForm, setTaskForm] = useState<Partial<Task>>({ status: "Pending" })
   const [savingTask, setSavingTask] = useState(false)
   // Marking a task Completed opens this modal to capture the actual work + time spent,
-  // which also gets auto-logged as a (pending-approval) timecard entry.
+  // and records the time spent on the task itself.
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
   const [completionForm, setCompletionForm] = useState({ submission_url: "", time_spent_minutes: "" })
   const [savingCompletion, setSavingCompletion] = useState(false)
@@ -342,7 +317,7 @@ export default function DbAdminPage() {
           setAccessLevel(level)
           setVisibleTabs(tabs)
           setActiveMainTab(
-            tabs.length > 0 ? tabs[0] : level === "deputy" ? "directory" : "punchcard"
+            tabs.length > 0 ? tabs[0] : level === "deputy" ? "directory" : "mytasks"
           )
         }
       } catch (err) {
@@ -464,13 +439,10 @@ export default function DbAdminPage() {
     fetchSharedCalendarUrl()
     fetchDriveTemplates()
 
-    // "My Tasks" and "Punch Card" are available to everyone, including directors/deputies/admins
-    // who can also be *assigned* tasks — handle them regardless of tier.
+    // "My Tasks" is available to everyone, including directors/deputies/admins who can also
+    // be *assigned* tasks — handle it regardless of tier.
     if (activeMainTab === "mytasks") {
       fetchMemberTasks()
-    } else if (activeMainTab === "punchcard") {
-      checkActiveTimecard()
-      fetchMemberTimecardHistory()
     }
 
     if (isHrOrAdmin && visibleTabs.includes(activeMainTab)) {
@@ -479,8 +451,6 @@ export default function DbAdminPage() {
       } else if (activeMainTab === "blogs") {
         fetchBlogs()
         fetchMembers() // Author options
-      } else if (activeMainTab === "timesheets") {
-        fetchAdminTimesheets()
       } else if (activeMainTab === "tasks") {
         fetchAdminTasks()
         fetchMembers() // Assignee options
@@ -488,32 +458,6 @@ export default function DbAdminPage() {
       fetchStats()
     }
   }, [isAuthenticated, isHrOrAdmin, activeMainTab, visibleTabs])
-
-  // Pulse Timer for Active Shift
-  useEffect(() => {
-    if (activeTimecard) {
-      const startTime = new Date(activeTimecard.clock_in).getTime()
-      
-      const updateTimer = () => {
-        const diffMs = Date.now() - startTime
-        const diffSecs = Math.floor(diffMs / 1000)
-        const hrs = Math.floor(diffSecs / 3600).toString().padStart(2, "0")
-        const mins = Math.floor((diffSecs % 3600) / 60).toString().padStart(2, "0")
-        const secs = (diffSecs % 60).toString().padStart(2, "0")
-        setElapsedTime(`${hrs}:${mins}:${secs}`)
-      }
-      
-      updateTimer()
-      timerRef.current = setInterval(updateTimer, 1000)
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current)
-      setElapsedTime("00:00:00")
-    }
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [activeTimecard])
 
   const fetchStats = async () => {
     try {
@@ -532,128 +476,6 @@ export default function DbAdminPage() {
       })
     } catch (err) {
       console.error("Error fetching stats:", err)
-    }
-  }
-
-  // --- TIMECARD / PUNCH CARD OPERATIONS ---
-
-  const checkActiveTimecard = async () => {
-    if (!currentUser) return
-    try {
-      const { data, error } = await supabase
-        .from("timecards")
-        .select("*")
-        .eq("member_id", currentUser.id)
-        .is("clock_out", null)
-        .maybeSingle()
-
-      if (error) throw error
-      setActiveTimecard(data)
-    } catch (err) {
-      console.error("Error checking active timecard:", err)
-    }
-  }
-
-  const fetchMemberTimecardHistory = async () => {
-    if (!currentUser) return
-    try {
-      const { data, error } = await supabase
-        .from("timecards")
-        .select("*")
-        .eq("member_id", currentUser.id)
-        .not("clock_out", "is", null)
-        .order("clock_in", { ascending: false })
-        .limit(20)
-
-      if (error) throw error
-      setTimecardsList(data || [])
-    } catch (err) {
-      console.error("Error fetching timecard history:", err)
-    }
-  }
-
-  const handleClockIn = async () => {
-    if (!currentUser) return
-    try {
-      const { data, error } = await supabase
-        .from("timecards")
-        .insert([
-          {
-            member_id: currentUser.id,
-            clock_in: new Date().toISOString(),
-            approved: false,
-            archived: false,
-            description: ""
-          }
-        ])
-        .select()
-        .single()
-
-      if (error) throw error
-      setActiveTimecard(data)
-
-      // Securely trigger the Discord notification via our API route
-      try {
-        await fetch("/api/members/timecard/notify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            member_name: currentUser.name,
-            action: "in",
-            description: clockInInput.trim() || undefined
-          })
-        })
-      } catch (notifyErr) {
-        console.error("Failed to send clock-in notification:", notifyErr)
-      }
-
-      setClockInInput("")
-    } catch (err: any) {
-      console.error(err)
-      alert(`Clock In failed: ${err.message}`)
-    }
-  }
-
-  const handleClockOut = async () => {
-    if (!activeTimecard) return
-    try {
-      const now = new Date()
-      const startTime = new Date(activeTimecard.clock_in)
-      const durationMin = Math.max(1, Math.round((now.getTime() - startTime.getTime()) / 60000))
-
-      const { error } = await supabase
-        .from("timecards")
-        .update({
-          clock_out: now.toISOString(),
-          duration_minutes: durationMin,
-          description: clockInInput
-        })
-        .eq("id", activeTimecard.id)
-
-      if (error) throw error
-
-      // Securely trigger the Discord notification via our API route
-      try {
-        await fetch("/api/members/timecard/notify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            member_name: currentUser.name,
-            action: "out",
-            description: clockInInput.trim() || undefined,
-            duration_minutes: durationMin
-          })
-        })
-      } catch (notifyErr) {
-        console.error("Failed to send clock-out notification:", notifyErr)
-      }
-
-      setActiveTimecard(null)
-      setClockInInput("")
-      fetchMemberTimecardHistory()
-    } catch (err: any) {
-      console.error(err)
-      alert(`Clock Out failed: ${err.message}`)
     }
   }
 
@@ -734,27 +556,8 @@ export default function DbAdminPage() {
         .eq("id", completingTask.id)
       if (taskError) throw taskError
 
-      // Auto-log the time against the member's own timesheet, pending the usual approval.
-      const clockOut = new Date()
-      const clockIn = new Date(clockOut.getTime() - minutes * 60000)
-      const workNote = completionForm.submission_url.trim()
-        ? `Task: ${completingTask.title} — ${completionForm.submission_url.trim()}`
-        : `Task: ${completingTask.title}`
-
-      const { error: timecardError } = await supabase.from("timecards").insert([{
-        member_id: currentUser.id,
-        clock_in: clockIn.toISOString(),
-        clock_out: clockOut.toISOString(),
-        duration_minutes: minutes,
-        description: workNote,
-        approved: false,
-        archived: false,
-      }])
-      if (timecardError) throw timecardError
-
       setCompletingTask(null)
       fetchMemberTasks()
-      fetchMemberTimecardHistory()
       if (isHrOrAdmin) fetchAdminTasks()
     } catch (err: any) {
       console.error(err)
@@ -764,49 +567,7 @@ export default function DbAdminPage() {
     }
   }
 
-  // --- HR / ADMIN TIMECARD & TASK OPERATIONS ---
-
-  const fetchAdminTimesheets = async () => {
-    try {
-      // First fetch timecards
-      const { data: timecards, error } = await supabase
-        .from("timecards")
-        .select("*")
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
-
-      // Join with member profiles manually using Auth User mapping
-      const { data: memberProfiles } = await supabase.from("members").select("id, name, role, department")
-      
-      const hydrated = (timecards || []).map((card: any) => {
-        // Fallback matching if profiles map keys differ
-        const m = memberProfiles?.find(p => p.id === card.member_id)
-        return {
-          ...card,
-          member: m ? { name: m.name, role: m.role, department: m.department } : { name: "System Admin/Owner", role: "Administrator", department: "HR" }
-        }
-      })
-      setAllTimecards(hydrated)
-    } catch (err) {
-      console.error("Error loading admin timesheets:", err)
-    }
-  }
-
-  const handleApproveTimecard = async (id: string, currentApprovalState: boolean) => {
-    try {
-      const { error } = await supabase
-        .from("timecards")
-        .update({ approved: !currentApprovalState })
-        .eq("id", id)
-
-      if (error) throw error
-      fetchAdminTimesheets()
-    } catch (err: any) {
-      console.error(err)
-      alert(`Approval operation failed: ${err.message}`)
-    }
-  }
+  // --- HR / ADMIN TASK OPERATIONS ---
 
   const fetchAdminTasks = async () => {
     try {
@@ -1324,7 +1085,7 @@ export default function DbAdminPage() {
     activeTab === "pending" ? pendingMembers : activeTab === "approved" ? approvedMembers : archivedMembers
 
   const adminTabLabel = (tab: string) =>
-    tab === "timesheets" ? "Timesheets (Shifts)" : tab === "tasks" ? "Assign Tasks" : `Manage ${tab}`
+    tab === "tasks" ? "Assign Tasks" : `Manage ${tab}`
   const accountabilityTabs: { id: string; label: string }[] = [
     ...(canSeeDirectory ? [{ id: "directory", label: "Directory" }] : []),
     ...(canSeeAttendance ? [{ id: "attendance", label: "Attendance" }] : []),
@@ -1341,7 +1102,6 @@ export default function DbAdminPage() {
     ...(userIsTrueOwner ? [{ id: "admin", label: "Admin" }] : []),
   ]
   const memberTabs: { id: string; label: string }[] = [
-    { id: "punchcard", label: "Punch Card" },
     { id: "mytasks", label: "My Tasks" },
     ...accountabilityTabs,
     { id: "shared", label: "Drive & Calendar" },
@@ -1434,107 +1194,6 @@ export default function DbAdminPage() {
 
       {/* --- RENDER MEMBER VIEWS --- */}
 
-      {/* 1. Punch Card (Clock In/Out) */}
-      {!isHrOrAdmin && activeMainTab === "punchcard" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Card Control */}
-          <div className="lg:col-span-1 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 relative ${activeTimecard ? "bg-green-50 text-green-500" : "bg-gray-100 text-gray-400"}`}>
-              {activeTimecard && (
-                <span className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-25"></span>
-              )}
-              <Clock className="w-10 h-10" />
-            </div>
-
-            {activeTimecard ? (
-              <>
-                <span className="inline-block bg-green-100 text-green-800 font-bold px-3 py-1 rounded-full text-xs mb-2">CLOCKED IN</span>
-                <div className="text-4xl font-mono font-bold text-gray-800 mb-6">{elapsedTime}</div>
-                
-                <div className="w-full mb-6">
-                  <label className="block text-xs font-semibold text-gray-500 text-left mb-1">What did you accomplish?</label>
-                  <input
-                    type="text"
-                    value={clockInInput}
-                    onChange={(e) => setClockInInput(e.target.value)}
-                    placeholder="E.g., Designed Instagram posters"
-                    className="w-full p-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                  />
-                </div>
-
-                <button
-                  onClick={handleClockOut}
-                  className="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
-                >
-                  <Square className="w-4 h-4 fill-white" />
-                  Clock Out
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="inline-block bg-gray-100 text-gray-600 font-semibold px-3 py-1 rounded-full text-xs mb-2">CLOCKED OUT</span>
-                <div className="text-4xl font-mono font-bold text-gray-300 mb-6">00:00:00</div>
-                
-                <button
-                  onClick={handleClockIn}
-                  className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
-                >
-                  <Play className="w-4 h-4 fill-white" />
-                  Clock In Shift
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Shift History */}
-          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold font-bricolage mb-4 text-[#1a1a1a] flex items-center gap-2">
-              <Award className="text-[#4CAF7D] w-5 h-5" /> Recent Shifts History
-            </h2>
-            
-            {loading ? (
-              <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-[#4CAF7D]" /></div>
-            ) : timecardsList.length === 0 ? (
-              <div className="text-center py-10 text-gray-400 text-sm">No shifts recorded yet. Clock in to log your volunteer hours.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm border-collapse">
-                  <thead>
-                    <tr className="border-b border-gray-100 text-gray-400 font-medium">
-                      <th className="pb-3">Date</th>
-                      <th className="pb-3">Work Log</th>
-                      <th className="pb-3 text-right">Duration</th>
-                      <th className="pb-3 text-right">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50 text-gray-600">
-                    {timecardsList.map((card) => (
-                      <tr key={card.id}>
-                        <td className="py-3 font-medium text-gray-800">
-                          {new Date(card.clock_in).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </td>
-                        <td className="py-3 max-w-[200px] truncate" title={card.description || "N/A"}>
-                          {card.description || <span className="text-gray-300 italic">No description</span>}
-                        </td>
-                        <td className="py-3 text-right font-semibold text-gray-700">
-                          {Math.round((card.duration_minutes || 0) / 6) / 10} hrs
-                        </td>
-                        <td className="py-3 text-right">
-                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${card.approved ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
-                            {card.approved ? "Approved" : "Pending"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* 2. Member Tasks */}
       {activeMainTab === "mytasks" && (() => {
         const FINISHED = ["Completed", "Incomplete"]
@@ -1543,8 +1202,8 @@ export default function DbAdminPage() {
         const renderCard = (task: Task) => {
           const isDone = FINISHED.includes(task.status)
           return (
-            <div key={task.id} className="p-4 border border-gray-150 rounded-xl hover:border-gray-300 transition-colors flex items-start gap-4 justify-between">
-              <div className="flex items-start gap-3">
+            <div key={task.id} className="p-4 border border-gray-150 rounded-xl hover:border-gray-300 transition-colors flex items-start gap-3">
+              <div className="flex items-start gap-3 min-w-0 flex-1">
                 <button
                   onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
                   disabled={task.status === "Incomplete"}
@@ -1552,12 +1211,12 @@ export default function DbAdminPage() {
                 >
                   <CheckCircle2 className="w-5 h-5" />
                 </button>
-                <div>
-                  <h3 className={`font-semibold text-[0.95rem] ${isDone ? "line-through text-gray-400" : "text-gray-800"}`}>
+                <div className="min-w-0 flex-1">
+                  <h3 className={`font-semibold text-[0.95rem] break-words ${isDone ? "line-through text-gray-400" : "text-gray-800"}`}>
                     {task.title}
                   </h3>
                   {task.description && (
-                    <p className={`text-sm mt-1 ${isDone ? "text-gray-300" : "text-gray-500"}`}>{task.description}</p>
+                    <p className={`text-sm mt-1 break-words ${isDone ? "text-gray-300" : "text-gray-500"}`}>{task.description}</p>
                   )}
                   {task.status === "Incomplete" && (
                     <p className="text-xs text-gray-400 mt-1 italic">Closed by a director — no longer needs to be done.</p>
@@ -1582,8 +1241,8 @@ export default function DbAdminPage() {
                   )}
                 </div>
               </div>
-              <div>
-                <span className={`inline-block px-2.5 py-1 rounded-full text-[0.75rem] font-bold uppercase tracking-wider ${
+              <div className="shrink-0">
+                <span className={`inline-block px-2.5 py-1 rounded-full text-[0.7rem] sm:text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap ${
                   task.status === "Completed" ? "bg-green-100 text-green-800" : task.status === "Incomplete" ? "bg-gray-200 text-gray-600" : task.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
                 }`}>
                   {task.status}
@@ -1717,64 +1376,6 @@ export default function DbAdminPage() {
       )}
 
       {/* --- RENDER HR & ADMIN CONTROL VIEWS --- */}
-
-      {/* 4. Timesheets Log Approval */}
-      {isHrOrAdmin && visibleTabs.includes("timesheets") && activeMainTab === "timesheets" && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-center pb-4 mb-6 border-b border-gray-100">
-            <h2 className="text-xl font-bold font-bricolage text-[#1a1a1a]">Timesheet Shift Approvals</h2>
-          </div>
-
-          {allTimecards.length === 0 ? (
-            <div className="text-center py-10 text-gray-400 text-sm">No timecard logs submitted for approval.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-250 text-gray-400 font-medium">
-                    <th className="pb-3">Member</th>
-                    <th className="pb-3">Department/Role</th>
-                    <th className="pb-3">Clock In</th>
-                    <th className="pb-3 text-right">Hours</th>
-                    <th className="pb-3">Work Description</th>
-                    <th className="pb-3 text-right">Approve</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50 text-gray-600">
-                  {allTimecards.map((card) => (
-                    <tr key={card.id}>
-                      <td className="py-3">
-                        <div className="font-semibold text-gray-800">{card.member?.name}</div>
-                      </td>
-                      <td className="py-3 text-xs">
-                        <div className="text-gray-700">{card.member?.department}</div>
-                        <div className="text-gray-400">{card.member?.role}</div>
-                      </td>
-                      <td className="py-3 text-xs">
-                        {card.clock_in ? new Date(card.clock_in).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "N/A"}
-                      </td>
-                      <td className="py-3 text-right font-semibold">
-                        {Math.round((card.duration_minutes || 0) / 6) / 10} hrs
-                      </td>
-                      <td className="py-3 max-w-[200px] truncate" title={card.description}>
-                        {card.description || <span className="text-gray-300 italic">No details</span>}
-                      </td>
-                      <td className="py-3 text-right">
-                        <button
-                          onClick={() => handleApproveTimecard(card.id, card.approved)}
-                          className={`px-3 py-1 rounded font-bold text-xs ${card.approved ? "bg-green-150 text-green-700 hover:bg-green-200" : "bg-amber-150 text-amber-700 hover:bg-amber-200"}`}
-                        >
-                          {card.approved ? "✓ Approved" : "Approve"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* 5. Admin Task Assigner */}
       {isHrOrAdmin && visibleTabs.includes("tasks") && activeMainTab === "tasks" && (
@@ -2138,8 +1739,7 @@ export default function DbAdminPage() {
 
       {/* --- MODAL POPUPS --- */}
 
-      {/* Task Completion Modal — captures the actual work + time spent, which also gets
-          auto-logged as a pending-approval timecard entry. */}
+      {/* Task Completion Modal — captures the actual work + time spent. */}
       {completingTask && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
@@ -2169,7 +1769,7 @@ export default function DbAdminPage() {
                   onChange={(e) => setCompletionForm({ ...completionForm, time_spent_minutes: e.target.value })}
                   className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
                 />
-                <p className="text-xs text-gray-400 mt-1">This gets added to your timesheet, pending HR approval.</p>
+                <p className="text-xs text-gray-400 mt-1">Recorded on the task so your director can see the effort involved.</p>
               </div>
               <div className="flex gap-3 pt-2">
                 <button

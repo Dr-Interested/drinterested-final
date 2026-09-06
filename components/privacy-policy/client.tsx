@@ -101,7 +101,7 @@ export default function PrivacyPolicyClientPage() {
             If you choose to provide us with your email address, you consent to receive emails from us. You can
             unsubscribe from our marketing emails at any time by clicking the "unsubscribe" link included in these
             emails or by contacting us directly. However, we may still send you non-promotional emails that are
-            essential to your use of our services (for example, a task or timesheet notification if you are a
+            essential to your use of our services (for example, a task or meeting notification if you are a
             member).
           </p>
         </section>

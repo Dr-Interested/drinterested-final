@@ -55,10 +55,14 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
       ? ["department", "team"]
       : []
 
-  /** Can this user create/finalize/fill attendance for a given meeting? */
+  // Once a meeting exists, any director / deputy / leadership / HR member can mark people
+  // present or excused on it — regardless of the meeting's department.
+  const canMarkAttendance = isOwner || isDirector || isDeputy || isHr
+
+  /** Can this user START (create) and CLOSE (finalize) a given meeting? Scoped: owner + HR
+   *  leadership for anything; a department's own director/deputy for their own dept meetings. */
   const canManageMeeting = (mt: Meeting) => {
-    if (fullGroup && (isOwner || (isHr && (isDirector || isDeputy)))) return true
-    if (fullGroup && isHr) return true // HR coordinators can fill any meeting
+    if (isOwner || (isHr && (isDirector || isDeputy))) return true
     if (!(isDirector || isDeputy)) return false
     if (mt.scope === "org") return false
     if (normalizeDepartmentName(mt.department) !== myDept) return false
@@ -332,7 +336,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
                   <button
                     key={opt}
                     onClick={() => setStatus(m.id, opt)}
-                    disabled={busy || selected.finalized || !canManageMeeting(selected)}
+                    disabled={busy || selected.finalized || !canMarkAttendance}
                     className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize transition-colors disabled:opacity-60 ${
                       st === opt
                         ? opt === "present"
@@ -427,7 +431,9 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
       )}
 
       {(() => {
-        const visibleMeetings = fullGroup ? meetings : meetings.filter(canManageMeeting)
+        // Everyone with the Attendance tab (owner / HR / any director / any deputy) sees every
+        // meeting so they can help mark attendance; only canManageMeeting() can create/close.
+        const visibleMeetings = meetings
         return visibleMeetings.length === 0 ? (
         <p className="text-gray-500 py-10 text-center">No meetings yet.</p>
       ) : (

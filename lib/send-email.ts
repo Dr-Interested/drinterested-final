@@ -2,7 +2,7 @@
  * Minimal Resend email sender — calls Resend's plain HTTP API directly (no SDK dependency).
  * Requires RESEND_API_KEY (and optionally RESEND_FROM_EMAIL) in the environment. Mirrors the
  * existing Discord-webhook pattern (see app/api/members/apply/notify): if unconfigured, it
- * logs a warning and no-ops rather than throwing, so task/timesheet actions never fail just
+ * logs a warning and no-ops rather than throwing, so task actions never fail just
  * because email isn't set up yet.
  */
 export async function sendEmail({
