@@ -15,6 +15,7 @@ import PortalTabSelector from "@/components/dashboard/PortalTabSelector"
 import DirectoryTab from "@/components/dashboard/DirectoryTab"
 import AttendanceTab from "@/components/dashboard/AttendanceTab"
 import StrikesTab from "@/components/dashboard/StrikesTab"
+import TasksAdminTab from "@/components/dashboard/TasksAdminTab"
 import YourStandingCard from "@/components/dashboard/YourStandingCard"
 import { PRESET_ROLES, subteamsFor } from "@/lib/teams"
 
@@ -462,6 +463,15 @@ export default function DbAdminPage() {
     fetchSharedCalendarUrl()
     fetchDriveTemplates()
 
+    // "My Tasks" and "Punch Card" are available to everyone, including directors/deputies/admins
+    // who can also be *assigned* tasks — handle them regardless of tier.
+    if (activeMainTab === "mytasks") {
+      fetchMemberTasks()
+    } else if (activeMainTab === "punchcard") {
+      checkActiveTimecard()
+      fetchMemberTimecardHistory()
+    }
+
     if (isHrOrAdmin && visibleTabs.includes(activeMainTab)) {
       if (activeMainTab === "members") {
         fetchMembers()
@@ -475,14 +485,6 @@ export default function DbAdminPage() {
         fetchMembers() // Assignee options
       }
       fetchStats()
-    } else {
-      // Member specific fetches
-      if (activeMainTab === "punchcard") {
-        checkActiveTimecard()
-        fetchMemberTimecardHistory()
-      } else if (activeMainTab === "mytasks") {
-        fetchMemberTasks()
-      }
     }
   }, [isAuthenticated, isHrOrAdmin, activeMainTab, visibleTabs])
 
@@ -1327,6 +1329,9 @@ export default function DbAdminPage() {
   const adminTabs: { id: string; label: string }[] = [
     ...visibleTabs.map((tab) => ({ id: tab, label: adminTabLabel(tab) })),
     ...accountabilityTabs,
+    // Directors/deputies/admins get tasks assigned to them too — their own list, separate
+    // from the "Assign Tasks" panel above.
+    { id: "mytasks", label: "My Tasks" },
     { id: "shared", label: "Drive & Calendar" },
     { id: "settings", label: "Settings" },
     ...(userIsTrueOwner ? [{ id: "admin", label: "Admin" }] : []),
@@ -1527,7 +1532,7 @@ export default function DbAdminPage() {
       )}
 
       {/* 2. Member Tasks */}
-      {!isHrOrAdmin && activeMainTab === "mytasks" && (
+      {activeMainTab === "mytasks" && (
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl font-bold font-bricolage mb-6 text-[#1a1a1a] flex items-center gap-2">
             <FileText className="text-[#4CAF7D] w-5 h-5" /> Assigned Tasks Checklist
@@ -1741,62 +1746,14 @@ export default function DbAdminPage() {
 
       {/* 5. Admin Task Assigner */}
       {isHrOrAdmin && visibleTabs.includes("tasks") && activeMainTab === "tasks" && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-center pb-4 mb-6 border-b border-gray-100">
-            <h2 className="text-xl font-bold font-bricolage text-[#1a1a1a]">Assign Tasks Panel</h2>
-            <button
-              onClick={() => {
-                setTaskForm({ status: "Pending" })
-                setIsCreatingTask(true)
-              }}
-              className="px-4 py-2 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors text-sm"
-            >
-              + Assign New Task
-            </button>
-          </div>
-
-          {allTasks.length === 0 ? (
-            <div className="text-center py-10 text-gray-400 text-sm">No tasks assigned yet. Click Assign New Task to begin.</div>
-          ) : (
-            <div className="space-y-4">
-              {allTasks.map((task) => (
-                <div key={task.id} className="p-4 border border-gray-150 rounded-xl flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    <button
-                      onClick={() => handleUpdateTaskStatus(task.id, task.status)}
-                      className={`mt-1 flex-shrink-0 transition-transform active:scale-95 ${task.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}`}
-                    >
-                      <CheckCircle2 className="w-5 h-5" />
-                    </button>
-                    <div>
-                      <h3 className="font-semibold text-gray-800">{task.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1">{task.description}</p>
-                      <div className="flex items-center gap-3 mt-3">
-                        <span className="text-xs font-semibold text-gray-400">Assigned To: <span className="text-[#4CAF7D]">{task.assigned_to}</span></span>
-                        {task.due_date && (
-                          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium">Due {new Date(task.due_date).toLocaleDateString()}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className={`px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wider ${
-                      task.status === "Completed" ? "bg-green-100 text-green-800" : task.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
-                    }`}>
-                      {task.status}
-                    </span>
-                    <button
-                      onClick={() => handleDeleteTask(task.id)}
-                      className="text-red-500 hover:text-red-700 transition-colors p-1"
-                    >
-                      <Trash className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <TasksAdminTab
+          accessLevel={accessLevel}
+          isTrueOwner={userIsTrueOwner}
+          department={profileDept}
+          team={profileTeam}
+          myEmail={(currentUser?.email || "").toLowerCase()}
+          myUserId={currentUser?.id || ""}
+        />
       )}
 
       {/* --- RENDER ORIGINAL ADMIN TAB CONTENTS (STILL FULLY SUPPORTED) --- */}
@@ -2528,77 +2485,7 @@ export default function DbAdminPage() {
         </div>
       )}
 
-      {/* Create Task Modal */}
-      {isCreatingTask && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
-            <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">Assign Member Task</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Task Title *</label>
-                <input
-                  type="text"
-                  value={taskForm.title || ""}
-                  onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
-                  placeholder="Task title"
-                  className="w-full p-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                <textarea
-                  value={taskForm.description || ""}
-                  onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
-                  placeholder="Task details and instructions..."
-                  className="w-full p-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                  rows={3}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Assign to Member *</label>
-                <select
-                  value={taskForm.assigned_to || ""}
-                  onChange={(e) => setTaskForm({ ...taskForm, assigned_to: e.target.value })}
-                  className="w-full p-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] bg-white"
-                  required
-                >
-                  <option value="" disabled>Select Member</option>
-                  {members.map(m => (
-                    <option key={m.id} value={m.email || ""}>{m.name} ({m.email || "No Email"})</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Due Date</label>
-                <input
-                  type="date"
-                  value={taskForm.due_date || ""}
-                  onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })}
-                  className="w-full p-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-8">
-              <button
-                onClick={() => setIsCreatingTask(false)}
-                className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded transition-colors"
-                disabled={savingTask}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveTask}
-                className="px-6 py-2 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded transition-colors flex items-center gap-2"
-                disabled={savingTask}
-              >
-                {savingTask && <Loader2 className="w-4 h-4 animate-spin" />}
-                Assign Task
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Task creation + the admin task list now live in <TasksAdminTab /> (the "tasks" tab). */}
 
     </div>
   )
