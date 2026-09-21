@@ -45,17 +45,37 @@ export async function sendEmail({
   }
 }
 
+// Shared brand shell for every transactional email sent through this app (task assignment/
+// reminder emails). Kept visually in sync with the Supabase Auth email templates (Confirm
+// Signup / Magic Link / Reset Password) — same logo, colors (#405862 / #4ecdc4), card layout,
+// and legal footer — so all outgoing mail reads as one consistent, trustworthy sender rather
+// than a mix of styles, which also helps avoid spam/phishing heuristics on bare-link emails.
 export function taskEmailShell(title: string, bodyHtml: string): string {
   return `
-    <div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1a1a1a;">
-      <h2 style="color: #1a1a1a; margin-bottom: 4px;">${title}</h2>
-      ${bodyHtml}
-      <p style="margin-top: 24px;">
-        <a href="https://www.drinterested.org/dashboard?login=true" style="background: #4CAF7D; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-          Open the Portal
-        </a>
-      </p>
-      <p style="color: #888; font-size: 12px; margin-top: 32px;">Dr. Interested Member Portal</p>
+    <div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #ffffff;">
+      <div style="background: #f5f1eb; padding: 24px; text-align: center; border-radius: 12px 12px 0 0;">
+        <img src="https://www.drinterested.org/circle-logo.png" alt="Dr. Interested" width="48" height="48" style="border-radius: 50%;" />
+      </div>
+      <div style="padding: 32px 28px; border: 1px solid #eee; border-top: none;">
+        <h2 style="color: #405862; margin: 0 0 16px; font-size: 20px;">${title}</h2>
+        <div style="color: #405862; line-height: 1.6; font-size: 14px;">
+          ${bodyHtml}
+        </div>
+        <p style="margin: 28px 0 0; text-align: center;">
+          <a href="https://www.drinterested.org/dashboard?login=true" style="background: #4ecdc4; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+            Open the Portal
+          </a>
+        </p>
+        <div style="border-top: 1px solid #eee; margin-top: 32px; padding-top: 16px; text-align: center;">
+          <p style="color: #aaa; font-size: 11px; margin: 0 0 6px;">Dr. Interested Member Portal</p>
+          <p style="color: #aaa; font-size: 11px; margin: 0 0 6px;">
+            <a href="https://www.drinterested.org/privacy-policy" style="color: #4ecdc4; text-decoration: none;">Privacy Policy</a>
+            &nbsp;&middot;&nbsp;
+            <a href="https://www.drinterested.org/terms" style="color: #4ecdc4; text-decoration: none;">Terms of Service</a>
+          </p>
+          <p style="color: #bbb; font-size: 10px; margin: 0;">© 2026 Dr. Interested. All rights reserved.</p>
+        </div>
+      </div>
     </div>
   `
 }

@@ -101,10 +101,15 @@ const OWNER_TABS = ["members", "blogs", "events", "webinars", "tasks"]
 // "none" = signed in (valid Supabase session) but no recognized account — e.g. someone who
 // signs in via SSO with an email that was never approved through /members/apply. They get
 // signed straight back out; this is NOT a tier that grants any dashboard access.
+// "pending" = a members row exists (they applied) but an admin hasn't approved it yet. Also
+// grants NO dashboard access — critically, this is checked BEFORE role/department is ever
+// looked at, because role/department on that row are self-reported by the applicant on the
+// public /members/apply form (e.g. anyone can pick department "Admin Team" + role "Executive
+// Director"). Never let an unapproved row reach the owner/director/deputy checks below.
 // "deputy" = Deputy Director. Same "sees the admin shell, not full owner tabs" idea as
 // "director", but scoped to their own sub-team (member.team) for the Directory. Split out
 // from "director" so the Directory / Attendance / Strikes tabs can apply the tighter scope.
-type AccessLevel = "owner" | "director" | "deputy" | "member" | "none"
+type AccessLevel = "owner" | "director" | "deputy" | "member" | "pending" | "none"
 
 type Access = { level: AccessLevel; tabs: string[]; department: string; team: string | null }
 
@@ -122,6 +127,11 @@ function resolveAccess(member: Member | null, userEmail: string | undefined): Ac
   }
   if (!member) {
     return { level: "none", tabs: [], department: "", team: null }
+  }
+  // Gate every role-based tier below on admin approval — role/department are self-reported by
+  // the applicant, so an unapproved row must never be evaluated against them.
+  if (!member.approved) {
+    return { level: "pending", tabs: [], department, team }
   }
   if (department === "Admin Team" && ADMIN_TEAM_LEADERSHIP_ROLES.some((r) => role.includes(r))) {
     return { level: "owner", tabs: OWNER_TABS, department, team }
@@ -164,12 +174,17 @@ export default function DbAdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [authError, setAuthError] = useState(false)
+  const [authError, setAuthError] = useState<string | false>(false)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
-  const [authView, setAuthView] = useState<"login" | "forgot">("login")
+  const [authView, setAuthView] = useState<"login" | "forgot" | "otp">("login")
   const [resetSent, setResetSent] = useState(false)
   const [resetError, setResetError] = useState<string | false>(false)
   const [isSendingReset, setIsSendingReset] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpCode, setOtpCode] = useState("")
+  const [otpError, setOtpError] = useState<string | false>(false)
+  const [isSendingOtp, setIsSendingOtp] = useState(false)
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
   const [isSsoLoading, setIsSsoLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [googleDriveUrl, setGoogleDriveUrl] = useState("https://drive.google.com/drive/folders/1-xwckNS2TWLPFjFuBNvpGgct43Bz4dvP?usp=drive_link")
@@ -643,7 +658,15 @@ export default function DbAdminPage() {
     setIsLoggingIn(false)
 
     if (error) {
-      setAuthError(true)
+      // Surface the real reason instead of a generic message — "Email not confirmed" (the
+      // confirmation email never arrived/was clicked) looks identical to a typo'd password
+      // otherwise, and sends people into a forgot-password loop that can't fix an unconfirmed
+      // account either.
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        setAuthError("Your email hasn't been confirmed yet. Check your inbox (and spam folder) for the confirmation link, or contact an admin.")
+      } else {
+        setAuthError("Invalid email or password.")
+      }
     } else {
       // portal-session cookie is set by the auth-state-change listener above once the
       // session lands — no need to duplicate that here.
@@ -666,6 +689,47 @@ export default function DbAdminPage() {
       setResetError(err.message || "Couldn't send the reset email. Try again.")
     } finally {
       setIsSendingReset(false)
+    }
+  }
+
+  // Passwordless login uses a manually-typed 6-digit code rather than a clickable link —
+  // Supabase's client auto-consumes a link's token the instant ANYTHING loads that URL
+  // (detectSessionInUrl), including automated link-scanners some email providers run against
+  // inbound mail before a human ever clicks, which silently burns the token. A code the user
+  // has to type can't be pre-fetched that way. See the Magic Link template in Supabase →
+  // Authentication → Email Templates, which must show {{ .Token }} as plain text (no href).
+  // shouldCreateUser: false so this can never create a brand new auth account — only log in
+  // to one that already exists.
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSendingOtp(true)
+    setOtpError(false)
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: false },
+      })
+      if (error) throw error
+      setOtpSent(true)
+    } catch (err: any) {
+      setOtpError(err.message || "Couldn't send the code. Try again.")
+    } finally {
+      setIsSendingOtp(false)
+    }
+  }
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsVerifyingOtp(true)
+    setOtpError(false)
+    try {
+      const { error } = await supabase.auth.verifyOtp({ email, token: otpCode, type: "email" })
+      if (error) throw error
+      // Success signs the user in — same auto-unmount-via-listener as above.
+    } catch (err: any) {
+      setOtpError(err.message || "Invalid or expired code.")
+    } finally {
+      setIsVerifyingOtp(false)
     }
   }
 
@@ -956,12 +1020,83 @@ export default function DbAdminPage() {
                 ← Back to login
               </button>
             </>
+          ) : authView === "otp" ? (
+            <>
+              <h2 className="text-2xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Sign In With a Code</h2>
+
+              {!otpSent ? (
+                <>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Enter your email — we&apos;ll send you a 6-digit one-time code instead of using your password.
+                  </p>
+                  <form onSubmit={handleSendOtp}>
+                    {otpError && <p className="text-[#c62828] text-sm mb-4">{otpError}</p>}
+                    <input
+                      type="email"
+                      placeholder="Email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4"
+                      autoFocus
+                      required
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSendingOtp}
+                      className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                    >
+                      {isSendingOtp && <Loader2 className="w-4 h-4 animate-spin" />}
+                      Send Code
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Enter the 6-digit code we emailed to {email}.
+                  </p>
+                  <form onSubmit={handleVerifyOtp}>
+                    {otpError && <p className="text-[#c62828] text-sm mb-4">{otpError}</p>}
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="6-digit code"
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4 tracking-widest"
+                      autoFocus
+                      required
+                    />
+                    <button
+                      type="submit"
+                      disabled={isVerifyingOtp}
+                      className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                    >
+                      {isVerifyingOtp && <Loader2 className="w-4 h-4 animate-spin" />}
+                      Verify & Sign In
+                    </button>
+                  </form>
+                </>
+              )}
+
+              <button
+                onClick={() => {
+                  setAuthView("login")
+                  setOtpSent(false)
+                  setOtpError(false)
+                  setOtpCode("")
+                }}
+                className="text-xs text-gray-500 hover:text-[#4CAF7D] mt-4 block mx-auto"
+              >
+                ← Back to login
+              </button>
+            </>
           ) : (
             <>
               <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">Portal Login</h2>
 
               {authError && (
-                <p className="text-[#c62828] text-sm mb-4">Invalid email or password.</p>
+                <p className="text-[#c62828] text-sm mb-4">{authError}</p>
               )}
 
               <form onSubmit={handleLogin}>
@@ -988,13 +1123,22 @@ export default function DbAdminPage() {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-1"
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setAuthView("forgot")}
-                  className="text-xs text-gray-500 hover:text-[#4CAF7D] mb-4 block"
-                >
-                  Forgot password?
-                </button>
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setAuthView("forgot")}
+                    className="text-xs text-gray-500 hover:text-[#4CAF7D]"
+                  >
+                    Forgot password?
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthView("otp")}
+                    className="text-xs text-gray-500 hover:text-[#4CAF7D]"
+                  >
+                    Sign in with a code instead
+                  </button>
+                </div>
                 <button
                   type="submit"
                   disabled={isLoggingIn}
@@ -1067,6 +1211,28 @@ export default function DbAdminPage() {
           >
             Apply for Membership
           </Link>
+          <button
+            onClick={handleLogout}
+            className="text-sm text-gray-500 hover:text-[#c62828] transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Signed in, application submitted, but an admin hasn't approved it yet — never show any
+  // dashboard content (including admin tabs their self-reported role/department might imply).
+  if (!loading && accessLevel === "pending") {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
+          <h2 className="text-xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Application Pending</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Thanks for applying! Your application is still under review by an admin. You&apos;ll be able to
+            access the portal once it&apos;s approved.
+          </p>
           <button
             onClick={handleLogout}
             className="text-sm text-gray-500 hover:text-[#c62828] transition-colors"

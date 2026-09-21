@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
+import { resilientFetch } from "./resilient-fetch"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -12,4 +13,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// global.fetch covers every request this client makes — data, auth, storage — so the
+// network-blocked-wifi fallback in resilientFetch (see lib/resilient-fetch.ts) applies
+// uniformly, including to login itself, not just data reads.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: { fetch: resilientFetch },
+})

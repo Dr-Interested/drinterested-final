@@ -20,7 +20,6 @@ const DEPARTMENTS = [
 
 const ROLES_BY_DEPARTMENT: Record<string, string[]> = {
   "Admin Team": [
-    "Executive Director",
     "Deputy Executive Director",
     "Executive Assistant"
   ],
