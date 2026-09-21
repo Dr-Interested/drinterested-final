@@ -66,7 +66,11 @@ async function relayFetch(input: RequestInfo | URL, init?: RequestInit): Promise
     throw new TypeError(payload?.error || "Supabase relay failed.")
   }
 
-  const body = payload.bodyBase64 ? new Blob([base64ToBytes(payload.bodyBase64)]) : null
+  let body: ArrayBuffer | null = null
+  if (payload.bodyBase64) {
+    const bytes = base64ToBytes(payload.bodyBase64)
+    body = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
+  }
   return new Response(body, { status: payload.status, headers: payload.headers })
 }
 
