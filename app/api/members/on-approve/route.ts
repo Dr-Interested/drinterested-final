@@ -5,6 +5,8 @@ import { OWNER_EMAILS } from "@/lib/owner"
 import { isDeputyRole, isDirectorRole, LEADERSHIP_RANK } from "@/lib/teams"
 
 export const dynamic = "force-dynamic"
+// Room for retries when Resend is rate limiting, and for bulk sends.
+export const maxDuration = 60
 
 /**
  * Called by the portal's Members tab right after an application is approved. Emails the new

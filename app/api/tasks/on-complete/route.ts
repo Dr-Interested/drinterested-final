@@ -5,6 +5,8 @@ import { isDeputyRole, isDirectorRole, LEADERSHIP_RANK, normalizeDepartmentName 
 import { OWNER_EMAILS } from "@/lib/owner"
 
 export const dynamic = "force-dynamic"
+// Room for retries when Resend is rate limiting, and for bulk sends.
+export const maxDuration = 60
 
 /**
  * Called by the portal (app/dashboard/page.tsx, handleSubmitTaskCompletion) right after a
@@ -78,7 +80,10 @@ export async function POST(request: Request) {
   }
   to = Array.from(new Set(to.filter((e) => e && e !== callerEmail)))
   if (to.length === 0) to = OWNER_EMAILS.filter((e) => e !== callerEmail)
-  if (to.length === 0) return NextResponse.json({ skipped: "no recipients" })
+  // The owner (or whoever has no one above them) completing their own task still gets the
+  // email as a record, rather than nothing being sent at all.
+  const ccCompleter = to.length > 0
+  if (to.length === 0) to = [callerEmail]
 
   const completerName = completer?.name || callerEmail
   const link = safeUrl(task.submission_url)
@@ -94,7 +99,7 @@ export async function POST(request: Request) {
 
   const { sent, reason } = await sendEmail({
     to,
-    cc: callerEmail,
+    cc: ccCompleter ? callerEmail : undefined,
     subject: `Task completed: ${task.title}`,
     html: taskEmailShell(
       `${esc(completerName)} completed a task`,

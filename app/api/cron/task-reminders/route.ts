@@ -4,6 +4,8 @@ import { todayET } from "@/lib/dates"
 import { sendTaskEmails } from "@/lib/task-emails"
 
 export const dynamic = "force-dynamic"
+// Room for retries when Resend is rate limiting, and for bulk sends.
+export const maxDuration = 60
 
 /**
  * Runs once daily (see vercel.json). Uses the service-role client so it can see every task

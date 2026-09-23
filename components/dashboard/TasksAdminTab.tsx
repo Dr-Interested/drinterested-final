@@ -358,7 +358,9 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       const batch = recipients.length > 1 ? crypto.randomUUID() : null
       const forDept = isAdminLevel ? form.forDept : myDept
       const forTeam = form.target === "team" ? (isDeputy ? team : form.team) || null : isDeputy ? team : null
+      // Ids are generated here so the email request below knows which rows were just created.
       const rows = recipients.map((email) => ({
+        id: crypto.randomUUID(),
         title: form.title.trim(),
         description: form.description.trim() || "",
         assigned_to: email,
@@ -371,6 +373,22 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       }))
       const { error } = await supabase.from("tasks").insert(rows)
       if (error) throw error
+      // Send the "you've been assigned a task" emails now. Nothing else triggers them unless
+      // the optional Supabase INSERT webhook is set up (the daily cron only catches stragglers
+      // the next morning). Each email is claimed before sending, so they never double up.
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) =>
+          fetch("/api/tasks/notify-new", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+            },
+            body: JSON.stringify({ taskIds: rows.map((r) => r.id) }),
+          }),
+        )
+        .catch((err) => console.error("Assignment emails failed:", err))
       setCreating(false)
       setForm((f) => ({ ...f, title: "", description: "", due_date: "", assigned_to: "" }))
       load()
