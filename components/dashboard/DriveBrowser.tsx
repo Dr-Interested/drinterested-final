@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import {
   Folder,
@@ -215,8 +216,8 @@ export default function DriveBrowser() {
       if (!res.ok) throw new Error(body?.error || "That action failed.")
       refresh()
       return body
-    } catch (err: any) {
-      alert(err?.message || "That action failed.")
+    } catch (err) {
+      alert(errorMessage(err) || "That action failed.")
       return null
     } finally {
       setBusy(false)
@@ -227,7 +228,7 @@ export default function DriveBrowser() {
   const handleCreateFolder = async () => {
     const name = window.prompt("Folder name:")
     if (!name || !currentFolderId) return
-    const bearer = await getBearer().catch((err) => { alert(err.message); return null })
+    const bearer = await getBearer().catch((err) => { alert(errorMessage(err)); return null })
     if (!bearer) return
     await runAction(() =>
       fetch("/api/drive/folder", {
@@ -367,8 +368,8 @@ export default function DriveBrowser() {
         setSelectedIds(new Set())
       }
       refresh()
-    } catch (err: any) {
-      alert(err?.message || "That action failed.")
+    } catch (err) {
+      alert(errorMessage(err) || "That action failed.")
     } finally {
       setBusy(false)
     }

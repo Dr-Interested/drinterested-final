@@ -96,7 +96,7 @@ export function taskDetailsHtml(task: { title: string; description?: string | nu
   return `
     <p style="margin:0 0 8px;"><strong>${escapeHtml(task.title)}</strong></p>
     ${task.description ? `<p style="margin:0 0 8px;white-space:pre-line;">${escapeHtml(task.description)}</p>` : ""}
-    ${task.due_date ? `<p style="margin:0 0 8px;"><strong>Due:</strong> ${formatDueDate(task.due_date)}</p>` : ""}
+    ${task.due_date ? `<p style="margin:0 0 8px;"><strong>Due:</strong> ${formatDueDate(task.due_date)} (by 11:59 PM ET)</p>` : ""}
   `
 }
 

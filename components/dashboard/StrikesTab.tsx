@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName } from "@/lib/teams"
 import { Loader2, X } from "lucide-react"
@@ -103,8 +104,8 @@ export default function StrikesTab({ myEmail }: { myEmail: string }) {
         .eq("id", s.id)
       if (error) throw error
       await load()
-    } catch (err: any) {
-      alert("Failed to void strike: " + err.message)
+    } catch (err) {
+      alert("Failed to void strike: " + errorMessage(err))
     } finally {
       setBusy(false)
     }

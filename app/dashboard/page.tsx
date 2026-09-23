@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
+import type { User as AuthUser } from "@supabase/supabase-js"
 import { Loader2, X, Eye, EyeOff, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -230,7 +232,7 @@ export default function DbAdminPage() {
   const [savingTemplateType, setSavingTemplateType] = useState<string | null>(null)
 
   // Current Logged-in User Data
-  const [currentUser, setCurrentUser] = useState<any | null>(null)
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
   const [currentMemberProfile, setCurrentMemberProfile] = useState<Member | null>(null)
   // accessLevel: "owner" (full access) | "director" (department-scoped admin tabs) | "member"
   // (tasks / shared resources only). visibleTabs is the director/owner's allowed
@@ -403,9 +405,9 @@ export default function DbAdminPage() {
         .upsert({ key: "google_drive_url", value: newUrl })
       if (error) throw error
       alert("Google Drive URL updated successfully!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to update Google Drive URL: " + err.message)
+      alert("Failed to update Google Drive URL: " + errorMessage(err))
     } finally {
       setIsSavingUrl(false)
     }
@@ -434,9 +436,9 @@ export default function DbAdminPage() {
         .upsert({ key: "shared_calendar_url", value: newUrl })
       if (error) throw error
       alert("Shared calendar link updated successfully!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to update shared calendar link: " + err.message)
+      alert("Failed to update shared calendar link: " + errorMessage(err))
     } finally {
       setIsSavingCalendarUrl(false)
     }
@@ -473,9 +475,9 @@ export default function DbAdminPage() {
         .upsert({ key: `drive_template_${type}`, value: url })
       if (error) throw error
       alert("Template link updated!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to update template link: " + err.message)
+      alert("Failed to update template link: " + errorMessage(err))
     } finally {
       setSavingTemplateType(null)
     }
@@ -599,9 +601,9 @@ export default function DbAdminPage() {
       if (error) throw error
       fetchMemberTasks()
       if (isHrOrAdmin) fetchAdminTasks()
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert(`Failed to update task status: ${err.message}`)
+      alert(`Failed to update task status: ${errorMessage(err)}`)
     }
   }
 
@@ -650,9 +652,9 @@ export default function DbAdminPage() {
       setCompletingTask(null)
       fetchMemberTasks()
       if (isHrOrAdmin) fetchAdminTasks()
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert(`Failed to submit completion: ${err.message}`)
+      alert(`Failed to submit completion: ${errorMessage(err)}`)
     } finally {
       setSavingCompletion(false)
     }
@@ -699,9 +701,9 @@ export default function DbAdminPage() {
       setIsCreatingTask(false)
       setTaskForm({ status: "Pending" })
       fetchAdminTasks()
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert(`Failed to save task: ${err.message}`)
+      alert(`Failed to save task: ${errorMessage(err)}`)
     } finally {
       setSavingTask(false)
     }
@@ -713,9 +715,9 @@ export default function DbAdminPage() {
       const { error } = await supabase.from("tasks").delete().eq("id", id)
       if (error) throw error
       fetchAdminTasks()
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert(`Failed to delete task: ${err.message}`)
+      alert(`Failed to delete task: ${errorMessage(err)}`)
     }
   }
 
@@ -762,8 +764,8 @@ export default function DbAdminPage() {
       })
       if (error) throw error
       setResetSent(true)
-    } catch (err: any) {
-      setResetError(friendlyAuthError(err?.message, "Couldn't send the reset email. Try again."))
+    } catch (err) {
+      setResetError(friendlyAuthError(errorMessage(err), "Couldn't send the reset email. Try again."))
     } finally {
       setIsSendingReset(false)
     }
@@ -789,8 +791,8 @@ export default function DbAdminPage() {
       if (error) throw error
       setOtpSent(true)
       setOtpCode("")
-    } catch (err: any) {
-      setOtpError(friendlyAuthError(err?.message, "Couldn't send the code. Try again."))
+    } catch (err) {
+      setOtpError(friendlyAuthError(errorMessage(err), "Couldn't send the code. Try again."))
     } finally {
       setIsSendingOtp(false)
     }
@@ -808,8 +810,8 @@ export default function DbAdminPage() {
       })
       if (error) throw error
       // Success signs the user in — same auto-unmount-via-listener as above.
-    } catch (err: any) {
-      setOtpError(friendlyAuthError(err?.message, "Invalid or expired code."))
+    } catch (err) {
+      setOtpError(friendlyAuthError(errorMessage(err), "Invalid or expired code."))
     } finally {
       setIsVerifyingOtp(false)
     }
@@ -830,8 +832,8 @@ export default function DbAdminPage() {
       }
       // On success the browser navigates away to the provider, so no further state update
       // is needed here — isSsoLoading resets naturally on the next page load.
-    } catch (err: any) {
-      alert(err.message || "Sign-in failed.")
+    } catch (err) {
+      alert(errorMessage(err) || "Sign-in failed.")
       setIsSsoLoading(false)
     }
   }
@@ -852,7 +854,7 @@ export default function DbAdminPage() {
 
       if (error) throw error
       setMembers(data || [])
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
       alert("Error loading members")
     } finally {
@@ -870,7 +872,7 @@ export default function DbAdminPage() {
 
       if (error) throw error
       setBlogs(data || [])
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
       alert("Error loading blogs")
     } finally {
@@ -1014,8 +1016,8 @@ export default function DbAdminPage() {
         author_id: blogForm.author_id || null,
         author_name: linkedMemberName || blogForm.author_name || null,
         featured: blogForm.featured || false,
-        content_type: (blogForm as any).content_type || "blog",
-        policy_type: (blogForm as any).policy_type || null
+        content_type: blogForm.content_type || "blog",
+        policy_type: blogForm.policy_type || null
       }
 
       let error;
@@ -1558,7 +1560,7 @@ export default function DbAdminPage() {
                   )}
                   {task.due_date && (
                     <span className={`inline-block text-[0.75rem] font-bold mt-2 px-2 py-0.5 rounded ${isPastDue(task.due_date) && !isDone ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"}`}>
-                      {isPastDue(task.due_date) && !isDone ? "Overdue · " : ""}Due {formatDateOnly(task.due_date)}
+                      {isPastDue(task.due_date) && !isDone ? "Overdue · " : ""}Due {formatDateOnly(task.due_date)}, 11:59 PM ET
                     </span>
                   )}
                   {task.status === "Pending" && (
@@ -2365,8 +2367,8 @@ export default function DbAdminPage() {
                     <div className="mt-2">
                       <input
                         type="text"
-                        value={(blogForm as any).author_name || ""}
-                        onChange={(e) => setBlogForm({ ...blogForm, author_name: e.target.value } as any)}
+                        value={blogForm.author_name || ""}
+                        onChange={(e) => setBlogForm({ ...blogForm, author_name: e.target.value })}
                         placeholder="Or type author name manually (e.g. guest writer)"
                         className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] text-sm"
                       />
@@ -2380,8 +2382,8 @@ export default function DbAdminPage() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Content Type</label>
                   <select
-                    value={(blogForm as any).content_type || "blog"}
-                    onChange={(e) => setBlogForm({ ...blogForm, content_type: e.target.value } as any)}
+                    value={blogForm.content_type || "blog"}
+                    onChange={(e) => setBlogForm({ ...blogForm, content_type: e.target.value })}
                     className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
                   >
                     <option value="blog">Blog Post</option>
@@ -2389,12 +2391,12 @@ export default function DbAdminPage() {
                     <option value="policy">Policy Work</option>
                   </select>
                 </div>
-                {(blogForm as any).content_type === "policy" && (
+                {blogForm.content_type === "policy" && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Policy Type</label>
                     <select
-                      value={(blogForm as any).policy_type || "report"}
-                      onChange={(e) => setBlogForm({ ...blogForm, policy_type: e.target.value } as any)}
+                      value={blogForm.policy_type || "report"}
+                      onChange={(e) => setBlogForm({ ...blogForm, policy_type: e.target.value })}
                       className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
                     >
                       <option value="report">Report</option>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import { Loader2, Paperclip, Upload, X } from "lucide-react"
 
@@ -54,9 +55,9 @@ export default function TaskFileUploadField({
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
       setFileName(file.name)
       onChange(data.publicUrl)
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      setError(err.message || "Upload failed.")
+      setError(errorMessage(err) || "Upload failed.")
     } finally {
       setBusy(false)
       if (inputRef.current) inputRef.current.value = ""

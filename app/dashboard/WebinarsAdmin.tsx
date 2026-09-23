@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import { Loader2 } from "lucide-react"
 import ImageUploadField from "@/components/admin/image-upload-field"
@@ -89,10 +90,10 @@ export default function WebinarsAdmin() {
       setIsCreating(false)
       setEditingWebinar(null)
       fetchWebinars()
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
       alert(
-        err?.message?.includes("webinars_slug_key")
+        errorMessage(err)?.includes("webinars_slug_key")
           ? "Failed to save: that slug is already used by another episode — edit the URL slug field to make it unique."
           : "Failed to save webinar."
       )

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin"
+import { todayET } from "@/lib/dates"
 import { escapeHtml, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 
 export const dynamic = "force-dynamic"
@@ -30,9 +31,9 @@ export async function GET(request: Request) {
     }
   }
 
-  const toDateStr = (d: Date) => d.toISOString().slice(0, 10)
-  const today = toDateStr(new Date())
-  const tomorrow = toDateStr(new Date(Date.now() + 24 * 60 * 60 * 1000))
+  // Due dates are Eastern Time calendar dates (see lib/dates.ts).
+  const today = todayET()
+  const tomorrow = todayET(1)
 
   const results = { permanentlyArchived: 0, deleted: 0, newAssignments: 0, dayBefore: 0, dueToday: 0, errors: [] as string[] }
 
@@ -67,7 +68,7 @@ export async function GET(request: Request) {
     // Pass 1 — assignment emails for tasks that never got one (bulk / SQL-created). Limited to
     // tasks created in the last 4 days so a first run after deploy doesn't email the assignee
     // of every historical task (all of which have a null assigned_email_sent_at).
-    const assignCutoff = toDateStr(new Date(Date.now() - 4 * 24 * 60 * 60 * 1000))
+    const assignCutoff = todayET(-4)
     const sendNewAssignments = async () => {
       const { data: tasks, error } = await supabase
         .from("tasks")

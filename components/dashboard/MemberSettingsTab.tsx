@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { useTheme } from "next-themes"
 import { supabase } from "@/lib/supabase-client"
 import ImageUploadField from "@/components/admin/image-upload-field"
@@ -84,7 +85,7 @@ export default function MemberSettingsTab() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "tasks", filter: `assigned_to=eq.${profile.email.toLowerCase()}` },
-        (payload: any) => {
+        (payload: { new?: { title?: string } }) => {
           new Notification("New task assigned", {
             body: payload.new?.title || "You have a new task in the Dr. Interested portal.",
           })
@@ -118,9 +119,9 @@ export default function MemberSettingsTab() {
         .eq("id", profile.id)
       if (error) throw error
       alert("Settings saved!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to save: " + err.message)
+      alert("Failed to save: " + errorMessage(err))
     } finally {
       setSaving(false)
     }

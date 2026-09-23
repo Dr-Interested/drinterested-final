@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
 import { formatDateOnly } from "@/lib/dates"
@@ -303,8 +304,8 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       if (error) throw error
       setEditingGroup(null)
       load()
-    } catch (err: any) {
-      alert("Failed to save changes: " + err.message)
+    } catch (err) {
+      alert("Failed to save changes: " + errorMessage(err))
     } finally {
       setSavingEdit(false)
     }
@@ -373,8 +374,8 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       setCreating(false)
       setForm((f) => ({ ...f, title: "", description: "", due_date: "", assigned_to: "" }))
       load()
-    } catch (err: any) {
-      alert("Failed to assign task: " + err.message)
+    } catch (err) {
+      alert("Failed to assign task: " + errorMessage(err))
     } finally {
       setSaving(false)
     }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import {
   LEADERSHIP_RANK,
@@ -128,8 +129,8 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
       })
       if (error) throw error
       await load()
-    } catch (err: any) {
-      alert("Failed to add strike: " + err.message)
+    } catch (err) {
+      alert("Failed to add strike: " + errorMessage(err))
     } finally {
       setBusyId(null)
     }
@@ -145,8 +146,8 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
         .eq("id", s.id)
       if (error) throw error
       await load()
-    } catch (err: any) {
-      alert("Failed to void: " + err.message)
+    } catch (err) {
+      alert("Failed to void: " + errorMessage(err))
     }
   }
 
@@ -159,8 +160,8 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
         .eq("id", m.id)
       if (error) throw error
       setMembers((prev) => prev.map((x) => (x.id === m.id ? { ...x, team: newTeam || null } : x)))
-    } catch (err: any) {
-      alert("Failed to change team: " + err.message)
+    } catch (err) {
+      alert("Failed to change team: " + errorMessage(err))
     } finally {
       setBusyId(null)
     }
