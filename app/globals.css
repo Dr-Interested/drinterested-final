@@ -56,6 +56,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* iOS Safari zooms the whole page when a field with text under 16px is focused, and many
+     forms here use 14px (text-sm). Keep form text at 16px on phones so tapping a field never
+     zooms; from the sm breakpoint up the design's own sizes apply. !important because the
+     text-sm utility on those fields would otherwise win. */
+  @media (max-width: 639px) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
 .main-bg {

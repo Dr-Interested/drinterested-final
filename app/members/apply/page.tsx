@@ -1,41 +1,15 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { Button } from "@/components/ui/button"
 import Cropper from "react-easy-crop"
+import { APPLY_DEPARTMENTS, APPLY_ROLES_BY_DEPARTMENT } from "@/lib/apply-options"
+import { errorMessage } from "@/lib/errors"
+import Link from "next/link"
 
-const DEPARTMENTS = [
-  "Admin Team",
-  "Medical Student Advisory Council",
-  "Marketing",
-  "Publications",
-  "HR",
-  "Events",
-  "Technology",
-  "Finance",
-  "Podcast",
-  "Ambassadors"
-]
-
-const ROLES_BY_DEPARTMENT: Record<string, string[]> = {
-  "Admin Team": [
-    "Deputy Executive Director",
-    "Executive Assistant"
-  ],
-  "Medical Student Advisory Council": [
-    "Chair of the Medical Student Advisory Council",
-    "Member of the Medical Student Advisory Council"
-  ],
-  "Marketing": ["Director", "Deputy Director", "Coordinator"],
-  "Publications": ["Director", "Deputy Director", "Coordinator"],
-  "HR": ["Director", "Deputy Director", "Coordinator"],
-  "Events": ["Director", "Deputy Director", "Coordinator"],
-  "Technology": ["Director", "Deputy Director", "Coordinator"],
-  "Finance": ["Director", "Deputy Director", "Coordinator"],
-  "Podcast": ["Deputy Director", "Member of Podcast"],
-  "Ambassadors": ["Deputy Director", "Organizational Ambassador"],
-}
+const DEPARTMENTS = APPLY_DEPARTMENTS
+const ROLES_BY_DEPARTMENT = APPLY_ROLES_BY_DEPARTMENT
 
 const getCroppedImg = async (imageSrc: string, pixelCrop: any): Promise<File> => {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -93,6 +67,14 @@ export default function DbApplyPage() {
   const [selectedRole, setSelectedRole] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
+  const messageRef = useRef<HTMLDivElement>(null)
+
+  // The result message renders above the form, so on a phone (where Submit is far below) bring
+  // it into view, otherwise it looks like nothing happened.
+  useEffect(() => {
+    if (message) messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+  }, [message])
 
   // Cropper State
   const [imageSrc, setImageSrc] = useState<string | null>(null)
@@ -136,6 +118,11 @@ export default function DbApplyPage() {
 
     const formData = new FormData(e.currentTarget)
 
+    if (password.length < 8) {
+      setMessage({ type: "error", text: "Password must be at least 8 characters." })
+      setLoading(false)
+      return
+    }
     if (password !== confirmPassword) {
       setMessage({ type: "error", text: "Passwords do not match." })
       setLoading(false)
@@ -183,7 +170,7 @@ export default function DbApplyPage() {
       // crypto.randomUUID() is cryptographically secure — makes storage URLs unguessable
       const fileName = `${crypto.randomUUID()}.webp`
       
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("avatar")
         .upload(fileName, finalCroppedFile)
 
@@ -234,35 +221,29 @@ export default function DbApplyPage() {
       validateSocialUrl(newMember.socials.linkedin)
       validateSocialUrl(newMember.socials.instagram)
       
-      // Register credentials in Supabase Auth
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      // Register credentials in Supabase Auth. The confirmation email's link lands on the
+      // portal login rather than the homepage.
+      const { error: signUpError } = await supabase.auth.signUp({
         email: newMember.email,
         password: password,
+        options: { emailRedirectTo: `${window.location.origin}/dashboard?login=true` },
       })
 
       if (signUpError) {
-        throw new Error(`Authentication signup failed: ${signUpError.message}`)
+        throw new Error(`Account creation failed: ${signUpError.message}`)
       }
 
-      const { error } = await supabase.from("members").insert([newMember])
+      // The members row is validated and saved server-side (it also notifies staff on Discord).
+      const res = await fetch("/api/members/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMember),
+      })
+      const result = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(result.error || "We couldn't submit your application. Please try again.")
 
-      if (error) throw error
-
-      // Securely trigger the Discord webhook notification via our Next.js API route
-      try {
-        await fetch("/api/members/apply/notify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newMember),
-        })
-      } catch (notifyErr) {
-        // Log notification error but don't fail the user application submission UX
-        console.error("Discord notification failed to send:", notifyErr)
-      }
-
-      setMessage({ type: "success", text: "✓ Application submitted successfully! We'll review it soon." })
+      setSubmittedEmail(newMember.email)
+      window.scrollTo({ top: 0, behavior: "smooth" })
       ;(e.target as HTMLFormElement).reset()
       setSelectedDepartment("")
       setSelectedRole("")
@@ -270,12 +251,74 @@ export default function DbApplyPage() {
       setConfirmPassword("")
       setFinalCroppedFile(null)
       setImageSrc(null)
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      setMessage({ type: "error", text: `Error: ${err.message || "Invalid input"}` })
+      setMessage({ type: "error", text: errorMessage(err) || "Something went wrong. Please try again." })
     } finally {
       setLoading(false)
     }
+  }
+
+  // After a successful submit the form is replaced by this, so nobody can miss that the
+  // application still needs an admin's approval and that the approval arrives by email.
+  if (submittedEmail) {
+    const steps = [
+      {
+        title: "Confirm your email",
+        body: (
+          <>
+            We just sent a confirmation link to <strong className="break-all">{submittedEmail}</strong>. Click it so we
+            know the address is yours (check your spam folder if you don&apos;t see it).
+          </>
+        ),
+      },
+      {
+        title: "Wait for approval",
+        body: <>An admin reviews every application. Until it&apos;s approved, you won&apos;t be able to use the member portal.</>,
+      },
+      {
+        title: "Watch for your approval email",
+        body: (
+          <>
+            We&apos;ll email you as soon as your application is approved. Then you can sign in to the portal with this email
+            and the password you just chose.
+          </>
+        ),
+      },
+    ]
+    return (
+      <div className="container max-w-2xl py-12 mx-auto px-4">
+        <div role="status" className="bg-white border border-[#81c784] rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-[#e8f5e9] text-[#2e7d32] flex items-center justify-center text-2xl font-bold mb-4">
+            ✓
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Application received!</h1>
+          <p className="text-gray-600 mb-6">
+            Thanks for applying to Dr. Interested. <strong>Your application now needs to be approved by an admin</strong>, and
+            we&apos;ll email you once it is.
+          </p>
+          <ol className="space-y-4 mb-8">
+            {steps.map((step, i) => (
+              <li key={step.title} className="flex gap-3">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-[#4CAF7D] text-white text-sm font-bold flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <div>
+                  <p className="font-semibold text-[#1a1a1a]">{step.title}</p>
+                  <p className="text-sm text-gray-600">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <Link
+            href="/"
+            className="inline-block w-full sm:w-auto text-center px-6 py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors"
+          >
+            Back to the homepage
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -285,6 +328,8 @@ export default function DbApplyPage() {
 
       {message && (
         <div
+          ref={messageRef}
+          role={message.type === "error" ? "alert" : "status"}
           className={`p-4 rounded-lg mb-6 ${
             message.type === "success" ? "bg-[#e8f5e9] text-[#2e7d32] border border-[#81c784]" : "bg-[#ffebee] text-[#c62828] border border-[#ef5350]"
           }`}
@@ -336,6 +381,8 @@ export default function DbApplyPage() {
             type="text"
             id="name"
             name="name"
+            autoComplete="name"
+            maxLength={100}
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -347,6 +394,8 @@ export default function DbApplyPage() {
             type="email"
             id="email"
             name="email"
+            autoComplete="email"
+            autoCapitalize="none"
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -359,12 +408,13 @@ export default function DbApplyPage() {
               type="password"
               id="password"
               name="password"
+              autoComplete="new-password"
               required
-              minLength={6}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
-              placeholder="Min. 6 characters"
+              placeholder="Min. 8 characters"
             />
           </div>
           <div>
@@ -373,6 +423,7 @@ export default function DbApplyPage() {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
+              autoComplete="new-password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -389,6 +440,9 @@ export default function DbApplyPage() {
             id="discord_username"
             name="discord_username"
             placeholder="e.g. username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            maxLength={40}
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -449,6 +503,8 @@ export default function DbApplyPage() {
             id="bio"
             name="bio"
             placeholder="Tell us about yourself, your interests, and what you'd like to contribute..."
+            minLength={10}
+            maxLength={2000}
             required
             className="w-full p-3 border border-gray-300 rounded-lg min-h-[100px] resize-y focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -506,6 +562,11 @@ export default function DbApplyPage() {
             </div>
           </div>
         </div>
+
+        <p className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-3">
+          After you apply, an admin reviews your application. <strong>We&apos;ll email you once it&apos;s approved</strong>, and
+          then you can sign in to the member portal.
+        </p>
 
         <Button
           type="submit"

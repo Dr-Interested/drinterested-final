@@ -1,8 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
+import { formatDateOnly } from "@/lib/dates"
 import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle, Pencil, Inbox, Link2, Paperclip, StickyNote } from "lucide-react"
 
 type TaskRow = {
@@ -302,8 +304,8 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       if (error) throw error
       setEditingGroup(null)
       load()
-    } catch (err: any) {
-      alert("Failed to save changes: " + err.message)
+    } catch (err) {
+      alert("Failed to save changes: " + errorMessage(err))
     } finally {
       setSavingEdit(false)
     }
@@ -372,8 +374,8 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       setCreating(false)
       setForm((f) => ({ ...f, title: "", description: "", due_date: "", assigned_to: "" }))
       load()
-    } catch (err: any) {
-      alert("Failed to assign task: " + err.message)
+    } catch (err) {
+      alert("Failed to assign task: " + errorMessage(err))
     } finally {
       setSaving(false)
     }
@@ -491,7 +493,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
   const DueBadge = ({ due }: { due: string | null }) =>
     due ? (
       <span className="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium shrink-0 whitespace-nowrap">
-        Due {new Date(due).toLocaleDateString()}
+        Due {formatDateOnly(due)}
       </span>
     ) : null
 
@@ -648,7 +650,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+    <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
       <div className="flex justify-between items-center pb-4 mb-4 border-b border-gray-100">
         <h2 className="text-xl font-bold font-bricolage text-[#1a1a1a]">Assign Tasks</h2>
         <button
@@ -915,9 +917,9 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       )}
 
       {editingGroup && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setEditingGroup(null)}>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto" onClick={() => setEditingGroup(null)}>
           <div
-            className="bg-white rounded-xl p-5 w-full max-w-md space-y-3 shadow-xl"
+            className="bg-white rounded-xl p-5 w-full max-w-md max-h-[90vh] overflow-y-auto space-y-3 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-bold text-gray-800">Edit task{editingGroup.rows.length > 1 ? ` (${editingGroup.rows.length} people)` : ""}</h3>

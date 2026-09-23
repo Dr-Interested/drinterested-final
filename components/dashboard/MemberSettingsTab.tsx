@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { useTheme } from "next-themes"
 import { supabase } from "@/lib/supabase-client"
 import ImageUploadField from "@/components/admin/image-upload-field"
@@ -84,7 +85,7 @@ export default function MemberSettingsTab() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "tasks", filter: `assigned_to=eq.${profile.email.toLowerCase()}` },
-        (payload: any) => {
+        (payload: { new?: { title?: string } }) => {
           new Notification("New task assigned", {
             body: payload.new?.title || "You have a new task in the Dr. Interested portal.",
           })
@@ -118,9 +119,9 @@ export default function MemberSettingsTab() {
         .eq("id", profile.id)
       if (error) throw error
       alert("Settings saved!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to save: " + err.message)
+      alert("Failed to save: " + errorMessage(err))
     } finally {
       setSaving(false)
     }
@@ -142,9 +143,9 @@ export default function MemberSettingsTab() {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Appearance */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
         <h3 className="font-bold text-lg mb-4">Appearance</h3>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             {resolvedTheme === "dark" ? <Moon className="w-5 h-5 text-gray-500" /> : <Sun className="w-5 h-5 text-amber-500" />}
             <div>
@@ -154,7 +155,7 @@ export default function MemberSettingsTab() {
           </div>
           <button
             onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            className={`relative w-12 h-7 rounded-full transition-colors ${resolvedTheme === "dark" ? "bg-[#4CAF7D]" : "bg-gray-300"}`}
+            className={`relative shrink-0 w-12 h-7 rounded-full transition-colors ${resolvedTheme === "dark" ? "bg-[#4CAF7D]" : "bg-gray-300"}`}
             aria-label="Toggle dark mode"
           >
             <span
@@ -167,7 +168,7 @@ export default function MemberSettingsTab() {
       </div>
 
       {/* Notifications */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
         <h3 className="font-bold text-lg mb-4">Notifications</h3>
         {notifState === "unsupported" ? (
           <p className="text-sm text-gray-500">Your browser doesn&apos;t support notifications.</p>
@@ -198,7 +199,7 @@ export default function MemberSettingsTab() {
       </div>
 
       {/* Profile */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
         <h3 className="font-bold text-lg mb-1.5">Your Profile</h3>
         <p className="text-xs text-gray-500 mb-4">
           {profile.name} &middot; {profile.role}{profile.department ? ` · ${profile.department}` : ""}

@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin"
-import { sendEmail, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
+import { todayET } from "@/lib/dates"
+import { sendTaskEmails } from "@/lib/task-emails"
 
 export const dynamic = "force-dynamic"
-
-const fmtDate = (d: string) =>
-  new Date(d).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
 
 /**
  * Runs once daily (see vercel.json). Uses the service-role client so it can see every task
@@ -33,9 +31,9 @@ export async function GET(request: Request) {
     }
   }
 
-  const toDateStr = (d: Date) => d.toISOString().slice(0, 10)
-  const today = toDateStr(new Date())
-  const tomorrow = toDateStr(new Date(Date.now() + 24 * 60 * 60 * 1000))
+  // Due dates are Eastern Time calendar dates (see lib/dates.ts).
+  const today = todayET()
+  const tomorrow = todayET(1)
 
   const results = { permanentlyArchived: 0, deleted: 0, newAssignments: 0, dayBefore: 0, dueToday: 0, errors: [] as string[] }
 
@@ -64,13 +62,10 @@ export async function GET(request: Request) {
     if (deleteErr) results.errors.push(deleteErr.message)
     else results.deleted = deletedRows?.length || 0
 
-    const { data: members } = await supabase.from("members").select("email, name")
-    const nameByEmail = new Map((members || []).map((m: any) => [String(m.email).toLowerCase(), m.name]))
-
-    // Pass 1 — assignment emails for tasks that never got one (bulk / SQL-created). Limited to
-    // tasks created in the last 4 days so a first run after deploy doesn't email the assignee
-    // of every historical task (all of which have a null assigned_email_sent_at).
-    const assignCutoff = toDateStr(new Date(Date.now() - 4 * 24 * 60 * 60 * 1000))
+    // Pass 1 — assignment emails for tasks that never got one (e.g. the portal's own send and
+    // the INSERT webhook both failed, or rows added by SQL). Limited to tasks created in the
+    // last 4 days so a first run after deploy doesn't email every historical task.
+    const assignCutoff = todayET(-4)
     const sendNewAssignments = async () => {
       const { data: tasks, error } = await supabase
         .from("tasks")
@@ -79,39 +74,17 @@ export async function GET(request: Request) {
         .eq("archived", false)
         .is("assigned_email_sent_at", null)
         .gte("created_at", assignCutoff)
-
       if (error) {
         results.errors.push(error.message)
         return
       }
-
-      for (const task of tasks || []) {
-        const assigneeEmail = task.assigned_to
-        if (!assigneeEmail) continue
-        const assigneeName = nameByEmail.get(String(assigneeEmail).toLowerCase())
-
-        const { sent } = await sendEmail({
-          to: assigneeEmail,
-          subject: `New task assigned: ${task.title}`,
-          html: taskEmailShell(
-            `Hi ${assigneeName || "there"}, you've been assigned a task`,
-            `
-              <p><strong>${task.title}</strong></p>
-              ${task.description ? `<p>${task.description}</p>` : ""}
-              ${task.due_date ? `<p><strong>Due:</strong> ${fmtDate(task.due_date)}</p>` : ""}
-            `,
-            taskPortalUrl(task.id)
-          ),
-        })
-
-        if (sent) {
-          await supabase.from("tasks").update({ assigned_email_sent_at: new Date().toISOString() }).eq("id", task.id)
-          results.newAssignments++
-        }
-      }
+      const { sent, failed } = await sendTaskEmails("assigned", tasks || [])
+      results.newAssignments += sent
+      if (failed) results.errors.push(`${failed} assignment email(s) failed`)
     }
 
-    const remind = async (dueDate: string, column: "reminder_day_before_sent_at" | "reminder_due_sent_at", isToday: boolean) => {
+    const remind = async (dueDate: string, kind: "due_tomorrow" | "due_today") => {
+      const column = kind === "due_today" ? "reminder_due_sent_at" : "reminder_day_before_sent_at"
       const { data: tasks, error } = await supabase
         .from("tasks")
         .select("*")
@@ -119,41 +92,19 @@ export async function GET(request: Request) {
         .not("status", "in", `(${FINISHED.join(",")})`)
         .eq("archived", false)
         .is(column, null)
-
       if (error) {
         results.errors.push(error.message)
         return
       }
-
-      for (const task of tasks || []) {
-        const assigneeEmail = task.assigned_to
-        if (!assigneeEmail) continue
-        const assigneeName = nameByEmail.get(String(assigneeEmail).toLowerCase())
-
-        const { sent } = await sendEmail({
-          to: assigneeEmail,
-          subject: isToday ? `Due today: ${task.title}` : `Due tomorrow: ${task.title}`,
-          html: taskEmailShell(
-            `Hi ${assigneeName || "there"}, ${isToday ? "a task is due today" : "a task is due tomorrow"}`,
-            `
-              <p><strong>${task.title}</strong></p>
-              ${task.description ? `<p>${task.description}</p>` : ""}
-              <p><strong>Due:</strong> ${new Date(task.due_date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
-            `,
-            taskPortalUrl(task.id)
-          ),
-        })
-
-        if (sent) {
-          await supabase.from("tasks").update({ [column]: new Date().toISOString() }).eq("id", task.id)
-          isToday ? results.dueToday++ : results.dayBefore++
-        }
-      }
+      const { sent, failed } = await sendTaskEmails(kind, tasks || [])
+      if (kind === "due_today") results.dueToday += sent
+      else results.dayBefore += sent
+      if (failed) results.errors.push(`${failed} ${kind.replace("_", " ")} reminder(s) failed`)
     }
 
     await sendNewAssignments()
-    await remind(tomorrow, "reminder_day_before_sent_at", false)
-    await remind(today, "reminder_due_sent_at", true)
+    await remind(tomorrow, "due_tomorrow")
+    await remind(today, "due_today")
 
     return NextResponse.json({ success: true, ...results, timestamp: new Date().toISOString() })
   } catch (err: any) {

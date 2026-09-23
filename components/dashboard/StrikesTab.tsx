@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName } from "@/lib/teams"
 import { Loader2, X } from "lucide-react"
@@ -103,8 +104,8 @@ export default function StrikesTab({ myEmail }: { myEmail: string }) {
         .eq("id", s.id)
       if (error) throw error
       await load()
-    } catch (err: any) {
-      alert("Failed to void strike: " + err.message)
+    } catch (err) {
+      alert("Failed to void strike: " + errorMessage(err))
     } finally {
       setBusy(false)
     }
@@ -186,7 +187,7 @@ export default function StrikesTab({ myEmail }: { myEmail: string }) {
                 </div>
 
                 {expanded === member.id && (
-                  <ul className="mt-3 space-y-2 pl-12">
+                  <ul className="mt-3 space-y-2 pl-2 sm:pl-12">
                     {active.map((s) => (
                       <li key={s.id} className="flex items-start gap-2 text-sm">
                         <div className="flex-1">

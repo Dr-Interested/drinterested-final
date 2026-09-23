@@ -1,7 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
+import { formatDateOnly, todayET } from "@/lib/dates"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
 import { Loader2, ChevronLeft, Lock, Unlock } from "lucide-react"
 
@@ -79,8 +81,8 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
   const [creating, setCreating] = useState(false)
   const [form, setForm] = useState({
     title: "",
-    date: new Date().toISOString().slice(0, 10),
-    scope: (allowedScopes[0] || "team") as string,
+    date: todayET(),
+    scope: (allowedScopes[0] || "team") as Meeting["scope"],
     department: fullGroup ? "Events" : myDept,
     team: !fullGroup && isDeputy ? team || "" : "",
   })
@@ -150,8 +152,8 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
           )
         setAttendance((prev) => [...prev.filter((a) => a.member_id !== memberId), { member_id: memberId, status }])
       }
-    } catch (err: any) {
-      alert("Failed to save: " + err.message)
+    } catch (err) {
+      alert("Failed to save: " + errorMessage(err))
     } finally {
       setBusy(false)
     }
@@ -159,7 +161,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
 
   async function createMeeting() {
     if (!form.title.trim()) return
-    if (!allowedScopes.includes(form.scope as any)) return
+    if (!allowedScopes.includes(form.scope)) return
     // Non-full-group leaders are locked to their own department (and deputies to their team).
     const dept = form.scope === "org" ? null : fullGroup ? form.department : myDept
     let teamVal: string | null = null
@@ -187,8 +189,8 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
       setForm({ ...form, title: "" })
       await loadLists()
       if (data) openMeeting(data as Meeting)
-    } catch (err: any) {
-      alert("Failed to create meeting: " + err.message)
+    } catch (err) {
+      alert("Failed to create meeting: " + errorMessage(err))
     } finally {
       setBusy(false)
     }
@@ -223,8 +225,8 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
       if (error) throw error
       setSelected({ ...selected, finalized: true })
       await loadLists()
-    } catch (err: any) {
-      alert("Failed to finalize: " + err.message)
+    } catch (err) {
+      alert("Failed to finalize: " + errorMessage(err))
     } finally {
       setBusy(false)
     }
@@ -249,8 +251,8 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
       if (error) throw error
       setSelected({ ...selected, finalized: false })
       await loadLists()
-    } catch (err: any) {
-      alert("Failed to un-finalize: " + err.message)
+    } catch (err) {
+      alert("Failed to un-finalize: " + errorMessage(err))
     } finally {
       setBusy(false)
     }
@@ -280,7 +282,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
             <div>
               <h2 className="text-xl font-bold">{selected.title}</h2>
               <p className="text-sm text-gray-500">
-                {selected.meeting_date} ·{" "}
+                {formatDateOnly(selected.meeting_date)} ·{" "}
                 {selected.scope === "org"
                   ? "Whole org"
                   : selected.scope === "department"
@@ -323,8 +325,8 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
           {roster.map((m) => {
             const st = statusOf(m.id)
             return (
-              <div key={m.id} className="flex items-center gap-3 p-3">
-                <div className="min-w-0 flex-1">
+              <div key={m.id} className="flex flex-wrap items-center gap-2 sm:gap-3 p-3">
+                <div className="min-w-0 flex-1 basis-40">
                   <p className="text-sm font-medium text-gray-900 truncate">{m.name}</p>
                   <p className="text-xs text-gray-400 truncate">
                     {m.role}
@@ -359,7 +361,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
   // ---- meeting list ----
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap gap-3 items-center justify-between">
         <h2 className="text-xl font-bold">Meeting Attendance</h2>
         {canManage && allowedScopes.length > 0 && (
           <button
@@ -389,7 +391,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
             />
             <select
               value={form.scope}
-              onChange={(e) => setForm({ ...form, scope: e.target.value })}
+              onChange={(e) => setForm({ ...form, scope: e.target.value as Meeting["scope"] })}
               className="p-2 border border-gray-300 rounded bg-white"
             >
               {allowedScopes.map((s) => (
@@ -443,7 +445,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
               <div>
                 <p className="font-medium text-gray-900">{m.title}</p>
                 <p className="text-xs text-gray-400">
-                  {m.meeting_date} ·{" "}
+                  {formatDateOnly(m.meeting_date)} ·{" "}
                   {m.scope === "org" ? "Whole org" : m.scope === "department" ? m.department : `${m.department} · ${m.team}`}
                 </p>
               </div>

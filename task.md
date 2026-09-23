@@ -33,11 +33,16 @@
 - [x] A17: Add error.tsx globally
 
 ## Batch 7 — Security: apply form (A10)
-- [/] A10: Add server-side validation/rate limiting (currently client-side length validation and secure storage UUID generation)
+- [x] A10: Server-side validation + rate limiting — /api/members/apply validates every field (zod), forces approved=false, rejects duplicates, rate limits per IP, and inserts with the service role
 
-## Deferred (scope too large / needs external decision)
-- [ ] A7: Split home-page.tsx (major refactor)
-- [ ] A8: Split dashboard (major refactor)
-- [ ] A9: Fix TypeScript any in dashboard
-- [ ] A11: Add CAPTCHA (needs service choice)
-- [ ] A15: CSS dark mode refactor
+## Batch 8 — Follow-ups (site-wide review)
+- [x] A7: Split home-page.tsx into components/home/* sections
+- [x] A8: Split dashboard — sign-in screen (PortalLogin) and My Tasks + completion modal (MyTasksTab) extracted; dead legacy admin-task code removed
+- [x] A9: Remove TypeScript `any` from the dashboard and portal tabs
+- [ ] A11: CAPTCHA — Cloudflare Turnstile was tried and removed (its challenge failed for real visitors); the apply and contact routes rely on server-side validation and per-IP rate limits instead
+- [ ] A15: CSS dark mode refactor — still deferred: dark mode works through ~100 global override rules in app/globals.css; replacing them with per-component `dark:` classes touches every page and needs a visual pass of each
+
+## Manual setup (outside the code)
+- [ ] Remove the anon INSERT policy on public.members once the new apply route is deployed (applications are now inserted server-side)
+- [ ] Paste docs/email-templates/* into Supabase Auth email templates; set up custom SMTP through Resend (see docs/email-templates/README.md)
+- [ ] Set RESEND_FROM_EMAIL to an address on the verified drinterested.org domain

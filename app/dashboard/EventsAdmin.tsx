@@ -193,7 +193,7 @@ export default function EventsAdmin() {
 
   return (
     <>
-      <div className="flex justify-between items-center border-b-2 border-gray-200 pb-4 mb-6">
+      <div className="flex flex-wrap gap-3 justify-between items-center border-b-2 border-gray-200 pb-4 mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Manage Events</h2>
         <button onClick={() => { setForm({}); setIsCreating(true); }} className="px-4 py-2 bg-[#4CAF7D] text-white font-semibold rounded-lg">
           + Create New Event

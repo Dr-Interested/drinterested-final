@@ -1,8 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { errorMessage } from "@/lib/errors"
 import { supabase } from "@/lib/supabase-client"
-import { Loader2, X, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar, ChevronRight } from "lucide-react"
+import type { User as AuthUser } from "@supabase/supabase-js"
+import { Loader2, Clock, ExternalLink, Calendar } from "lucide-react"
 import Link from "next/link"
 import EventsAdmin from "./EventsAdmin"
 import WebinarsAdmin from "./WebinarsAdmin"
@@ -12,6 +14,9 @@ import DriveBrowser from "@/components/dashboard/DriveBrowser"
 import MemberSettingsTab from "@/components/dashboard/MemberSettingsTab"
 import PortalFirstVisitPrompts from "@/components/dashboard/PortalFirstVisitPrompts"
 import PortalTabSelector from "@/components/dashboard/PortalTabSelector"
+import PortalLogin from "@/components/dashboard/PortalLogin"
+import MyTasksTab from "@/components/dashboard/MyTasksTab"
+import EmailTestCard from "@/components/dashboard/EmailTestCard"
 import DirectoryTab from "@/components/dashboard/DirectoryTab"
 import AttendanceTab from "@/components/dashboard/AttendanceTab"
 import StrikesTab from "@/components/dashboard/StrikesTab"
@@ -19,7 +24,6 @@ import TasksAdminTab from "@/components/dashboard/TasksAdminTab"
 import YourStandingCard from "@/components/dashboard/YourStandingCard"
 import { PRESET_ROLES, subteamsFor } from "@/lib/teams"
 import { OWNER_EMAILS } from "@/lib/owner"
-import TaskFileUploadField from "@/components/dashboard/TaskFileUploadField"
 
 type Member = {
   id: string
@@ -158,38 +162,9 @@ function resolveAccess(member: Member | null, userEmail: string | undefined): Ac
   return { level: "member", tabs: [], department, team }
 }
 
-type Task = {
-  id: string
-  title: string
-  description: string
-  assigned_to: string
-  assigned_by: string
-  due_date: string
-  status: string
-  created_at: string
-  submission_url?: string | null
-  submission_note?: string | null
-  submission_file_url?: string | null
-  time_spent_minutes?: number | null
-  completed_at?: string | null
-}
 
 export default function DbAdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [authError, setAuthError] = useState<string | false>(false)
-  const [isLoggingIn, setIsLoggingIn] = useState(false)
-  const [authView, setAuthView] = useState<"login" | "forgot" | "otp">("login")
-  const [resetSent, setResetSent] = useState(false)
-  const [resetError, setResetError] = useState<string | false>(false)
-  const [isSendingReset, setIsSendingReset] = useState(false)
-  const [otpSent, setOtpSent] = useState(false)
-  const [otpCode, setOtpCode] = useState("")
-  const [otpError, setOtpError] = useState<string | false>(false)
-  const [isSendingOtp, setIsSendingOtp] = useState(false)
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
-  const [isSsoLoading, setIsSsoLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [googleDriveUrl, setGoogleDriveUrl] = useState("https://drive.google.com/drive/folders/1-xwckNS2TWLPFjFuBNvpGgct43Bz4dvP?usp=drive_link")
   const [isSavingUrl, setIsSavingUrl] = useState(false)
@@ -208,7 +183,7 @@ export default function DbAdminPage() {
   const [savingTemplateType, setSavingTemplateType] = useState<string | null>(null)
 
   // Current Logged-in User Data
-  const [currentUser, setCurrentUser] = useState<any | null>(null)
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
   const [currentMemberProfile, setCurrentMemberProfile] = useState<Member | null>(null)
   // accessLevel: "owner" (full access) | "director" (department-scoped admin tabs) | "member"
   // (tasks / shared resources only). visibleTabs is the director/owner's allowed
@@ -265,24 +240,12 @@ export default function DbAdminPage() {
     totalEvents: 0
   })
 
-  // Tasks State
-  const [myTasks, setMyTasks] = useState<Task[]>([])
-  const [myTasksShowDone, setMyTasksShowDone] = useState(false)
-  const [allTasks, setAllTasks] = useState<Task[]>([])
-  const [isCreatingTask, setIsCreatingTask] = useState(false)
-  const [taskForm, setTaskForm] = useState<Partial<Task>>({ status: "Pending" })
-  const [savingTask, setSavingTask] = useState(false)
-  // Marking a task Completed opens this modal to capture the actual work + time spent,
-  // and records the time spent on the task itself.
-  const [completingTask, setCompletingTask] = useState<Task | null>(null)
-  const [completionForm, setCompletionForm] = useState({ submission_url: "", submission_note: "", submission_file_url: "" })
-  const [uploadingCompletionFile, setUploadingCompletionFile] = useState(false)
-  const [savingCompletion, setSavingCompletion] = useState(false)
   // The task id a reminder/assignment email's "Open the Portal" link points at (?task=<id>),
   // so My Tasks can scroll to and briefly highlight that specific card once it loads.
   const [deepLinkedTaskId] = useState<string | null>(() =>
     typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : null
   )
+
 
   // Auth Effect — the single place that syncs isAuthenticated with the actual Supabase
   // session AND keeps the portal-session cookie (read by proxy.ts middleware) in lockstep,
@@ -381,9 +344,9 @@ export default function DbAdminPage() {
         .upsert({ key: "google_drive_url", value: newUrl })
       if (error) throw error
       alert("Google Drive URL updated successfully!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to update Google Drive URL: " + err.message)
+      alert("Failed to update Google Drive URL: " + errorMessage(err))
     } finally {
       setIsSavingUrl(false)
     }
@@ -412,9 +375,9 @@ export default function DbAdminPage() {
         .upsert({ key: "shared_calendar_url", value: newUrl })
       if (error) throw error
       alert("Shared calendar link updated successfully!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to update shared calendar link: " + err.message)
+      alert("Failed to update shared calendar link: " + errorMessage(err))
     } finally {
       setIsSavingCalendarUrl(false)
     }
@@ -451,9 +414,9 @@ export default function DbAdminPage() {
         .upsert({ key: `drive_template_${type}`, value: url })
       if (error) throw error
       alert("Template link updated!")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      alert("Failed to update template link: " + err.message)
+      alert("Failed to update template link: " + errorMessage(err))
     } finally {
       setSavingTemplateType(null)
     }
@@ -468,25 +431,30 @@ export default function DbAdminPage() {
     fetchSharedCalendarUrl()
     fetchDriveTemplates()
 
-    // "My Tasks" is available to everyone, including directors/deputies/admins who can also
-    // be *assigned* tasks — handle it regardless of tier.
-    if (activeMainTab === "mytasks") {
-      fetchMemberTasks()
-    }
-
     if (isHrOrAdmin && visibleTabs.includes(activeMainTab)) {
       if (activeMainTab === "members") {
         fetchMembers()
       } else if (activeMainTab === "blogs") {
         fetchBlogs()
         fetchMembers() // Author options
-      } else if (activeMainTab === "tasks") {
-        fetchAdminTasks()
-        fetchMembers() // Assignee options
       }
       fetchStats()
     }
-  }, [isAuthenticated, isHrOrAdmin, activeMainTab, visibleTabs])
+  }, [isAuthenticated, isHrOrAdmin, activeMainTab, visibleTabs, currentUser?.email])
+
+  // A ?tab= deep link (or a tab left over from a previous role) that this person can't open
+  // would otherwise render an empty page — fall back to My Tasks.
+  useEffect(() => {
+    if (loading || !isAuthenticated || !currentUser) return
+    const available =
+      ["mytasks", "shared", "settings"].includes(activeMainTab) ||
+      (activeMainTab === "directory" && canSeeDirectory) ||
+      (activeMainTab === "attendance" && canSeeAttendance) ||
+      (activeMainTab === "strikes" && canSeeStrikesTab) ||
+      (activeMainTab === "admin" && isHrOrAdmin && visibleTabs.includes("members")) ||
+      (isHrOrAdmin && visibleTabs.includes(activeMainTab))
+    if (!available) setActiveMainTab("mytasks")
+  }, [loading, isAuthenticated, currentUser, activeMainTab, canSeeDirectory, canSeeAttendance, canSeeStrikesTab, isHrOrAdmin, visibleTabs])
 
   const fetchStats = async () => {
     try {
@@ -508,291 +476,7 @@ export default function DbAdminPage() {
     }
   }
 
-  // --- TASK OPERATIONS ---
-
-  const fetchMemberTasks = async () => {
-    if (!currentUser) return
-    try {
-      const { data, error } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("assigned_to", currentUser.email?.toLowerCase())
-        .eq("archived", false)
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
-      setMyTasks(data || [])
-      if (deepLinkedTaskId) {
-        const target = (data || []).find((t: Task) => t.id === deepLinkedTaskId)
-        if (target && ["Completed", "Incomplete"].includes(target.status)) setMyTasksShowDone(true)
-        // Deferred so the card has actually painted (and the "Completed" section, if just
-        // expanded above, has re-rendered) before we scroll to it.
-        setTimeout(() => {
-          document.getElementById(`task-${deepLinkedTaskId}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
-        }, 100)
-      }
-    } catch (err) {
-      console.error("Error fetching member tasks:", err)
-    }
-  }
-
-  const handleUpdateTaskStatus = async (taskId: string, currentStatus: string, task?: Task) => {
-    // "Incomplete" is a terminal state an assigner set — members can't cycle out of it.
-    if (currentStatus === "Incomplete") return
-    const nextStatusMap: Record<string, string> = {
-      "Pending": "In Progress",
-      "In Progress": "Completed",
-      "Completed": "Pending"
-    }
-    const nextStatus = nextStatusMap[currentStatus] || "Pending"
-
-    // Marking something Completed captures the actual work (link / note / file) first, rather than
-    // just flipping a status — see handleSubmitTaskCompletion, which does the status update.
-    if (nextStatus === "Completed" && task) {
-      setCompletingTask(task)
-      setCompletionForm({ submission_url: "", submission_note: "", submission_file_url: "" })
-      return
-    }
-
-    try {
-      const { error } = await supabase
-        .from("tasks")
-        .update({ status: nextStatus, completed_at: nextStatus === "Pending" ? null : undefined })
-        .eq("id", taskId)
-
-      if (error) throw error
-      fetchMemberTasks()
-      if (isHrOrAdmin) fetchAdminTasks()
-    } catch (err: any) {
-      console.error(err)
-      alert(`Failed to update task status: ${err.message}`)
-    }
-  }
-
-  const handleSubmitTaskCompletion = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!completingTask || !currentUser) return
-
-    if (uploadingCompletionFile) {
-      alert("Please wait for your file to finish uploading.")
-      return
-    }
-
-    setSavingCompletion(true)
-    try {
-      const nowIso = new Date().toISOString()
-
-      const { error: taskError } = await supabase
-        .from("tasks")
-        .update({
-          status: "Completed",
-          submission_url: completionForm.submission_url.trim() || null,
-          submission_note: completionForm.submission_note.trim() || null,
-          submission_file_url: completionForm.submission_file_url || null,
-          completed_at: nowIso,
-        })
-        .eq("id", completingTask.id)
-      if (taskError) throw taskError
-
-      // Fire-and-forget: emails the reviewer(s) what was submitted, CC'ing the completer.
-      // The route checks the caller's session, so pass the access token along.
-      const completedId = completingTask.id
-      supabase.auth
-        .getSession()
-        .then(({ data: { session } }) =>
-          fetch("/api/tasks/on-complete", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
-            },
-            body: JSON.stringify({ taskId: completedId }),
-          }),
-        )
-        .catch((err) => console.error("Completion email failed:", err))
-
-      setCompletingTask(null)
-      fetchMemberTasks()
-      if (isHrOrAdmin) fetchAdminTasks()
-    } catch (err: any) {
-      console.error(err)
-      alert(`Failed to submit completion: ${err.message}`)
-    } finally {
-      setSavingCompletion(false)
-    }
-  }
-
-  // --- HR / ADMIN TASK OPERATIONS ---
-
-  const fetchAdminTasks = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("tasks")
-        .select("*")
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
-      setAllTasks(data || [])
-    } catch (err) {
-      console.error("Error loading admin tasks:", err)
-    }
-  }
-
-  const handleSaveTask = async () => {
-    if (!taskForm.title || !taskForm.assigned_to) {
-      alert("Please enter a title and select a member to assign the task to.")
-      return
-    }
-    setSavingTask(true)
-    try {
-      const newTask = {
-        title: taskForm.title,
-        description: taskForm.description || "",
-        assigned_to: taskForm.assigned_to.toLowerCase(),
-        assigned_by: currentUser?.id,
-        due_date: taskForm.due_date || null,
-        status: taskForm.status || "Pending"
-      }
-
-      const { error } = await supabase.from("tasks").insert([newTask])
-      if (error) throw error
-      // The assignment email is sent by the Supabase "tasks INSERT" webhook -> /api/tasks/on-insert
-      // (with the daily cron as a backfill), so every task — UI, SQL, or script — is covered the
-      // same way. Nothing to do here.
-
-      setIsCreatingTask(false)
-      setTaskForm({ status: "Pending" })
-      fetchAdminTasks()
-    } catch (err: any) {
-      console.error(err)
-      alert(`Failed to save task: ${err.message}`)
-    } finally {
-      setSavingTask(false)
-    }
-  }
-
-  const handleDeleteTask = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this task?")) return
-    try {
-      const { error } = await supabase.from("tasks").delete().eq("id", id)
-      if (error) throw error
-      fetchAdminTasks()
-    } catch (err: any) {
-      console.error(err)
-      alert(`Failed to delete task: ${err.message}`)
-    }
-  }
-
   // --- ORIGINAL ADMIN PORTAL HANDLERS ---
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoggingIn(true)
-    setAuthError(false)
-    
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    setIsLoggingIn(false)
-
-    if (error) {
-      // Surface the real reason instead of a generic message — "Email not confirmed" (the
-      // confirmation email never arrived/was clicked) looks identical to a typo'd password
-      // otherwise, and sends people into a forgot-password loop that can't fix an unconfirmed
-      // account either.
-      if (error.message.toLowerCase().includes("email not confirmed")) {
-        setAuthError("Your email hasn't been confirmed yet. Check your inbox (and spam folder) for the confirmation link, or contact an admin.")
-      } else {
-        setAuthError("Invalid email or password.")
-      }
-    } else {
-      // portal-session cookie is set by the auth-state-change listener above once the
-      // session lands — no need to duplicate that here.
-      setEmail("")
-      setPassword("")
-    }
-  }
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSendingReset(true)
-    setResetError(false)
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/dashboard/reset-password`,
-      })
-      if (error) throw error
-      setResetSent(true)
-    } catch (err: any) {
-      setResetError(err.message || "Couldn't send the reset email. Try again.")
-    } finally {
-      setIsSendingReset(false)
-    }
-  }
-
-  // Passwordless login uses a manually-typed 6-digit code rather than a clickable link —
-  // Supabase's client auto-consumes a link's token the instant ANYTHING loads that URL
-  // (detectSessionInUrl), including automated link-scanners some email providers run against
-  // inbound mail before a human ever clicks, which silently burns the token. A code the user
-  // has to type can't be pre-fetched that way. See the Magic Link template in Supabase →
-  // Authentication → Email Templates, which must show {{ .Token }} as plain text (no href).
-  // shouldCreateUser: false so this can never create a brand new auth account — only log in
-  // to one that already exists.
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSendingOtp(true)
-    setOtpError(false)
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: false },
-      })
-      if (error) throw error
-      setOtpSent(true)
-    } catch (err: any) {
-      setOtpError(err.message || "Couldn't send the code. Try again.")
-    } finally {
-      setIsSendingOtp(false)
-    }
-  }
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsVerifyingOtp(true)
-    setOtpError(false)
-    try {
-      const { error } = await supabase.auth.verifyOtp({ email, token: otpCode, type: "email" })
-      if (error) throw error
-      // Success signs the user in — same auto-unmount-via-listener as above.
-    } catch (err: any) {
-      setOtpError(err.message || "Invalid or expired code.")
-    } finally {
-      setIsVerifyingOtp(false)
-    }
-  }
-
-  const handleOAuthSignIn = async (provider: "google" | "discord") => {
-    setIsSsoLoading(true)
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        // "login=true" lets the proxy.ts middleware through on the redirect back, before
-        // the client-side auth listener has had a chance to set the portal-session cookie.
-        options: { redirectTo: `${window.location.origin}/dashboard?login=true` },
-      })
-      if (error) {
-        alert(`${provider === "google" ? "Google" : "Discord"} sign-in failed: ${error.message}`)
-        setIsSsoLoading(false)
-      }
-      // On success the browser navigates away to the provider, so no further state update
-      // is needed here — isSsoLoading resets naturally on the next page load.
-    } catch (err: any) {
-      alert(err.message || "Sign-in failed.")
-      setIsSsoLoading(false)
-    }
-  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -810,7 +494,7 @@ export default function DbAdminPage() {
 
       if (error) throw error
       setMembers(data || [])
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
       alert("Error loading members")
     } finally {
@@ -828,7 +512,7 @@ export default function DbAdminPage() {
 
       if (error) throw error
       setBlogs(data || [])
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
       alert("Error loading blogs")
     } finally {
@@ -841,6 +525,20 @@ export default function DbAdminPage() {
       const { error } = await supabase.from("members").update({ approved: true }).eq("id", id)
       if (error) throw error
       fetchMembers()
+      // Fire-and-forget welcome email so the new member knows they can sign in now.
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) =>
+          fetch("/api/members/on-approve", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+            },
+            body: JSON.stringify({ memberId: id }),
+          }),
+        )
+        .catch((err) => console.error("Approval email failed:", err))
     } catch (error) {
       console.error(error)
       alert("Failed to approve.")
@@ -958,8 +656,8 @@ export default function DbAdminPage() {
         author_id: blogForm.author_id || null,
         author_name: linkedMemberName || blogForm.author_name || null,
         featured: blogForm.featured || false,
-        content_type: (blogForm as any).content_type || "blog",
-        policy_type: (blogForm as any).policy_type || null
+        content_type: blogForm.content_type || "blog",
+        policy_type: blogForm.policy_type || null
       }
 
       let error;
@@ -1002,236 +700,10 @@ export default function DbAdminPage() {
     }
   }
 
-  // Render Login Modal if not authenticated
+  // Render the sign-in screen if not authenticated. The auth listener above flips
+  // isAuthenticated once PortalLogin's sign-in (password, code, or SSO) lands a session.
   if (!isAuthenticated) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] relative">
-          <Link
-            href="/"
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </Link>
-
-          {authView === "forgot" ? (
-            <>
-              <h2 className="text-2xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Reset Password</h2>
-              <p className="text-sm text-gray-500 mb-6">
-                Enter the email you applied with — we&apos;ll send a link to set a new password.
-              </p>
-
-              {resetSent ? (
-                <div className="bg-[#e8f5e9] text-[#2e7d32] border border-[#81c784] rounded-lg p-4 text-sm">
-                  Check your inbox for a reset link. It may take a minute to arrive.
-                </div>
-              ) : (
-                <form onSubmit={handleForgotPassword}>
-                  {resetError && <p className="text-[#c62828] text-sm mb-4">{resetError}</p>}
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4"
-                    autoFocus
-                    required
-                  />
-                  <button
-                    type="submit"
-                    disabled={isSendingReset}
-                    className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
-                  >
-                    {isSendingReset && <Loader2 className="w-4 h-4 animate-spin" />}
-                    Send Reset Link
-                  </button>
-                </form>
-              )}
-
-              <button
-                onClick={() => {
-                  setAuthView("login")
-                  setResetSent(false)
-                  setResetError(false)
-                }}
-                className="text-xs text-gray-500 hover:text-[#4CAF7D] mt-4 block mx-auto"
-              >
-                ← Back to login
-              </button>
-            </>
-          ) : authView === "otp" ? (
-            <>
-              <h2 className="text-2xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Sign In With a Code</h2>
-
-              {!otpSent ? (
-                <>
-                  <p className="text-sm text-gray-500 mb-6">
-                    Enter your email — we&apos;ll send you a 6-digit one-time code instead of using your password.
-                  </p>
-                  <form onSubmit={handleSendOtp}>
-                    {otpError && <p className="text-[#c62828] text-sm mb-4">{otpError}</p>}
-                    <input
-                      type="email"
-                      placeholder="Email address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4"
-                      autoFocus
-                      required
-                    />
-                    <button
-                      type="submit"
-                      disabled={isSendingOtp}
-                      className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
-                    >
-                      {isSendingOtp && <Loader2 className="w-4 h-4 animate-spin" />}
-                      Send Code
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm text-gray-500 mb-6">
-                    Enter the 6-digit code we emailed to {email}.
-                  </p>
-                  <form onSubmit={handleVerifyOtp}>
-                    {otpError && <p className="text-[#c62828] text-sm mb-4">{otpError}</p>}
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="6-digit code"
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4 tracking-widest"
-                      autoFocus
-                      required
-                    />
-                    <button
-                      type="submit"
-                      disabled={isVerifyingOtp}
-                      className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
-                    >
-                      {isVerifyingOtp && <Loader2 className="w-4 h-4 animate-spin" />}
-                      Verify & Sign In
-                    </button>
-                  </form>
-                </>
-              )}
-
-              <button
-                onClick={() => {
-                  setAuthView("login")
-                  setOtpSent(false)
-                  setOtpError(false)
-                  setOtpCode("")
-                }}
-                className="text-xs text-gray-500 hover:text-[#4CAF7D] mt-4 block mx-auto"
-              >
-                ← Back to login
-              </button>
-            </>
-          ) : (
-            <>
-              <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">Portal Login</h2>
-
-              {authError && (
-                <p className="text-[#c62828] text-sm mb-4">{authError}</p>
-              )}
-
-              <form onSubmit={handleLogin}>
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-                    setAuthError(false)
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4"
-                  autoFocus
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value)
-                    setAuthError(false)
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-1"
-                  required
-                />
-                <div className="flex items-center justify-between mb-4">
-                  <button
-                    type="button"
-                    onClick={() => setAuthView("forgot")}
-                    className="text-xs text-gray-500 hover:text-[#4CAF7D]"
-                  >
-                    Forgot password?
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAuthView("otp")}
-                    className="text-xs text-gray-500 hover:text-[#4CAF7D]"
-                  >
-                    Sign in with a code instead
-                  </button>
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoggingIn}
-                  className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
-                >
-                  {isLoggingIn && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Login
-                </button>
-              </form>
-
-              <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400 uppercase tracking-wide">or</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              <div className="space-y-2.5">
-                <button
-                  type="button"
-                  onClick={() => handleOAuthSignIn("google")}
-                  disabled={isSsoLoading}
-                  className="w-full py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2.5 disabled:opacity-70"
-                >
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.87c2.27-2.09 3.58-5.17 3.58-8.82Z" />
-                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.94-2.9l-3.87-3.02c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.12-6.73-4.96H1.27v3.12A12 12 0 0 0 12 24Z" />
-                    <path fill="#FBBC05" d="M5.27 14.27a7.2 7.2 0 0 1 0-4.54V6.61H1.27a12 12 0 0 0 0 10.78l4-3.12Z" />
-                    <path fill="#EA4335" d="M12 4.77c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.94 1.19 15.24 0 12 0A12 12 0 0 0 1.27 6.61l4 3.12C6.22 6.89 8.87 4.77 12 4.77Z" />
-                  </svg>
-                  Continue with Google
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleOAuthSignIn("discord")}
-                  disabled={isSsoLoading}
-                  className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2.5 disabled:opacity-70"
-                >
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.52.07.07 0 0 0-.08.04c-.21.38-.45.87-.61 1.26a18.3 18.3 0 0 0-5.48 0 12.6 12.6 0 0 0-.62-1.26.08.08 0 0 0-.08-.04c-1.7.29-3.36.8-4.89 1.52a.07.07 0 0 0-.03.03C.53 8.6-.32 12.72.1 16.78a.08.08 0 0 0 .03.06 19.9 19.9 0 0 0 6 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.23-2a.08.08 0 0 0-.04-.11 13.1 13.1 0 0 1-1.87-.9.08.08 0 0 1 0-.13c.13-.09.25-.19.37-.28a.07.07 0 0 1 .08 0c3.93 1.79 8.18 1.79 12.06 0a.07.07 0 0 1 .08 0c.12.1.24.19.37.28a.08.08 0 0 1 0 .13c-.6.35-1.22.65-1.87.9a.08.08 0 0 0-.04.11c.36.7.78 1.37 1.23 2a.08.08 0 0 0 .08.03 19.8 19.8 0 0 0 6.01-3.03.08.08 0 0 0 .03-.06c.5-4.7-.83-8.79-3.51-12.38a.06.06 0 0 0-.03-.03ZM8.02 14.35c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.41 2.15-2.41 1.21 0 2.17 1.09 2.15 2.41 0 1.33-.95 2.41-2.15 2.41Zm7.97 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.41 2.15-2.41 1.21 0 2.17 1.09 2.15 2.41 0 1.33-.94 2.41-2.15 2.41Z" />
-                  </svg>
-                  Continue with Discord
-                </button>
-              </div>
-
-              <p className="text-xs text-gray-500 mt-4 text-center">
-                Log in with your individual member profile account.
-              </p>
-            </>
-          )}
-        </div>
-      </div>
-    )
+    return <PortalLogin />
   }
 
   // Signed in, but no recognized account (no matching members row and not the owner) —
@@ -1239,11 +711,12 @@ export default function DbAdminPage() {
   // dashboard content; hand them straight back to the apply flow.
   if (!loading && accessLevel === "none") {
     return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white rounded-xl p-6 sm:p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
           <h2 className="text-xl font-bold font-bricolage mb-2 text-[#1a1a1a]">No Account Found</h2>
           <p className="text-sm text-gray-500 mb-6">
-            {currentUser?.email} isn&apos;t linked to a Dr. Interested member profile yet.
+            <strong className="break-all text-gray-700">{currentUser?.email}</strong> isn&apos;t linked to a Dr.
+            Interested member profile yet. If you applied with a different email, sign out and sign in with that one.
           </p>
           <Link
             href="/members/apply"
@@ -1266,12 +739,13 @@ export default function DbAdminPage() {
   // dashboard content (including admin tabs their self-reported role/department might imply).
   if (!loading && accessLevel === "pending") {
     return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white rounded-xl p-6 sm:p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
           <h2 className="text-xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Application Pending</h2>
           <p className="text-sm text-gray-500 mb-6">
-            Thanks for applying! Your application is still under review by an admin. You&apos;ll be able to
-            access the portal once it&apos;s approved.
+            Thanks for applying! Your application is still waiting for an admin to approve it. We&apos;ll email
+            you at <strong className="break-all text-gray-700">{currentUser?.email}</strong> as soon as it&apos;s
+            approved, and then you can sign in here.
           </p>
           <button
             onClick={handleLogout}
@@ -1315,16 +789,16 @@ export default function DbAdminPage() {
   ]
 
   return (
-    <div className="container max-w-6xl mx-auto py-12 px-4 relative">
+    <div className="container max-w-6xl mx-auto py-6 sm:py-12 px-4 relative">
       <PortalFirstVisitPrompts />
 
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-gray-100 pb-6">
         <div>
-          <h1 className="text-3xl font-bold font-bricolage text-[#1a1a1a]">
+          <h1 className="text-2xl sm:text-3xl font-bold font-bricolage text-[#1a1a1a]">
             {accessLevel === "owner"
               ? "Owner Control Center"
-              : accessLevel === "director"
+              : accessLevel === "director" || accessLevel === "deputy"
                 ? `${currentMemberProfile?.department || "Director"} Panel`
                 : "Member Portal"}
           </h1>
@@ -1351,7 +825,7 @@ export default function DbAdminPage() {
             onClick={handleLogout}
             className="text-[#c62828] hover:text-[#a01a1a] font-semibold border border-red-200 hover:border-red-400 bg-red-50/50 hover:bg-red-50 px-4 py-2 rounded-lg transition-all text-sm"
           >
-            Sign Out Portal
+            Sign Out
           </button>
         </div>
       </div>
@@ -1360,22 +834,22 @@ export default function DbAdminPage() {
       {isHrOrAdmin ? (
         <>
           {/* Dashboard Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Approved Members</p>
-              <p className="text-3xl font-bold text-[#1a1a1a]">{stats.approvedMembers}</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Approved Members</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#1a1a1a]">{stats.approvedMembers}</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Pending Applications</p>
-              <p className="text-3xl font-bold text-[#c62828]">{stats.pendingMembers}</p>
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Pending Applications</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#c62828]">{stats.pendingMembers}</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Published Blogs</p>
-              <p className="text-3xl font-bold text-[#4CAF7D]">{stats.publishedBlogs}</p>
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Published Blogs</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#4CAF7D]">{stats.publishedBlogs}</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Total Events</p>
-              <p className="text-3xl font-bold text-blue-600">{stats.totalEvents}</p>
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Total Events</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.totalEvents}</p>
             </div>
           </div>
 
@@ -1401,118 +875,9 @@ export default function DbAdminPage() {
       {/* --- RENDER MEMBER VIEWS --- */}
 
       {/* 2. Member Tasks */}
-      {activeMainTab === "mytasks" && (() => {
-        const FINISHED = ["Completed", "Incomplete"]
-        const activeTasks = myTasks.filter((t) => !FINISHED.includes(t.status))
-        const doneTasks = myTasks.filter((t) => FINISHED.includes(t.status))
-        const renderCard = (task: Task) => {
-          const isDone = FINISHED.includes(task.status)
-          const isDeepLinked = task.id === deepLinkedTaskId
-          return (
-            <div
-              key={task.id}
-              id={`task-${task.id}`}
-              className={`p-4 border rounded-xl transition-colors flex items-start gap-3 ${
-                isDeepLinked ? "border-[#4ecdc4] ring-2 ring-[#4ecdc4]/40" : "border-gray-150 hover:border-gray-300"
-              }`}
-            >
-              <div className="flex items-start gap-3 min-w-0 flex-1">
-                <button
-                  onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
-                  disabled={task.status === "Incomplete"}
-                  className={`mt-1 flex-shrink-0 transition-transform active:scale-95 ${task.status === "Completed" ? "text-green-500" : task.status === "Incomplete" ? "text-gray-300 cursor-default" : "text-gray-300 hover:text-gray-400"}`}
-                >
-                  <CheckCircle2 className="w-5 h-5" />
-                </button>
-                <div className="min-w-0 flex-1">
-                  <h3 className={`font-semibold text-[0.95rem] break-words ${isDone ? "line-through text-gray-400" : "text-gray-800"}`}>
-                    {task.title}
-                  </h3>
-                  {task.description && (
-                    <p className={`text-sm mt-1 break-words ${isDone ? "text-gray-300" : "text-gray-500"}`}>{task.description}</p>
-                  )}
-                  {task.status === "Incomplete" && (
-                    <p className="text-xs text-gray-400 mt-1 italic">Closed by a director — no longer needs to be done.</p>
-                  )}
-                  {task.due_date && (
-                    <span className={`inline-block text-[0.75rem] font-bold mt-2 px-2 py-0.5 rounded ${new Date(task.due_date) < new Date() && !isDone ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"}`}>
-                      Due {new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                    </span>
-                  )}
-                  {task.status === "Pending" && (
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs bg-amber-50 border border-amber-100 text-amber-800 rounded-lg px-2.5 py-1.5">
-                      <span>Ready to start? Mark this In Progress.</span>
-                      <button
-                        onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
-                        className="font-semibold text-amber-900 underline hover:no-underline"
-                      >
-                        Mark In Progress
-                      </button>
-                    </div>
-                  )}
-                  {task.status === "Completed" && (task.submission_url || task.submission_file_url || task.submission_note || task.time_spent_minutes) && (
-                    <div className="text-xs text-gray-400 mt-2 space-y-1">
-                      {task.submission_note && <p className="whitespace-pre-wrap break-words">{task.submission_note}</p>}
-                      <p className="space-x-2">
-                        {task.time_spent_minutes ? <span>{Math.round(task.time_spent_minutes / 6) / 10} hrs logged</span> : null}
-                        {task.submission_url && (
-                          <a href={task.submission_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
-                            View submitted work
-                          </a>
-                        )}
-                        {task.submission_file_url && (
-                          <a href={task.submission_file_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
-                            View attached file
-                          </a>
-                        )}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="shrink-0">
-                <span className={`inline-block px-2.5 py-1 rounded-full text-[0.7rem] sm:text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap ${
-                  task.status === "Completed" ? "bg-green-100 text-green-800" : task.status === "Incomplete" ? "bg-gray-200 text-gray-600" : task.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
-                }`}>
-                  {task.status}
-                </span>
-              </div>
-            </div>
-          )
-        }
-        return (
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-xl font-bold font-bricolage mb-6 text-[#1a1a1a] flex items-center gap-2">
-            <FileText className="text-[#4CAF7D] w-5 h-5" /> Assigned Tasks Checklist
-          </h2>
-
-          {myTasks.length === 0 ? (
-            <div className="text-center py-10 text-gray-400 text-sm">No tasks currently assigned to you! Check back later.</div>
-          ) : (
-            <div className="space-y-4">
-              {activeTasks.length === 0 ? (
-                <div className="text-center py-6 text-gray-400 text-sm">All caught up — nothing active right now.</div>
-              ) : (
-                activeTasks.map(renderCard)
-              )}
-
-              {doneTasks.length > 0 && (
-                <div className="border-t border-gray-100 pt-3">
-                  <button
-                    onClick={() => setMyTasksShowDone((v) => !v)}
-                    className="flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-700"
-                  >
-                    <ChevronRight className={`w-4 h-4 transition-transform ${myTasksShowDone ? "rotate-90" : ""}`} />
-                    Completed ({doneTasks.length})
-                  </button>
-                  {myTasksShowDone && <div className="space-y-3 mt-3">{doneTasks.map(renderCard)}</div>}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        )
-      })()}
+      {activeMainTab === "mytasks" && currentUser?.email && (
+        <MyTasksTab userEmail={currentUser.email.toLowerCase()} deepLinkedTaskId={deepLinkedTaskId} />
+      )}
 
       {/* 3. Resources Tab — visible to everyone (owner, director, and plain members alike;
           see the "Drive & Calendar" button appended to both tab bars above). Drive browsing
@@ -1523,7 +888,7 @@ export default function DbAdminPage() {
           <DriveBrowser />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center mb-4">
                   <Calendar className="w-6 h-6" />
@@ -1551,7 +916,7 @@ export default function DbAdminPage() {
               )}
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4">
                   <Clock className="w-6 h-6" />
@@ -1627,10 +992,12 @@ export default function DbAdminPage() {
           {activeMainTab === "admin" && (
             <h2 className="text-xl font-bold font-bricolage text-[#1a1a1a] mb-6">Admin Settings</h2>
           )}
+          {userIsTrueOwner && activeMainTab === "admin" && <EmailTestCard />}
+
           {/* Site-wide links (Drive folder, shared calendar) — true-owner-only (not Admin Team
               leadership), since these apply org-wide, not just to HR. Now on their own Admin tab. */}
           {userIsTrueOwner && activeMainTab === "admin" && (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Configure Portal Links</h3>
               <p className="text-xs text-gray-500 mb-4">
                 These links are shown to every member on the Resources tab of their portal.
@@ -1688,7 +1055,7 @@ export default function DbAdminPage() {
               Sign in as whichever Google account already owns the shared Drive folder to skip
               re-sharing it. */}
           {userIsTrueOwner && activeMainTab === "admin" && (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Google Drive Connection</h3>
               <p className="text-xs text-gray-500 mb-4">
                 New folders/Docs/Sheets/Forms, template copies, and uploads made in the Drive
@@ -1715,7 +1082,7 @@ export default function DbAdminPage() {
               browser copies this file instead of creating a blank one, so new files start from
               the org's house template. Falls back to a blank file if left empty. */}
           {userIsTrueOwner && activeMainTab === "admin" && (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Drive "New" Templates</h3>
               <p className="text-xs text-gray-500 mb-4">
                 Paste the link to an existing Doc/Sheet/Slides/Form to use as the template. When a
@@ -1755,10 +1122,10 @@ export default function DbAdminPage() {
 
           {activeMainTab === "members" && (
           <>
-          <div className="flex gap-4 border-b-2 border-gray-200 mb-8 overflow-x-auto">
+          <div className="flex gap-1 sm:gap-4 border-b-2 border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab("pending")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 font-medium text-[0.95rem] whitespace-nowrap border-b-4 transition-colors -mb-[2px] ${
                 activeTab === "pending"
                   ? "text-[#4CAF7D] border-[#4CAF7D]"
                   : "text-gray-500 border-transparent hover:text-[#4CAF7D]"
@@ -1771,7 +1138,7 @@ export default function DbAdminPage() {
             </button>
             <button
               onClick={() => setActiveTab("approved")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 font-medium text-[0.95rem] whitespace-nowrap border-b-4 transition-colors -mb-[2px] ${
                 activeTab === "approved"
                   ? "text-[#4CAF7D] border-[#4CAF7D]"
                   : "text-gray-500 border-transparent hover:text-[#4CAF7D]"
@@ -1784,7 +1151,7 @@ export default function DbAdminPage() {
             </button>
             <button
               onClick={() => setActiveTab("archived")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 font-medium text-[0.95rem] whitespace-nowrap border-b-4 transition-colors -mb-[2px] ${
                 activeTab === "archived"
                   ? "text-[#4CAF7D] border-[#4CAF7D]"
                   : "text-gray-500 border-transparent hover:text-[#4CAF7D]"
@@ -1807,12 +1174,13 @@ export default function DbAdminPage() {
               No {activeTab} members
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {displayMembers.map((member) => (
                 <div key={member.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
                   <img
                     src={member.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22280%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22280%22 height=%22200%22/%3E%3C/svg%3E"}
                     alt={member.name}
+                    loading="lazy"
                     className="w-full h-[200px] object-cover bg-gray-100"
                   />
                   <div className="p-5 flex flex-col flex-grow">
@@ -1901,7 +1269,7 @@ export default function DbAdminPage() {
       {/* 7. Original Blogs Tab */}
       {isHrOrAdmin && visibleTabs.includes("blogs") && activeMainTab === "blogs" && (
         <>
-          <div className="flex justify-between items-center border-b-2 border-gray-200 pb-4 mb-8">
+          <div className="flex flex-wrap gap-3 justify-between items-center border-b-2 border-gray-200 pb-4 mb-6 sm:mb-8">
             <h2 className="text-xl font-semibold text-gray-800">Published Blogs</h2>
             <button
               onClick={() => {
@@ -1928,7 +1296,7 @@ export default function DbAdminPage() {
               {blogs.map((blog) => (
                 <div key={blog.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
                   <div className="relative h-[200px] w-full bg-gray-100">
-                    <img src={blog.cover_image || "/placeholder.svg"} className="w-full h-full object-cover" />
+                    <img src={blog.cover_image || "/placeholder.svg"} alt="" loading="lazy" className="w-full h-full object-cover" />
                   </div>
                   <div className="p-5 flex flex-col flex-grow">
                     <div className="text-xs text-gray-500 mb-2">{new Date(blog.created_at).toLocaleDateString()} • {blog.reading_time}</div>
@@ -1968,73 +1336,10 @@ export default function DbAdminPage() {
 
       {/* --- MODAL POPUPS --- */}
 
-      {/* Task Completion Modal — captures the actual work (link / note / file). */}
-      {completingTask && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
-            <h2 className="text-xl font-bold font-bricolage mb-1 text-[#1a1a1a]">Mark as Complete</h2>
-            <p className="text-sm text-gray-500 mb-6">{completingTask.title}</p>
-            <form onSubmit={handleSubmitTaskCompletion} className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Link to your work <span className="text-gray-400 font-normal">(optional — e.g. a Canva link)</span>
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={completionForm.submission_url}
-                  onChange={(e) => setCompletionForm({ ...completionForm, submission_url: e.target.value })}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Notes <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Anything your director should know about this work"
-                  value={completionForm.submission_note}
-                  onChange={(e) => setCompletionForm({ ...completionForm, submission_note: e.target.value })}
-                  className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
-                />
-              </div>
-              <TaskFileUploadField
-                pathPrefix={completingTask.id}
-                value={completionForm.submission_file_url}
-                onChange={(url) => setCompletionForm((f) => ({ ...f, submission_file_url: url }))}
-                onUploadingChange={setUploadingCompletionFile}
-              />
-              <p className="text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg p-2.5">
-                Don&apos;t forget to also reply to this task on Discord and log your hours on VolunTime.
-              </p>
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setCompletingTask(null)}
-                  className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-colors"
-                  disabled={savingCompletion}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingCompletion || uploadingCompletionFile}
-                  className="flex-1 py-2.5 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
-                >
-                  {savingCompletion && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Submit & Complete
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Edit Member Modal */}
       {editingMember && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-white rounded-xl p-5 sm:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">Edit Member</h2>
             <div className="space-y-4">
               <div>
@@ -2191,7 +1496,7 @@ export default function DbAdminPage() {
       {/* Edit/Create Blog Modal */}
       {(isCreatingBlog || editingBlog) && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-white rounded-xl p-5 sm:p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">
               {isCreatingBlog ? "Write New Blog" : "Edit Blog"}
             </h2>
@@ -2234,8 +1539,8 @@ export default function DbAdminPage() {
                     <div className="mt-2">
                       <input
                         type="text"
-                        value={(blogForm as any).author_name || ""}
-                        onChange={(e) => setBlogForm({ ...blogForm, author_name: e.target.value } as any)}
+                        value={blogForm.author_name || ""}
+                        onChange={(e) => setBlogForm({ ...blogForm, author_name: e.target.value })}
                         placeholder="Or type author name manually (e.g. guest writer)"
                         className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] text-sm"
                       />
@@ -2249,8 +1554,8 @@ export default function DbAdminPage() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Content Type</label>
                   <select
-                    value={(blogForm as any).content_type || "blog"}
-                    onChange={(e) => setBlogForm({ ...blogForm, content_type: e.target.value } as any)}
+                    value={blogForm.content_type || "blog"}
+                    onChange={(e) => setBlogForm({ ...blogForm, content_type: e.target.value })}
                     className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
                   >
                     <option value="blog">Blog Post</option>
@@ -2258,12 +1563,12 @@ export default function DbAdminPage() {
                     <option value="policy">Policy Work</option>
                   </select>
                 </div>
-                {(blogForm as any).content_type === "policy" && (
+                {blogForm.content_type === "policy" && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Policy Type</label>
                     <select
-                      value={(blogForm as any).policy_type || "report"}
-                      onChange={(e) => setBlogForm({ ...blogForm, policy_type: e.target.value } as any)}
+                      value={blogForm.policy_type || "report"}
+                      onChange={(e) => setBlogForm({ ...blogForm, policy_type: e.target.value })}
                       className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
                     >
                       <option value="report">Report</option>
