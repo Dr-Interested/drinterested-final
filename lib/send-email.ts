@@ -33,8 +33,6 @@ function toPayload(m: EmailMessage, from: string) {
     ...(m.cc && m.cc.length ? { cc: m.cc } : {}),
     subject: m.subject,
     html: m.html,
-    // A plain-text alternative alongside the HTML noticeably helps inbox placement.
-    text: htmlToText(m.html),
   }
 }
 
@@ -124,26 +122,6 @@ export function taskDetailsHtml(task: { title: string; description?: string | nu
     ${task.description ? `<p style="margin:0 0 8px;white-space:pre-line;">${escapeHtml(task.description)}</p>` : ""}
     ${task.due_date ? `<p style="margin:0 0 8px;"><strong>Due:</strong> ${formatDueDate(task.due_date)} (by 11:59 PM ET)</p>` : ""}
   `
-}
-
-function htmlToText(html: string): string {
-  return html
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, "$2 ($1)")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(p|div|h[1-6]|li)>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&middot;/g, "·")
-    .replace(/&copy;/g, "©")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&amp;/g, "&")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n\s*\n\s*\n+/g, "\n\n")
-    .trim()
 }
 
 // Shared brand shell for every transactional email sent through this app (task assignment,
