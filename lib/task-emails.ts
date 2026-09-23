@@ -1,16 +1,9 @@
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import {
-  escapeHtml,
-  sendEmailBatch,
-  taskDetailsHtml,
-  taskEmailShell,
-  taskPortalUrl,
-  type EmailMessage,
-} from "@/lib/send-email"
+import { escapeHtml, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl, type EmailMessage } from "@/lib/send-email"
 
-// Server-only. Task assignment / reminder emails, sent exactly once per task even though
-// three things can try to send the assignment email (the portal right after assigning, the
-// Supabase INSERT webhook, and the daily cron's backfill): each first "claims" the task by
+// Server-only. Task assignment / reminder emails, sent exactly once per task even though two
+// things can try to send the assignment email (the Supabase INSERT webhook and the daily
+// cron's backfill, which can overlap): each first "claims" the task by
 // stamping its *_sent_at column only where it's still null, and only the caller whose claim
 // succeeded sends. If the send fails, the stamp is cleared again so the cron retries it.
 
@@ -46,7 +39,7 @@ function buildMessage(kind: TaskEmailKind, task: TaskRow, name: string | undefin
   return {
     to: String(task.assigned_to),
     subject,
-    html: taskEmailShell(title, taskDetailsHtml(task), taskPortalUrl(task.id), "View the Task"),
+    html: taskEmailShell(title, taskDetailsHtml(task), taskPortalUrl(task.id)),
   }
 }
 
@@ -82,9 +75,12 @@ export async function sendTaskEmails(kind: TaskEmailKind, tasks: TaskRow[]): Pro
   if (!toSend.length) return { sent: 0, failed: 0 }
 
   const names = await namesByEmail(toSend.map((t) => String(t.assigned_to)))
-  const results = await sendEmailBatch(
-    toSend.map((t) => buildMessage(kind, t, names.get(String(t.assigned_to).toLowerCase()))),
-  )
+  // One email per task, one after another (sendEmail retries if Resend says it's busy).
+  const results: boolean[] = []
+  for (const t of toSend) {
+    const { sent } = await sendEmail(buildMessage(kind, t, names.get(String(t.assigned_to).toLowerCase())))
+    results.push(sent)
+  }
 
   const failedIds = toSend.filter((_, i) => !results[i]).map((t) => t.id)
   if (failedIds.length) {

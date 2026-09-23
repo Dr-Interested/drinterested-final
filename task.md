@@ -39,11 +39,10 @@
 - [x] A7: Split home-page.tsx into components/home/* sections
 - [x] A8: Split dashboard — sign-in screen (PortalLogin) and My Tasks + completion modal (MyTasksTab) extracted; dead legacy admin-task code removed
 - [x] A9: Remove TypeScript `any` from the dashboard and portal tabs
-- [x] A11: CAPTCHA — Cloudflare Turnstile on apply + contact (turns on when NEXT_PUBLIC_TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY are set)
+- [ ] A11: CAPTCHA — Cloudflare Turnstile was tried and removed (its challenge failed for real visitors); the apply and contact routes rely on server-side validation and per-IP rate limits instead
 - [ ] A15: CSS dark mode refactor — still deferred: dark mode works through ~100 global override rules in app/globals.css; replacing them with per-component `dark:` classes touches every page and needs a visual pass of each
 
 ## Manual setup (outside the code)
 - [ ] Remove the anon INSERT policy on public.members once the new apply route is deployed (applications are now inserted server-side)
 - [ ] Paste docs/email-templates/* into Supabase Auth email templates; set up custom SMTP through Resend (see docs/email-templates/README.md)
 - [ ] Set RESEND_FROM_EMAIL to an address on the verified drinterested.org domain
-- [ ] Optional: Turnstile keys in Vercel

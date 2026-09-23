@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { Button } from "@/components/ui/button"
 import Cropper from "react-easy-crop"
-import TurnstileWidget, { turnstileConfigured } from "@/components/turnstile-widget"
 import { APPLY_DEPARTMENTS, APPLY_ROLES_BY_DEPARTMENT } from "@/lib/apply-options"
 import { errorMessage } from "@/lib/errors"
 import Link from "next/link"
@@ -68,9 +67,7 @@ export default function DbApplyPage() {
   const [selectedRole, setSelectedRole] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
-  const [turnstileReset, setTurnstileReset] = useState(0)
   const messageRef = useRef<HTMLDivElement>(null)
 
   // The result message renders above the form, so on a phone (where Submit is far below) bring
@@ -224,10 +221,6 @@ export default function DbApplyPage() {
       validateSocialUrl(newMember.socials.linkedin)
       validateSocialUrl(newMember.socials.instagram)
       
-      if (turnstileConfigured && !turnstileToken) {
-        throw new Error("Please complete the verification check above the Submit button.")
-      }
-
       // Register credentials in Supabase Auth. The confirmation email's link lands on the
       // portal login rather than the homepage.
       const { error: signUpError } = await supabase.auth.signUp({
@@ -244,7 +237,7 @@ export default function DbApplyPage() {
       const res = await fetch("/api/members/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newMember, turnstileToken }),
+        body: JSON.stringify(newMember),
       })
       const result = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(result.error || "We couldn't submit your application. Please try again.")
@@ -261,7 +254,6 @@ export default function DbApplyPage() {
     } catch (err) {
       console.error(err)
       setMessage({ type: "error", text: errorMessage(err) || "Something went wrong. Please try again." })
-      setTurnstileReset((n) => n + 1)
     } finally {
       setLoading(false)
     }
@@ -570,8 +562,6 @@ export default function DbApplyPage() {
             </div>
           </div>
         </div>
-
-        <TurnstileWidget onToken={setTurnstileToken} resetKey={turnstileReset} />
 
         <p className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-3">
           After you apply, an admin reviews your application. <strong>We&apos;ll email you once it&apos;s approved</strong>, and

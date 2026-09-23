@@ -108,7 +108,6 @@ export async function POST(request: Request) {
         <p style="color:#888;font-size:13px;margin:16px 0 0;">Review it in the portal. Whoever assigned the task marks it Received there, which starts its archive clock.</p>
       `,
       taskPortalUrl(task.id, "tasks"),
-      "Review in the Portal",
     ),
   })
 

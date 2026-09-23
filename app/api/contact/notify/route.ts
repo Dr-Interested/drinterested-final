@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { clientIp, rateLimit } from "@/lib/rate-limit"
 import { postDiscordEmbed } from "@/lib/discord"
-import { verifyTurnstile } from "@/lib/turnstile"
 
 export const dynamic = "force-dynamic"
 
@@ -11,7 +10,6 @@ const Contact = z.object({
   email: z.string().trim().email().max(254),
   subject: z.string().trim().max(200).optional().default(""),
   message: z.string().trim().min(1).max(5000),
-  turnstileToken: z.string().optional().nullable(),
 })
 
 /** Posts a copy of a /contact form submission to the staff Discord channel. */
@@ -31,10 +29,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Please fill in your name, a valid email and a message." }, { status: 400 })
   }
   const c = parsed.data
-
-  if (!(await verifyTurnstile(c.turnstileToken, ip))) {
-    return NextResponse.json({ error: "Please complete the verification check and try again." }, { status: 400 })
-  }
 
   const { sent, reason } = await postDiscordEmbed({
     title: "✉️ New Contact Inquiry",

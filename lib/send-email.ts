@@ -38,9 +38,9 @@ function toPayload(m: EmailMessage, from: string) {
   }
 }
 
-// POST to Resend, retrying when it answers 429. Resend allows only a few requests per second
-// per account, so a burst (a task assigned to a whole department fires one webhook per
-// person at the same moment) used to get most of its emails rejected and silently dropped.
+// POST to Resend, retrying when it answers 429 (or a 5xx). Resend allows only a few requests
+// per second per account, so a burst (a task assigned to a whole department fires one webhook
+// per person at the same moment) used to get most of its emails rejected and silently dropped.
 async function resendPost(path: string, body: unknown): Promise<{ ok: boolean; status: number; text: string }> {
   const apiKey = process.env.RESEND_API_KEY!
   let last = { ok: false, status: 0, text: "" }
@@ -86,28 +86,6 @@ export async function sendEmail(message: EmailMessage): Promise<{ sent: boolean;
     return { sent: false, reason: `resend_${res.status}`, detail: res.text }
   }
   return { sent: true }
-}
-
-/**
- * Sends many emails through Resend's batch endpoint (up to 100 per request), so bulk task
- * assignments and the daily reminder run don't hit Resend's per-second rate limit. Returns,
- * in order, whether each message was accepted.
- */
-export async function sendEmailBatch(messages: EmailMessage[]): Promise<boolean[]> {
-  if (!messages.length) return []
-  if (!process.env.RESEND_API_KEY) {
-    console.warn(`RESEND_API_KEY is not configured — skipping ${messages.length} email(s).`)
-    return messages.map(() => false)
-  }
-  const from = fromAddress()
-  const results: boolean[] = []
-  for (let i = 0; i < messages.length; i += 100) {
-    const chunk = messages.slice(i, i + 100)
-    const res = await resendPost("/emails/batch", chunk.map((m) => toPayload(m, from)))
-    if (!res.ok) console.error("Resend batch send failed:", res.status, res.text)
-    results.push(...chunk.map(() => res.ok))
-  }
-  return results
 }
 
 /** Escape user-controlled text (task titles, notes, names) before it goes into email HTML. */

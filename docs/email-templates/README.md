@@ -52,10 +52,10 @@ emailing them. To check everything at once, open the portal's **Admin** tab and 
 **Send test email**: it emails you and lists any missing or wrong settings, including Resend's
 own error message if it rejects the send.
 
-Assignment emails go out straight from the portal when a task is assigned (batched, so a task for
-a whole department doesn't hit Resend's rate limit). The Supabase "tasks INSERT" webhook to
-`/api/tasks/on-insert` is now optional backup, and the daily 9 AM ET job retries anything that
-failed. Nobody gets the same email twice.
+Assignment emails are sent by the Supabase "tasks INSERT" webhook (Database → Webhooks →
+`https://www.drinterested.org/api/tasks/on-insert`) the moment a task is created, and the daily
+9 AM ET job sends any that didn't go out. If Resend is briefly busy (a task assigned to a whole
+department), sends are retried, and nobody gets the same email twice.
 
 ## 4. Redirect URLs
 

@@ -25,7 +25,6 @@ import {
   Twitter
 } from "lucide-react"
 import SeoSchema from "@/components/seo-schema"
-import TurnstileWidget, { turnstileConfigured } from "@/components/turnstile-widget"
 import { motion } from "framer-motion"
 
 export default function ContactClientPage() {
@@ -39,8 +38,6 @@ export default function ContactClientPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const [turnstileReset, setTurnstileReset] = useState(0)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -50,10 +47,6 @@ export default function ContactClientPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isSending) return
-    if (turnstileConfigured && !turnstileToken) {
-      setSubmitError("Please complete the verification check above the Send button.")
-      return
-    }
     setIsSending(true)
     setSubmitError(null)
 
@@ -91,7 +84,7 @@ export default function ContactClientPage() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ ...formData, turnstileToken }),
+            body: JSON.stringify(formData),
           })
         } catch (notifyErr) {
           console.error("Discord contact notification failed:", notifyErr)
@@ -108,7 +101,6 @@ export default function ContactClientPage() {
       setSubmitError("There was an error submitting the form. Please try again.")
     } finally {
       setIsSending(false)
-      setTurnstileReset((n) => n + 1)
     }
   }
 
@@ -414,8 +406,6 @@ export default function ContactClientPage() {
                     className="border-[#405862]/20 focus:border-[#4ecdc4] text-sm resize-none"
                   />
                 </div>
-
-                <TurnstileWidget onToken={setTurnstileToken} resetKey={turnstileReset} />
 
                 <Button type="submit" disabled={isSending} className="w-full bg-[#405862] hover:bg-[#334852] group disabled:opacity-70">
                   <span>{isSending ? "Sending..." : "Send Message"}</span>

@@ -4,7 +4,6 @@ import { supabaseAdmin } from "@/lib/supabase-admin"
 import { APPLY_DEPARTMENTS, APPLY_ROLES_BY_DEPARTMENT } from "@/lib/apply-options"
 import { clientIp, rateLimit } from "@/lib/rate-limit"
 import { postDiscordEmbed } from "@/lib/discord"
-import { verifyTurnstile } from "@/lib/turnstile"
 
 export const dynamic = "force-dynamic"
 
@@ -32,7 +31,6 @@ const Application = z
       .object({ website: optionalUrl, linkedin: optionalUrl, instagram: optionalUrl })
       .optional()
       .default({}),
-    turnstileToken: z.string().optional().nullable(),
   })
   .refine((a) => (APPLY_ROLES_BY_DEPARTMENT[a.department] || []).includes(a.role), {
     message: "Please choose a role for your department.",
@@ -43,8 +41,7 @@ const Application = z
  * Server-side half of the public /members/apply form (task.md A10). The browser still creates
  * the Supabase Auth account itself, but the `members` row is validated and inserted here with
  * the service role: every field is checked against the same presets and limits the form
- * uses, `approved` is always forced to false, submissions are rate limited per IP, and (when
- * TURNSTILE_SECRET_KEY is set) must carry a valid CAPTCHA token. The staff Discord
+ * uses, `approved` is always forced to false, submissions are rate limited per IP. The staff Discord
  * notification is sent from here too, so there's no public endpoint that posts arbitrary text
  * to Discord.
  */
@@ -64,10 +61,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid application." }, { status: 400 })
   }
   const a = parsed.data
-
-  if (!(await verifyTurnstile(a.turnstileToken, ip))) {
-    return NextResponse.json({ error: "Please complete the verification check and try again." }, { status: 400 })
-  }
 
   const { data: existing } = await supabaseAdmin.from("members").select("id").eq("email", a.email).maybeSingle()
   if (existing) {
