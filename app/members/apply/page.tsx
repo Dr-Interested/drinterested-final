@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import Cropper from "react-easy-crop"
 import TurnstileWidget, { turnstileConfigured } from "@/components/turnstile-widget"
 import { APPLY_DEPARTMENTS, APPLY_ROLES_BY_DEPARTMENT } from "@/lib/apply-options"
+import { errorMessage } from "@/lib/errors"
+import Link from "next/link"
 
 const DEPARTMENTS = APPLY_DEPARTMENTS
 const ROLES_BY_DEPARTMENT = APPLY_ROLES_BY_DEPARTMENT
@@ -67,6 +69,7 @@ export default function DbApplyPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
   const [turnstileReset, setTurnstileReset] = useState(0)
   const messageRef = useRef<HTMLDivElement>(null)
 
@@ -246,10 +249,8 @@ export default function DbApplyPage() {
       const result = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(result.error || "We couldn't submit your application. Please try again.")
 
-      setMessage({
-        type: "success",
-        text: "✓ Application submitted! Check your inbox (and spam folder) for an email to confirm your address. Once an admin approves your application you can sign in to the portal.",
-      })
+      setSubmittedEmail(newMember.email)
+      window.scrollTo({ top: 0, behavior: "smooth" })
       ;(e.target as HTMLFormElement).reset()
       setSelectedDepartment("")
       setSelectedRole("")
@@ -257,13 +258,75 @@ export default function DbApplyPage() {
       setConfirmPassword("")
       setFinalCroppedFile(null)
       setImageSrc(null)
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      setMessage({ type: "error", text: err.message || "Something went wrong. Please try again." })
+      setMessage({ type: "error", text: errorMessage(err) || "Something went wrong. Please try again." })
       setTurnstileReset((n) => n + 1)
     } finally {
       setLoading(false)
     }
+  }
+
+  // After a successful submit the form is replaced by this, so nobody can miss that the
+  // application still needs an admin's approval and that the approval arrives by email.
+  if (submittedEmail) {
+    const steps = [
+      {
+        title: "Confirm your email",
+        body: (
+          <>
+            We just sent a confirmation link to <strong className="break-all">{submittedEmail}</strong>. Click it so we
+            know the address is yours (check your spam folder if you don&apos;t see it).
+          </>
+        ),
+      },
+      {
+        title: "Wait for approval",
+        body: <>An admin reviews every application. Until it&apos;s approved, you won&apos;t be able to use the member portal.</>,
+      },
+      {
+        title: "Watch for your approval email",
+        body: (
+          <>
+            We&apos;ll email you as soon as your application is approved. Then you can sign in to the portal with this email
+            and the password you just chose.
+          </>
+        ),
+      },
+    ]
+    return (
+      <div className="container max-w-2xl py-12 mx-auto px-4">
+        <div role="status" className="bg-white border border-[#81c784] rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-[#e8f5e9] text-[#2e7d32] flex items-center justify-center text-2xl font-bold mb-4">
+            ✓
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Application received!</h1>
+          <p className="text-gray-600 mb-6">
+            Thanks for applying to Dr. Interested. <strong>Your application now needs to be approved by an admin</strong>, and
+            we&apos;ll email you once it is.
+          </p>
+          <ol className="space-y-4 mb-8">
+            {steps.map((step, i) => (
+              <li key={step.title} className="flex gap-3">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-[#4CAF7D] text-white text-sm font-bold flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <div>
+                  <p className="font-semibold text-[#1a1a1a]">{step.title}</p>
+                  <p className="text-sm text-gray-600">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <Link
+            href="/"
+            className="inline-block w-full sm:w-auto text-center px-6 py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors"
+          >
+            Back to the homepage
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -509,6 +572,11 @@ export default function DbApplyPage() {
         </div>
 
         <TurnstileWidget onToken={setTurnstileToken} resetKey={turnstileReset} />
+
+        <p className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-3">
+          After you apply, an admin reviews your application. <strong>We&apos;ll email you once it&apos;s approved</strong>, and
+          then you can sign in to the member portal.
+        </p>
 
         <Button
           type="submit"
