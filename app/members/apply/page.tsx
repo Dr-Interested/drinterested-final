@@ -1,41 +1,14 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { Button } from "@/components/ui/button"
 import Cropper from "react-easy-crop"
+import TurnstileWidget, { turnstileConfigured } from "@/components/turnstile-widget"
+import { APPLY_DEPARTMENTS, APPLY_ROLES_BY_DEPARTMENT } from "@/lib/apply-options"
 
-const DEPARTMENTS = [
-  "Admin Team",
-  "Medical Student Advisory Council",
-  "Marketing",
-  "Publications",
-  "HR",
-  "Events",
-  "Technology",
-  "Finance",
-  "Podcast",
-  "Ambassadors"
-]
-
-const ROLES_BY_DEPARTMENT: Record<string, string[]> = {
-  "Admin Team": [
-    "Deputy Executive Director",
-    "Executive Assistant"
-  ],
-  "Medical Student Advisory Council": [
-    "Chair of the Medical Student Advisory Council",
-    "Member of the Medical Student Advisory Council"
-  ],
-  "Marketing": ["Director", "Deputy Director", "Coordinator"],
-  "Publications": ["Director", "Deputy Director", "Coordinator"],
-  "HR": ["Director", "Deputy Director", "Coordinator"],
-  "Events": ["Director", "Deputy Director", "Coordinator"],
-  "Technology": ["Director", "Deputy Director", "Coordinator"],
-  "Finance": ["Director", "Deputy Director", "Coordinator"],
-  "Podcast": ["Deputy Director", "Member of Podcast"],
-  "Ambassadors": ["Deputy Director", "Organizational Ambassador"],
-}
+const DEPARTMENTS = APPLY_DEPARTMENTS
+const ROLES_BY_DEPARTMENT = APPLY_ROLES_BY_DEPARTMENT
 
 const getCroppedImg = async (imageSrc: string, pixelCrop: any): Promise<File> => {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -93,6 +66,15 @@ export default function DbApplyPage() {
   const [selectedRole, setSelectedRole] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileReset, setTurnstileReset] = useState(0)
+  const messageRef = useRef<HTMLDivElement>(null)
+
+  // The result message renders above the form, so on a phone (where Submit is far below) bring
+  // it into view, otherwise it looks like nothing happened.
+  useEffect(() => {
+    if (message) messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+  }, [message])
 
   // Cropper State
   const [imageSrc, setImageSrc] = useState<string | null>(null)
@@ -183,7 +165,7 @@ export default function DbApplyPage() {
       // crypto.randomUUID() is cryptographically secure — makes storage URLs unguessable
       const fileName = `${crypto.randomUUID()}.webp`
       
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("avatar")
         .upload(fileName, finalCroppedFile)
 
@@ -234,35 +216,35 @@ export default function DbApplyPage() {
       validateSocialUrl(newMember.socials.linkedin)
       validateSocialUrl(newMember.socials.instagram)
       
-      // Register credentials in Supabase Auth
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      if (turnstileConfigured && !turnstileToken) {
+        throw new Error("Please complete the verification check above the Submit button.")
+      }
+
+      // Register credentials in Supabase Auth. The confirmation email's link lands on the
+      // portal login rather than the homepage.
+      const { error: signUpError } = await supabase.auth.signUp({
         email: newMember.email,
         password: password,
+        options: { emailRedirectTo: `${window.location.origin}/dashboard?login=true` },
       })
 
       if (signUpError) {
-        throw new Error(`Authentication signup failed: ${signUpError.message}`)
+        throw new Error(`Account creation failed: ${signUpError.message}`)
       }
 
-      const { error } = await supabase.from("members").insert([newMember])
+      // The members row is validated and saved server-side (it also notifies staff on Discord).
+      const res = await fetch("/api/members/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...newMember, turnstileToken }),
+      })
+      const result = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(result.error || "We couldn't submit your application. Please try again.")
 
-      if (error) throw error
-
-      // Securely trigger the Discord webhook notification via our Next.js API route
-      try {
-        await fetch("/api/members/apply/notify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newMember),
-        })
-      } catch (notifyErr) {
-        // Log notification error but don't fail the user application submission UX
-        console.error("Discord notification failed to send:", notifyErr)
-      }
-
-      setMessage({ type: "success", text: "✓ Application submitted successfully! We'll review it soon." })
+      setMessage({
+        type: "success",
+        text: "✓ Application submitted! Check your inbox (and spam folder) for an email to confirm your address. Once an admin approves your application you can sign in to the portal.",
+      })
       ;(e.target as HTMLFormElement).reset()
       setSelectedDepartment("")
       setSelectedRole("")
@@ -272,7 +254,8 @@ export default function DbApplyPage() {
       setImageSrc(null)
     } catch (err: any) {
       console.error(err)
-      setMessage({ type: "error", text: `Error: ${err.message || "Invalid input"}` })
+      setMessage({ type: "error", text: err.message || "Something went wrong. Please try again." })
+      setTurnstileReset((n) => n + 1)
     } finally {
       setLoading(false)
     }
@@ -285,6 +268,8 @@ export default function DbApplyPage() {
 
       {message && (
         <div
+          ref={messageRef}
+          role={message.type === "error" ? "alert" : "status"}
           className={`p-4 rounded-lg mb-6 ${
             message.type === "success" ? "bg-[#e8f5e9] text-[#2e7d32] border border-[#81c784]" : "bg-[#ffebee] text-[#c62828] border border-[#ef5350]"
           }`}
@@ -336,6 +321,8 @@ export default function DbApplyPage() {
             type="text"
             id="name"
             name="name"
+            autoComplete="name"
+            maxLength={100}
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -347,6 +334,8 @@ export default function DbApplyPage() {
             type="email"
             id="email"
             name="email"
+            autoComplete="email"
+            autoCapitalize="none"
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -359,6 +348,7 @@ export default function DbApplyPage() {
               type="password"
               id="password"
               name="password"
+              autoComplete="new-password"
               required
               minLength={6}
               value={password}
@@ -373,6 +363,7 @@ export default function DbApplyPage() {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
+              autoComplete="new-password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -389,6 +380,9 @@ export default function DbApplyPage() {
             id="discord_username"
             name="discord_username"
             placeholder="e.g. username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            maxLength={40}
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -449,6 +443,8 @@ export default function DbApplyPage() {
             id="bio"
             name="bio"
             placeholder="Tell us about yourself, your interests, and what you'd like to contribute..."
+            minLength={10}
+            maxLength={2000}
             required
             className="w-full p-3 border border-gray-300 rounded-lg min-h-[100px] resize-y focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
           />
@@ -506,6 +502,8 @@ export default function DbApplyPage() {
             </div>
           </div>
         </div>
+
+        <TurnstileWidget onToken={setTurnstileToken} resetKey={turnstileReset} />
 
         <Button
           type="submit"

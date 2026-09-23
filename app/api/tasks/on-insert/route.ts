@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { sendEmail, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
+import { escapeHtml, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 
 export const dynamic = "force-dynamic"
 
@@ -31,11 +31,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
-  const task = payload?.record
-  if (!task?.id || !task?.assigned_to) {
+  // Only the id is taken from the payload; the task itself is re-read from the database. That
+  // way a forged request (e.g. if TASK_WEBHOOK_SECRET isn't set) can't choose the recipient
+  // or the email's content, only re-trigger a real task's own assignment email once.
+  const taskId = payload?.record?.id
+  if (!taskId) {
     return NextResponse.json({ skipped: "no task record" })
   }
-  if (task.status === "Completed" || task.assigned_email_sent_at) {
+  const { data: task } = await supabaseAdmin.from("tasks").select("*").eq("id", taskId).maybeSingle()
+  if (!task?.assigned_to) {
+    return NextResponse.json({ skipped: "task not found" })
+  }
+  if (["Completed", "Incomplete"].includes(task.status) || task.archived || task.assigned_email_sent_at) {
     return NextResponse.json({ skipped: "already handled" })
   }
 
@@ -45,26 +52,14 @@ export async function POST(request: Request) {
     .eq("email", String(task.assigned_to).toLowerCase())
     .maybeSingle()
 
-  const dueLine = task.due_date
-    ? `<p><strong>Due:</strong> ${new Date(task.due_date).toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })}</p>`
-    : ""
-
   const { sent, reason } = await sendEmail({
     to: task.assigned_to,
     subject: `New task assigned: ${task.title}`,
     html: taskEmailShell(
-      `Hi ${member?.name || "there"}, you've been assigned a task`,
-      `
-        <p><strong>${task.title}</strong></p>
-        ${task.description ? `<p>${task.description}</p>` : ""}
-        ${dueLine}
-      `,
-      taskPortalUrl(task.id)
+      `Hi ${escapeHtml(member?.name || "there")}, you've been assigned a task`,
+      taskDetailsHtml(task),
+      taskPortalUrl(task.id),
+      "View the Task"
     ),
   })
 

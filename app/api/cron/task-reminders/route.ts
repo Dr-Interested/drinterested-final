@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin"
-import { sendEmail, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
+import { escapeHtml, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 
 export const dynamic = "force-dynamic"
-
-const fmtDate = (d: string) =>
-  new Date(d).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
 
 /**
  * Runs once daily (see vercel.json). Uses the service-role client so it can see every task
@@ -94,13 +91,10 @@ export async function GET(request: Request) {
           to: assigneeEmail,
           subject: `New task assigned: ${task.title}`,
           html: taskEmailShell(
-            `Hi ${assigneeName || "there"}, you've been assigned a task`,
-            `
-              <p><strong>${task.title}</strong></p>
-              ${task.description ? `<p>${task.description}</p>` : ""}
-              ${task.due_date ? `<p><strong>Due:</strong> ${fmtDate(task.due_date)}</p>` : ""}
-            `,
-            taskPortalUrl(task.id)
+            `Hi ${escapeHtml(assigneeName || "there")}, you've been assigned a task`,
+            taskDetailsHtml(task),
+            taskPortalUrl(task.id),
+            "View the Task"
           ),
         })
 
@@ -134,19 +128,17 @@ export async function GET(request: Request) {
           to: assigneeEmail,
           subject: isToday ? `Due today: ${task.title}` : `Due tomorrow: ${task.title}`,
           html: taskEmailShell(
-            `Hi ${assigneeName || "there"}, ${isToday ? "a task is due today" : "a task is due tomorrow"}`,
-            `
-              <p><strong>${task.title}</strong></p>
-              ${task.description ? `<p>${task.description}</p>` : ""}
-              <p><strong>Due:</strong> ${new Date(task.due_date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
-            `,
-            taskPortalUrl(task.id)
+            `Hi ${escapeHtml(assigneeName || "there")}, ${isToday ? "a task is due today" : "a task is due tomorrow"}`,
+            taskDetailsHtml(task),
+            taskPortalUrl(task.id),
+            "View the Task"
           ),
         })
 
         if (sent) {
           await supabase.from("tasks").update({ [column]: new Date().toISOString() }).eq("id", task.id)
-          isToday ? results.dueToday++ : results.dayBefore++
+          if (isToday) results.dueToday++
+          else results.dayBefore++
         }
       }
     }

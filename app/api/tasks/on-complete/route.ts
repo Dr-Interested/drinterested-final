@@ -1,17 +1,10 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { sendEmail, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
+import { escapeHtml as esc, safeHttpUrl as safeUrl, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 import { isDeputyRole, isDirectorRole, LEADERSHIP_RANK, normalizeDepartmentName } from "@/lib/teams"
 import { OWNER_EMAILS } from "@/lib/owner"
 
 export const dynamic = "force-dynamic"
-
-const esc = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-
-// Only http(s) links are rendered as links, so a submitted "javascript:" URL can't end up
-// as a clickable href in a reviewer's inbox.
-const safeUrl = (u: string | null | undefined) => (u && /^https?:\/\//i.test(u.trim()) ? u.trim() : null)
 
 /**
  * Called by the portal (app/dashboard/page.tsx, handleSubmitTaskCompletion) right after a
@@ -91,14 +84,13 @@ export async function POST(request: Request) {
   const link = safeUrl(task.submission_url)
   const file = safeUrl(task.submission_file_url)
   const note = (task.submission_note || "").trim()
-  const dueLine = task.due_date
-    ? `<p><strong>Due:</strong> ${new Date(task.due_date).toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })}</p>`
-    : ""
+  const row = (label: string, value: string) =>
+    `<p style="margin:0 0 8px;"><strong>${label}:</strong> ${value}</p>`
+  const submission = [
+    link ? row("Link", `<a href="${esc(link)}" style="color:#4ecdc4;word-break:break-all;">${esc(link)}</a>`) : "",
+    file ? row("File", `<a href="${esc(file)}" style="color:#4ecdc4;">Download the attached file</a>`) : "",
+    note ? `<p style="margin:0 0 4px;"><strong>Notes:</strong></p><p style="margin:0;white-space:pre-line;">${esc(note)}</p>` : "",
+  ].join("")
 
   const { sent, reason } = await sendEmail({
     to,
@@ -107,17 +99,16 @@ export async function POST(request: Request) {
     html: taskEmailShell(
       `${esc(completerName)} completed a task`,
       `
-        <p><strong>${esc(task.title)}</strong></p>
-        ${task.description ? `<p>${esc(task.description)}</p>` : ""}
-        ${dueLine}
-        <p><strong>Completed by:</strong> ${esc(completerName)}${dept ? ` (${esc(dept)}${team ? ` / ${esc(team)}` : ""})` : ""}</p>
-        ${link ? `<p><strong>Link:</strong> <a href="${esc(link)}" style="color:#4ecdc4;">${esc(link)}</a></p>` : ""}
-        ${note ? `<p><strong>Notes:</strong><br/>${esc(note).replace(/\n/g, "<br/>")}</p>` : ""}
-        ${file ? `<p><strong>File:</strong> <a href="${esc(file)}" style="color:#4ecdc4;">Download the attached file</a></p>` : ""}
-        ${!link && !note && !file ? `<p style="color:#888;">Nothing was attached to this submission.</p>` : ""}
-        <p style="color:#888;font-size:13px;">Review it in the portal. Whoever assigned the task marks it Received there, which starts its archive clock.</p>
+        ${taskDetailsHtml(task)}
+        ${row("Completed by", `${esc(completerName)}${dept ? ` (${esc(dept)}${team ? ` / ${esc(team)}` : ""})` : ""}`)}
+        <div style="margin:16px 0 0;padding:14px 16px;background:#f0fbfa;border:1px solid #c8efec;border-radius:8px;">
+          <p style="margin:0 0 8px;font-weight:600;">What they submitted</p>
+          ${submission || `<p style="margin:0;color:#888;">Nothing was attached to this submission.</p>`}
+        </div>
+        <p style="color:#888;font-size:13px;margin:16px 0 0;">Review it in the portal. Whoever assigned the task marks it Received there, which starts its archive clock.</p>
       `,
       taskPortalUrl(task.id, "tasks"),
+      "Review in the Portal",
     ),
   })
 

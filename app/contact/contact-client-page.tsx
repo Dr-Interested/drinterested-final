@@ -25,6 +25,7 @@ import {
   Twitter
 } from "lucide-react"
 import SeoSchema from "@/components/seo-schema"
+import TurnstileWidget, { turnstileConfigured } from "@/components/turnstile-widget"
 import { motion } from "framer-motion"
 
 export default function ContactClientPage() {
@@ -37,6 +38,9 @@ export default function ContactClientPage() {
 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isSending, setIsSending] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileReset, setTurnstileReset] = useState(0)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -45,6 +49,13 @@ export default function ContactClientPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSending) return
+    if (turnstileConfigured && !turnstileToken) {
+      setSubmitError("Please complete the verification check above the Send button.")
+      return
+    }
+    setIsSending(true)
+    setSubmitError(null)
 
     // Prepare the data for submission
     const formDataToSend = new FormData()
@@ -80,7 +91,7 @@ export default function ContactClientPage() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify({ ...formData, turnstileToken }),
           })
         } catch (notifyErr) {
           console.error("Discord contact notification failed:", notifyErr)
@@ -95,6 +106,9 @@ export default function ContactClientPage() {
     } catch (error) {
       console.error("Error:", error)
       setSubmitError("There was an error submitting the form. Please try again.")
+    } finally {
+      setIsSending(false)
+      setTurnstileReset((n) => n + 1)
     }
   }
 
@@ -343,6 +357,8 @@ export default function ContactClientPage() {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Your name"
+                    autoComplete="name"
+                    maxLength={100}
                     required
                     className="border-[#405862]/20 focus:border-[#4ecdc4] h-9 text-sm"
                   />
@@ -359,6 +375,8 @@ export default function ContactClientPage() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="your.email@example.com"
+                    autoComplete="email"
+                    autoCapitalize="none"
                     required
                     className="border-[#405862]/20 focus:border-[#4ecdc4] h-9 text-sm"
                   />
@@ -374,6 +392,7 @@ export default function ContactClientPage() {
                     value={formData.subject}
                     onChange={handleChange}
                     placeholder="What is this regarding?"
+                    maxLength={200}
                     required
                     className="border-[#405862]/20 focus:border-[#4ecdc4] h-9 text-sm"
                   />
@@ -390,27 +409,30 @@ export default function ContactClientPage() {
                     onChange={handleChange}
                     placeholder="How can we help you?"
                     rows={4}
+                    maxLength={5000}
                     required
                     className="border-[#405862]/20 focus:border-[#4ecdc4] text-sm resize-none"
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-[#405862] hover:bg-[#334852] group">
-                  <span>Send Message</span>
+                <TurnstileWidget onToken={setTurnstileToken} resetKey={turnstileReset} />
+
+                <Button type="submit" disabled={isSending} className="w-full bg-[#405862] hover:bg-[#334852] group disabled:opacity-70">
+                  <span>{isSending ? "Sending..." : "Send Message"}</span>
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Button>
               </form>
 
               {/* Show success message */}
               {isSubmitted && (
-                <div className="mt-4 p-3 text-center text-green-600 bg-green-50 rounded-lg border border-green-200">
+                <div role="status" className="mt-4 p-3 text-center text-green-600 bg-green-50 rounded-lg border border-green-200">
                   <p className="text-sm font-medium">Message sent successfully! We will get back to you soon.</p>
                 </div>
               )}
 
               {/* Show error message */}
               {submitError && (
-                <div className="mt-4 p-3 text-center text-red-600 bg-red-50 rounded-lg border border-red-200">
+                <div role="alert" className="mt-4 p-3 text-center text-red-600 bg-red-50 rounded-lg border border-red-200">
                   <p className="text-sm font-medium">{submitError}</p>
                 </div>
               )}
