@@ -118,6 +118,11 @@ export default function DbApplyPage() {
 
     const formData = new FormData(e.currentTarget)
 
+    if (password.length < 8) {
+      setMessage({ type: "error", text: "Password must be at least 8 characters." })
+      setLoading(false)
+      return
+    }
     if (password !== confirmPassword) {
       setMessage({ type: "error", text: "Passwords do not match." })
       setLoading(false)
@@ -350,11 +355,11 @@ export default function DbApplyPage() {
               name="password"
               autoComplete="new-password"
               required
-              minLength={6}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] focus:border-transparent transition-all"
-              placeholder="Min. 6 characters"
+              placeholder="Min. 8 characters"
             />
           </div>
           <div>

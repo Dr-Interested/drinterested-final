@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
-import { Loader2, X, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar, ChevronRight } from "lucide-react"
+import { Loader2, X, Eye, EyeOff, Clock, Play, Square, Award, FileText, CheckCircle2, User, ExternalLink, Trash, Edit, Check, Calendar, ChevronRight } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import EventsAdmin from "./EventsAdmin"
 import WebinarsAdmin from "./WebinarsAdmin"
 import ReactMarkdown from "react-markdown"
@@ -158,6 +159,24 @@ function resolveAccess(member: Member | null, userEmail: string | undefined): Ac
   return { level: "member", tabs: [], department, team }
 }
 
+// Supabase Auth's raw error strings are terse ("Signups not allowed for otp", "For security
+// purposes, you can only request this after 42 seconds") — map the common ones to plain help.
+function friendlyAuthError(message: string | undefined, fallback: string): string {
+  const m = (message || "").toLowerCase()
+  if (!m) return fallback
+  if (m.includes("rate limit") || m.includes("for security purposes") || m.includes("too many"))
+    return "Too many attempts. Please wait a minute and try again."
+  if (m.includes("signups not allowed") || m.includes("user not found"))
+    return "We couldn't find a portal account for that email. Use the email you applied with."
+  if (m.includes("token has expired") || (m.includes("invalid") && m.includes("token")) || m.includes("otp"))
+    return "That code is incorrect or has expired. Request a new code and try again."
+  if (m.includes("email not confirmed"))
+    return "Your email hasn't been confirmed yet. Check your inbox (and spam folder) for the confirmation link, or contact an admin."
+  if (m.includes("failed to fetch") || m.includes("network"))
+    return "Couldn't reach the server. Check your connection and try again."
+  return message || fallback
+}
+
 type Task = {
   id: string
   title: string
@@ -190,6 +209,7 @@ export default function DbAdminPage() {
   const [isSendingOtp, setIsSendingOtp] = useState(false)
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
   const [isSsoLoading, setIsSsoLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(true)
   const [googleDriveUrl, setGoogleDriveUrl] = useState("https://drive.google.com/drive/folders/1-xwckNS2TWLPFjFuBNvpGgct43Bz4dvP?usp=drive_link")
   const [isSavingUrl, setIsSavingUrl] = useState(false)
@@ -486,7 +506,21 @@ export default function DbAdminPage() {
       }
       fetchStats()
     }
-  }, [isAuthenticated, isHrOrAdmin, activeMainTab, visibleTabs])
+  }, [isAuthenticated, isHrOrAdmin, activeMainTab, visibleTabs, currentUser?.email])
+
+  // A ?tab= deep link (or a tab left over from a previous role) that this person can't open
+  // would otherwise render an empty page — fall back to My Tasks.
+  useEffect(() => {
+    if (loading || !isAuthenticated || !currentUser) return
+    const available =
+      ["mytasks", "shared", "settings"].includes(activeMainTab) ||
+      (activeMainTab === "directory" && canSeeDirectory) ||
+      (activeMainTab === "attendance" && canSeeAttendance) ||
+      (activeMainTab === "strikes" && canSeeStrikesTab) ||
+      (activeMainTab === "admin" && isHrOrAdmin && visibleTabs.includes("members")) ||
+      (isHrOrAdmin && visibleTabs.includes(activeMainTab))
+    if (!available) setActiveMainTab("mytasks")
+  }, [loading, isAuthenticated, currentUser, activeMainTab, canSeeDirectory, canSeeAttendance, canSeeStrikesTab, isHrOrAdmin, visibleTabs])
 
   const fetchStats = async () => {
     try {
@@ -690,10 +724,10 @@ export default function DbAdminPage() {
     setIsLoggingIn(true)
     setAuthError(false)
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    // Phones often autocomplete a trailing space or a capital letter into the email field.
+    const { error } = await supabase.auth
+      .signInWithPassword({ email: email.trim().toLowerCase(), password })
+      .catch((err) => ({ error: err as Error }))
 
     setIsLoggingIn(false)
 
@@ -702,11 +736,12 @@ export default function DbAdminPage() {
       // confirmation email never arrived/was clicked) looks identical to a typo'd password
       // otherwise, and sends people into a forgot-password loop that can't fix an unconfirmed
       // account either.
-      if (error.message.toLowerCase().includes("email not confirmed")) {
-        setAuthError("Your email hasn't been confirmed yet. Check your inbox (and spam folder) for the confirmation link, or contact an admin.")
-      } else {
-        setAuthError("Invalid email or password.")
-      }
+      const m = error.message.toLowerCase()
+      setAuthError(
+        m.includes("invalid login credentials")
+          ? "Invalid email or password."
+          : friendlyAuthError(error.message, "Invalid email or password."),
+      )
     } else {
       // portal-session cookie is set by the auth-state-change listener above once the
       // session lands — no need to duplicate that here.
@@ -720,13 +755,13 @@ export default function DbAdminPage() {
     setIsSendingReset(true)
     setResetError(false)
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
         redirectTo: `${window.location.origin}/dashboard/reset-password`,
       })
       if (error) throw error
       setResetSent(true)
     } catch (err: any) {
-      setResetError(err.message || "Couldn't send the reset email. Try again.")
+      setResetError(friendlyAuthError(err?.message, "Couldn't send the reset email. Try again."))
     } finally {
       setIsSendingReset(false)
     }
@@ -746,13 +781,14 @@ export default function DbAdminPage() {
     setOtpError(false)
     try {
       const { error } = await supabase.auth.signInWithOtp({
-        email,
+        email: email.trim().toLowerCase(),
         options: { shouldCreateUser: false },
       })
       if (error) throw error
       setOtpSent(true)
+      setOtpCode("")
     } catch (err: any) {
-      setOtpError(err.message || "Couldn't send the code. Try again.")
+      setOtpError(friendlyAuthError(err?.message, "Couldn't send the code. Try again."))
     } finally {
       setIsSendingOtp(false)
     }
@@ -763,11 +799,15 @@ export default function DbAdminPage() {
     setIsVerifyingOtp(true)
     setOtpError(false)
     try {
-      const { error } = await supabase.auth.verifyOtp({ email, token: otpCode, type: "email" })
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim().toLowerCase(),
+        token: otpCode.replace(/\D/g, ""),
+        type: "email",
+      })
       if (error) throw error
       // Success signs the user in — same auto-unmount-via-listener as above.
     } catch (err: any) {
-      setOtpError(err.message || "Invalid or expired code.")
+      setOtpError(friendlyAuthError(err?.message, "Invalid or expired code."))
     } finally {
       setIsVerifyingOtp(false)
     }
@@ -1005,8 +1045,10 @@ export default function DbAdminPage() {
   // Render Login Modal if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] relative">
+      <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto">
+        <div className="min-h-full flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl p-6 sm:p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] relative">
+          <Image src="/circle-logo.png" alt="Dr. Interested" width={44} height={44} className="rounded-full mb-4" priority />
           <Link
             href="/"
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -1023,15 +1065,27 @@ export default function DbAdminPage() {
               </p>
 
               {resetSent ? (
-                <div className="bg-[#e8f5e9] text-[#2e7d32] border border-[#81c784] rounded-lg p-4 text-sm">
-                  Check your inbox for a reset link. It may take a minute to arrive.
+                <div role="status" className="bg-[#e8f5e9] text-[#2e7d32] border border-[#81c784] rounded-lg p-4 text-sm space-y-2">
+                  <p>
+                    If <strong className="break-all">{email.trim()}</strong> has a portal account, a reset link is on its way.
+                    It can take a few minutes, so check your spam folder too.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setResetSent(false)}
+                    className="text-xs font-semibold underline hover:no-underline"
+                  >
+                    Didn&apos;t get it? Send again
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleForgotPassword}>
-                  {resetError && <p className="text-[#c62828] text-sm mb-4">{resetError}</p>}
+                  {resetError && <p role="alert" className="text-[#c62828] text-sm mb-4">{resetError}</p>}
                   <input
                     type="email"
                     placeholder="Email address"
+                    autoComplete="email"
+                    autoCapitalize="none"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4"
@@ -1070,10 +1124,12 @@ export default function DbAdminPage() {
                     Enter your email — we&apos;ll send you a 6-digit one-time code instead of using your password.
                   </p>
                   <form onSubmit={handleSendOtp}>
-                    {otpError && <p className="text-[#c62828] text-sm mb-4">{otpError}</p>}
+                    {otpError && <p role="alert" className="text-[#c62828] text-sm mb-4">{otpError}</p>}
                     <input
                       type="email"
                       placeholder="Email address"
+                      autoComplete="email"
+                      autoCapitalize="none"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4"
@@ -1093,17 +1149,21 @@ export default function DbAdminPage() {
               ) : (
                 <>
                   <p className="text-sm text-gray-500 mb-6">
-                    Enter the 6-digit code we emailed to {email}.
+                    Enter the code we emailed to <strong className="break-all text-gray-700">{email.trim()}</strong>. It can take a
+                    minute to arrive, so check your spam folder too.
                   </p>
                   <form onSubmit={handleVerifyOtp}>
-                    {otpError && <p className="text-[#c62828] text-sm mb-4">{otpError}</p>}
+                    {otpError && <p role="alert" className="text-[#c62828] text-sm mb-4">{otpError}</p>}
                     <input
                       type="text"
                       inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="[0-9]*"
+                      maxLength={10}
                       placeholder="6-digit code"
                       value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4 tracking-widest"
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-4 tracking-[0.4em] text-center text-lg"
                       autoFocus
                       required
                     />
@@ -1116,6 +1176,27 @@ export default function DbAdminPage() {
                       Verify & Sign In
                     </button>
                   </form>
+                  <div className="flex items-center justify-between mt-3 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOtpSent(false)
+                        setOtpError(false)
+                        setOtpCode("")
+                      }}
+                      className="text-gray-500 hover:text-[#4CAF7D]"
+                    >
+                      Use a different email
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleSendOtp(e as unknown as React.FormEvent)}
+                      disabled={isSendingOtp}
+                      className="text-gray-500 hover:text-[#4CAF7D] disabled:opacity-60"
+                    >
+                      {isSendingOtp ? "Sending…" : "Resend code"}
+                    </button>
+                  </div>
                 </>
               )}
 
@@ -1136,13 +1217,15 @@ export default function DbAdminPage() {
               <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">Portal Login</h2>
 
               {authError && (
-                <p className="text-[#c62828] text-sm mb-4">{authError}</p>
+                <p role="alert" className="text-[#c62828] text-sm mb-4">{authError}</p>
               )}
 
               <form onSubmit={handleLogin}>
                 <input
                   type="email"
                   placeholder="Email address"
+                  autoComplete="username"
+                  autoCapitalize="none"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value)
@@ -1152,29 +1235,46 @@ export default function DbAdminPage() {
                   autoFocus
                   required
                 />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value)
-                    setAuthError(false)
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D] mb-1"
-                  required
-                />
-                <div className="flex items-center justify-between mb-4">
+                <div className="relative mb-1">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      setAuthError(false)
+                    }}
+                    className="w-full p-3 pr-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
+                    required
+                  />
                   <button
                     type="button"
-                    onClick={() => setAuthView("forgot")}
-                    className="text-xs text-gray-500 hover:text-[#4CAF7D]"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-gray-600"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthView("forgot")
+                      setAuthError(false)
+                    }}
+                    className="text-xs text-gray-500 hover:text-[#4CAF7D] py-1"
                   >
                     Forgot password?
                   </button>
                   <button
                     type="button"
-                    onClick={() => setAuthView("otp")}
-                    className="text-xs text-gray-500 hover:text-[#4CAF7D]"
+                    onClick={() => {
+                      setAuthView("otp")
+                      setAuthError(false)
+                    }}
+                    className="text-xs text-gray-500 hover:text-[#4CAF7D] py-1"
                   >
                     Sign in with a code instead
                   </button>
@@ -1185,7 +1285,7 @@ export default function DbAdminPage() {
                   className="w-full py-3 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                 >
                   {isLoggingIn && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Login
+                  Sign In
                 </button>
               </form>
 
@@ -1230,6 +1330,7 @@ export default function DbAdminPage() {
             </>
           )}
         </div>
+        </div>
       </div>
     )
   }
@@ -1239,11 +1340,12 @@ export default function DbAdminPage() {
   // dashboard content; hand them straight back to the apply flow.
   if (!loading && accessLevel === "none") {
     return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white rounded-xl p-6 sm:p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
           <h2 className="text-xl font-bold font-bricolage mb-2 text-[#1a1a1a]">No Account Found</h2>
           <p className="text-sm text-gray-500 mb-6">
-            {currentUser?.email} isn&apos;t linked to a Dr. Interested member profile yet.
+            <strong className="break-all text-gray-700">{currentUser?.email}</strong> isn&apos;t linked to a Dr.
+            Interested member profile yet. If you applied with a different email, sign out and sign in with that one.
           </p>
           <Link
             href="/members/apply"
@@ -1266,8 +1368,8 @@ export default function DbAdminPage() {
   // dashboard content (including admin tabs their self-reported role/department might imply).
   if (!loading && accessLevel === "pending") {
     return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white rounded-xl p-6 sm:p-8 w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center">
           <h2 className="text-xl font-bold font-bricolage mb-2 text-[#1a1a1a]">Application Pending</h2>
           <p className="text-sm text-gray-500 mb-6">
             Thanks for applying! Your application is still under review by an admin. You&apos;ll be able to
