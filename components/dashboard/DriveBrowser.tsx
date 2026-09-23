@@ -404,7 +404,7 @@ export default function DriveBrowser() {
   }, [selectedIds, clipboard, currentFolderId, items])
 
   return (
-    <div ref={containerRef} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+    <div ref={containerRef} className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
       <h3 className="font-bold text-lg mb-4">Browse Team Drive</h3>
 
       <div className="flex items-center gap-1 flex-wrap text-sm mb-4 text-gray-500">

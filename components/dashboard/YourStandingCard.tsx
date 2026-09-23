@@ -49,7 +49,7 @@ export default function YourStandingCard() {
 
   if (loading) {
     return (
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center gap-3 text-gray-400 max-w-2xl">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center gap-3 text-gray-400 max-w-2xl">
         <Loader2 className="w-5 h-5 animate-spin" /> Loading your standing…
       </div>
     )
@@ -59,7 +59,7 @@ export default function YourStandingCard() {
   const count = active.length
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm max-w-2xl">
+    <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm max-w-2xl">
       <div className="flex items-center gap-3 mb-3">
         {count === 0 ? (
           <ShieldCheck className="w-5 h-5 text-[#4CAF7D]" />

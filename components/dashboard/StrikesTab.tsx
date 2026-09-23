@@ -186,7 +186,7 @@ export default function StrikesTab({ myEmail }: { myEmail: string }) {
                 </div>
 
                 {expanded === member.id && (
-                  <ul className="mt-3 space-y-2 pl-12">
+                  <ul className="mt-3 space-y-2 pl-2 sm:pl-12">
                     {active.map((s) => (
                       <li key={s.id} className="flex items-start gap-2 text-sm">
                         <div className="flex-1">

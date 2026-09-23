@@ -20,7 +20,9 @@ import TasksAdminTab from "@/components/dashboard/TasksAdminTab"
 import YourStandingCard from "@/components/dashboard/YourStandingCard"
 import { PRESET_ROLES, subteamsFor } from "@/lib/teams"
 import { OWNER_EMAILS } from "@/lib/owner"
+import { formatDateOnly, isPastDue } from "@/lib/dates"
 import TaskFileUploadField from "@/components/dashboard/TaskFileUploadField"
+import LinkifyText from "@/components/linkify-text"
 
 type Member = {
   id: string
@@ -881,6 +883,20 @@ export default function DbAdminPage() {
       const { error } = await supabase.from("members").update({ approved: true }).eq("id", id)
       if (error) throw error
       fetchMembers()
+      // Fire-and-forget welcome email so the new member knows they can sign in now.
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) =>
+          fetch("/api/members/on-approve", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+            },
+            body: JSON.stringify({ memberId: id }),
+          }),
+        )
+        .catch((err) => console.error("Approval email failed:", err))
     } catch (error) {
       console.error(error)
       alert("Failed to approve.")
@@ -1417,16 +1433,16 @@ export default function DbAdminPage() {
   ]
 
   return (
-    <div className="container max-w-6xl mx-auto py-12 px-4 relative">
+    <div className="container max-w-6xl mx-auto py-6 sm:py-12 px-4 relative">
       <PortalFirstVisitPrompts />
 
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-gray-100 pb-6">
         <div>
-          <h1 className="text-3xl font-bold font-bricolage text-[#1a1a1a]">
+          <h1 className="text-2xl sm:text-3xl font-bold font-bricolage text-[#1a1a1a]">
             {accessLevel === "owner"
               ? "Owner Control Center"
-              : accessLevel === "director"
+              : accessLevel === "director" || accessLevel === "deputy"
                 ? `${currentMemberProfile?.department || "Director"} Panel`
                 : "Member Portal"}
           </h1>
@@ -1453,7 +1469,7 @@ export default function DbAdminPage() {
             onClick={handleLogout}
             className="text-[#c62828] hover:text-[#a01a1a] font-semibold border border-red-200 hover:border-red-400 bg-red-50/50 hover:bg-red-50 px-4 py-2 rounded-lg transition-all text-sm"
           >
-            Sign Out Portal
+            Sign Out
           </button>
         </div>
       </div>
@@ -1462,22 +1478,22 @@ export default function DbAdminPage() {
       {isHrOrAdmin ? (
         <>
           {/* Dashboard Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Approved Members</p>
-              <p className="text-3xl font-bold text-[#1a1a1a]">{stats.approvedMembers}</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Approved Members</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#1a1a1a]">{stats.approvedMembers}</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Pending Applications</p>
-              <p className="text-3xl font-bold text-[#c62828]">{stats.pendingMembers}</p>
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Pending Applications</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#c62828]">{stats.pendingMembers}</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Published Blogs</p>
-              <p className="text-3xl font-bold text-[#4CAF7D]">{stats.publishedBlogs}</p>
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Published Blogs</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#4CAF7D]">{stats.publishedBlogs}</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
-              <p className="text-gray-500 text-sm font-medium mb-1">Total Events</p>
-              <p className="text-3xl font-bold text-blue-600">{stats.totalEvents}</p>
+            <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Total Events</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.totalEvents}</p>
             </div>
           </div>
 
@@ -1514,15 +1530,17 @@ export default function DbAdminPage() {
             <div
               key={task.id}
               id={`task-${task.id}`}
-              className={`p-4 border rounded-xl transition-colors flex items-start gap-3 ${
-                isDeepLinked ? "border-[#4ecdc4] ring-2 ring-[#4ecdc4]/40" : "border-gray-150 hover:border-gray-300"
+              className={`p-3 sm:p-4 border rounded-xl transition-colors flex items-start gap-3 ${
+                isDeepLinked ? "border-[#4ecdc4] ring-2 ring-[#4ecdc4]/40" : "border-gray-200 hover:border-gray-300"
               }`}
             >
               <div className="flex items-start gap-3 min-w-0 flex-1">
                 <button
                   onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
                   disabled={task.status === "Incomplete"}
-                  className={`mt-1 flex-shrink-0 transition-transform active:scale-95 ${task.status === "Completed" ? "text-green-500" : task.status === "Incomplete" ? "text-gray-300 cursor-default" : "text-gray-300 hover:text-gray-400"}`}
+                  aria-label={task.status === "Completed" ? "Reopen task" : task.status === "In Progress" ? "Mark complete" : "Mark in progress"}
+                  title={task.status === "Completed" ? "Reopen task" : task.status === "In Progress" ? "Mark complete" : "Mark in progress"}
+                  className={`mt-1 flex-shrink-0 p-1 -m-1 transition-transform active:scale-95 ${task.status === "Completed" ? "text-green-500" : task.status === "Incomplete" ? "text-gray-300 cursor-default" : "text-gray-300 hover:text-gray-400"}`}
                 >
                   <CheckCircle2 className="w-5 h-5" />
                 </button>
@@ -1531,14 +1549,16 @@ export default function DbAdminPage() {
                     {task.title}
                   </h3>
                   {task.description && (
-                    <p className={`text-sm mt-1 break-words ${isDone ? "text-gray-300" : "text-gray-500"}`}>{task.description}</p>
+                    <p className={`text-sm mt-1 break-words whitespace-pre-line ${isDone ? "text-gray-400" : "text-gray-600"}`}>
+                      <LinkifyText text={task.description} />
+                    </p>
                   )}
                   {task.status === "Incomplete" && (
                     <p className="text-xs text-gray-400 mt-1 italic">Closed by a director — no longer needs to be done.</p>
                   )}
                   {task.due_date && (
-                    <span className={`inline-block text-[0.75rem] font-bold mt-2 px-2 py-0.5 rounded ${new Date(task.due_date) < new Date() && !isDone ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"}`}>
-                      Due {new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    <span className={`inline-block text-[0.75rem] font-bold mt-2 px-2 py-0.5 rounded ${isPastDue(task.due_date) && !isDone ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"}`}>
+                      {isPastDue(task.due_date) && !isDone ? "Overdue · " : ""}Due {formatDateOnly(task.due_date)}
                     </span>
                   )}
                   {task.status === "Pending" && (
@@ -1552,10 +1572,18 @@ export default function DbAdminPage() {
                       </button>
                     </div>
                   )}
+                  {task.status === "In Progress" && (
+                    <button
+                      onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
+                      className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[#4CAF7D] hover:bg-[#2d8659] px-3 py-1.5 text-xs font-semibold text-white"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Submit &amp; Mark Complete
+                    </button>
+                  )}
                   {task.status === "Completed" && (task.submission_url || task.submission_file_url || task.submission_note || task.time_spent_minutes) && (
-                    <div className="text-xs text-gray-400 mt-2 space-y-1">
+                    <div className="text-xs text-gray-500 mt-2 space-y-1">
                       {task.submission_note && <p className="whitespace-pre-wrap break-words">{task.submission_note}</p>}
-                      <p className="space-x-2">
+                      <p className="flex flex-wrap gap-x-3 gap-y-1">
                         {task.time_spent_minutes ? <span>{Math.round(task.time_spent_minutes / 6) / 10} hrs logged</span> : null}
                         {task.submission_url && (
                           <a href={task.submission_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
@@ -1583,9 +1611,9 @@ export default function DbAdminPage() {
           )
         }
         return (
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-xl font-bold font-bricolage mb-6 text-[#1a1a1a] flex items-center gap-2">
-            <FileText className="text-[#4CAF7D] w-5 h-5" /> Assigned Tasks Checklist
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <h2 className="text-xl font-bold font-bricolage mb-4 sm:mb-6 text-[#1a1a1a] flex items-center gap-2">
+            <FileText className="text-[#4CAF7D] w-5 h-5" /> My Tasks
           </h2>
 
           {myTasks.length === 0 ? (
@@ -1625,7 +1653,7 @@ export default function DbAdminPage() {
           <DriveBrowser />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center mb-4">
                   <Calendar className="w-6 h-6" />
@@ -1653,7 +1681,7 @@ export default function DbAdminPage() {
               )}
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4">
                   <Clock className="w-6 h-6" />
@@ -1732,7 +1760,7 @@ export default function DbAdminPage() {
           {/* Site-wide links (Drive folder, shared calendar) — true-owner-only (not Admin Team
               leadership), since these apply org-wide, not just to HR. Now on their own Admin tab. */}
           {userIsTrueOwner && activeMainTab === "admin" && (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Configure Portal Links</h3>
               <p className="text-xs text-gray-500 mb-4">
                 These links are shown to every member on the Resources tab of their portal.
@@ -1790,7 +1818,7 @@ export default function DbAdminPage() {
               Sign in as whichever Google account already owns the shared Drive folder to skip
               re-sharing it. */}
           {userIsTrueOwner && activeMainTab === "admin" && (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Google Drive Connection</h3>
               <p className="text-xs text-gray-500 mb-4">
                 New folders/Docs/Sheets/Forms, template copies, and uploads made in the Drive
@@ -1817,7 +1845,7 @@ export default function DbAdminPage() {
               browser copies this file instead of creating a blank one, so new files start from
               the org's house template. Falls back to a blank file if left empty. */}
           {userIsTrueOwner && activeMainTab === "admin" && (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm mb-8">
               <h3 className="text-lg font-bold font-bricolage mb-1.5 text-[#1a1a1a]">Drive "New" Templates</h3>
               <p className="text-xs text-gray-500 mb-4">
                 Paste the link to an existing Doc/Sheet/Slides/Form to use as the template. When a
@@ -1857,10 +1885,10 @@ export default function DbAdminPage() {
 
           {activeMainTab === "members" && (
           <>
-          <div className="flex gap-4 border-b-2 border-gray-200 mb-8 overflow-x-auto">
+          <div className="flex gap-1 sm:gap-4 border-b-2 border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab("pending")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 font-medium text-[0.95rem] whitespace-nowrap border-b-4 transition-colors -mb-[2px] ${
                 activeTab === "pending"
                   ? "text-[#4CAF7D] border-[#4CAF7D]"
                   : "text-gray-500 border-transparent hover:text-[#4CAF7D]"
@@ -1873,7 +1901,7 @@ export default function DbAdminPage() {
             </button>
             <button
               onClick={() => setActiveTab("approved")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 font-medium text-[0.95rem] whitespace-nowrap border-b-4 transition-colors -mb-[2px] ${
                 activeTab === "approved"
                   ? "text-[#4CAF7D] border-[#4CAF7D]"
                   : "text-gray-500 border-transparent hover:text-[#4CAF7D]"
@@ -1886,7 +1914,7 @@ export default function DbAdminPage() {
             </button>
             <button
               onClick={() => setActiveTab("archived")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-[0.95rem] border-b-4 transition-colors -mb-[2px] ${
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 font-medium text-[0.95rem] whitespace-nowrap border-b-4 transition-colors -mb-[2px] ${
                 activeTab === "archived"
                   ? "text-[#4CAF7D] border-[#4CAF7D]"
                   : "text-gray-500 border-transparent hover:text-[#4CAF7D]"
@@ -1909,12 +1937,13 @@ export default function DbAdminPage() {
               No {activeTab} members
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {displayMembers.map((member) => (
                 <div key={member.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
                   <img
                     src={member.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22280%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22280%22 height=%22200%22/%3E%3C/svg%3E"}
                     alt={member.name}
+                    loading="lazy"
                     className="w-full h-[200px] object-cover bg-gray-100"
                   />
                   <div className="p-5 flex flex-col flex-grow">
@@ -2003,7 +2032,7 @@ export default function DbAdminPage() {
       {/* 7. Original Blogs Tab */}
       {isHrOrAdmin && visibleTabs.includes("blogs") && activeMainTab === "blogs" && (
         <>
-          <div className="flex justify-between items-center border-b-2 border-gray-200 pb-4 mb-8">
+          <div className="flex flex-wrap gap-3 justify-between items-center border-b-2 border-gray-200 pb-4 mb-6 sm:mb-8">
             <h2 className="text-xl font-semibold text-gray-800">Published Blogs</h2>
             <button
               onClick={() => {
@@ -2030,7 +2059,7 @@ export default function DbAdminPage() {
               {blogs.map((blog) => (
                 <div key={blog.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
                   <div className="relative h-[200px] w-full bg-gray-100">
-                    <img src={blog.cover_image || "/placeholder.svg"} className="w-full h-full object-cover" />
+                    <img src={blog.cover_image || "/placeholder.svg"} alt="" loading="lazy" className="w-full h-full object-cover" />
                   </div>
                   <div className="p-5 flex flex-col flex-grow">
                     <div className="text-xs text-gray-500 mb-2">{new Date(blog.created_at).toLocaleDateString()} • {blog.reading_time}</div>
@@ -2073,7 +2102,7 @@ export default function DbAdminPage() {
       {/* Task Completion Modal — captures the actual work (link / note / file). */}
       {completingTask && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-white rounded-xl p-5 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
             <h2 className="text-xl font-bold font-bricolage mb-1 text-[#1a1a1a]">Mark as Complete</h2>
             <p className="text-sm text-gray-500 mb-6">{completingTask.title}</p>
             <form onSubmit={handleSubmitTaskCompletion} className="space-y-4">
@@ -2136,7 +2165,7 @@ export default function DbAdminPage() {
       {/* Edit Member Modal */}
       {editingMember && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-white rounded-xl p-5 sm:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">Edit Member</h2>
             <div className="space-y-4">
               <div>
@@ -2293,7 +2322,7 @@ export default function DbAdminPage() {
       {/* Edit/Create Blog Modal */}
       {(isCreatingBlog || editingBlog) && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-white rounded-xl p-5 sm:p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <h2 className="text-2xl font-bold font-bricolage mb-6 text-[#1a1a1a]">
               {isCreatingBlog ? "Write New Blog" : "Edit Blog"}
             </h2>

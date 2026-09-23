@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
+import { formatDateOnly, todayLocalISO } from "@/lib/dates"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
 import { Loader2, ChevronLeft, Lock, Unlock } from "lucide-react"
 
@@ -79,7 +80,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
   const [creating, setCreating] = useState(false)
   const [form, setForm] = useState({
     title: "",
-    date: new Date().toISOString().slice(0, 10),
+    date: todayLocalISO(),
     scope: (allowedScopes[0] || "team") as string,
     department: fullGroup ? "Events" : myDept,
     team: !fullGroup && isDeputy ? team || "" : "",
@@ -280,7 +281,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
             <div>
               <h2 className="text-xl font-bold">{selected.title}</h2>
               <p className="text-sm text-gray-500">
-                {selected.meeting_date} ·{" "}
+                {formatDateOnly(selected.meeting_date)} ·{" "}
                 {selected.scope === "org"
                   ? "Whole org"
                   : selected.scope === "department"
@@ -323,8 +324,8 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
           {roster.map((m) => {
             const st = statusOf(m.id)
             return (
-              <div key={m.id} className="flex items-center gap-3 p-3">
-                <div className="min-w-0 flex-1">
+              <div key={m.id} className="flex flex-wrap items-center gap-2 sm:gap-3 p-3">
+                <div className="min-w-0 flex-1 basis-40">
                   <p className="text-sm font-medium text-gray-900 truncate">{m.name}</p>
                   <p className="text-xs text-gray-400 truncate">
                     {m.role}
@@ -359,7 +360,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
   // ---- meeting list ----
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap gap-3 items-center justify-between">
         <h2 className="text-xl font-bold">Meeting Attendance</h2>
         {canManage && allowedScopes.length > 0 && (
           <button
@@ -443,7 +444,7 @@ export default function AttendanceTab({ accessLevel, department, team, isHr, isO
               <div>
                 <p className="font-medium text-gray-900">{m.title}</p>
                 <p className="text-xs text-gray-400">
-                  {m.meeting_date} ·{" "}
+                  {formatDateOnly(m.meeting_date)} ·{" "}
                   {m.scope === "org" ? "Whole org" : m.scope === "department" ? m.department : `${m.department} · ${m.team}`}
                 </p>
               </div>

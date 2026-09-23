@@ -172,8 +172,8 @@ export default function DirectoryTab({ accessLevel, department, team, isHr, canA
     const deptSubteams = subteamsFor(m.department)
     return (
       <div className="py-2.5">
-        <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="min-w-0 w-full sm:w-auto sm:flex-1">
             <p className="font-medium text-gray-900 text-sm truncate">
               {m.name}
               <span className="text-gray-400 font-normal"> · {m.role}</span>
