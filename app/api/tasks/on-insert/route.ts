@@ -3,6 +3,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin"
 import { sendTaskEmails } from "@/lib/task-emails"
 
 export const dynamic = "force-dynamic"
+// Room for retries when Resend is rate limiting, and for bulk sends.
+export const maxDuration = 60
 
 /**
  * Supabase Database Webhook target — fires on every INSERT into public.tasks, so a task

@@ -2,8 +2,11 @@ import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { OWNER_EMAILS } from "@/lib/owner"
 import { sendEmail, taskEmailShell } from "@/lib/send-email"
+import { sendTaskEmails } from "@/lib/task-emails"
 
 export const dynamic = "force-dynamic"
+// Room for retries when Resend is rate limiting, and for bulk sends.
+export const maxDuration = 60
 
 /**
  * Owner-only email diagnostic (Admin tab → "Send test email"). Reports which email-related
@@ -18,6 +21,23 @@ export async function POST(request: Request) {
   } = token ? await supabaseAdmin.auth.getUser(token) : { data: { user: null } }
   const email = user?.email?.toLowerCase()
   if (!email || !OWNER_EMAILS.includes(email)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+
+  // "Send missed task emails": assignment emails for open tasks from the last 14 days that
+  // never got one (same thing the daily cron does each morning, on demand).
+  const body = await request.json().catch(() => ({}))
+  if (body?.action === "backfill") {
+    const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+    const { data: tasks, error } = await supabaseAdmin
+      .from("tasks")
+      .select("*")
+      .not("status", "in", "(Completed,Incomplete)")
+      .eq("archived", false)
+      .is("assigned_email_sent_at", null)
+      .gte("created_at", since)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    const r = await sendTaskEmails("assigned", tasks || [])
+    return NextResponse.json({ backfill: true, found: (tasks || []).length, ...r })
+  }
 
   const from = process.env.RESEND_FROM_EMAIL || ""
   const settings = {
@@ -47,5 +67,13 @@ export async function POST(request: Request) {
   })
   if (!result.sent && result.detail) problems.push(`Resend rejected the test email: ${result.detail}`)
 
-  return NextResponse.json({ sent: result.sent, reason: result.reason, settings, problems })
+  const { count: unsent } = await supabaseAdmin
+    .from("tasks")
+    .select("id", { count: "exact", head: true })
+    .not("status", "in", "(Completed,Incomplete)")
+    .eq("archived", false)
+    .is("assigned_email_sent_at", null)
+    .gte("created_at", new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
+
+  return NextResponse.json({ sent: result.sent, reason: result.reason, settings, problems, unsentAssignments: unsent ?? 0 })
 }
