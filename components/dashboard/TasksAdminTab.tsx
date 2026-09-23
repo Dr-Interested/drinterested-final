@@ -394,11 +394,162 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       )
     : [myDept]
 
+  type Row = (typeof scoped)[number]
+  const noteKey = (r: Row) => "n:" + r.id
+
+  const StatusBadge = ({ r }: { r: Row }) => (
+    <span
+      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap ${
+        r.status === "Completed"
+          ? "bg-green-100 text-green-800"
+          : r.status === "Incomplete"
+            ? "bg-gray-200 text-gray-600"
+            : r.status === "In Progress"
+              ? "bg-blue-100 text-blue-800"
+              : "bg-amber-100 text-amber-800"
+      }`}
+    >
+      {r.status}
+    </span>
+  )
+
+  const StatusToggle = ({ r }: { r: Row }) => (
+    <button
+      onClick={() => toggleStatus(r.id, r.status)}
+      className={`shrink-0 ${r.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}`}
+      title={isFinished(r.status) ? "Reopen" : "Advance status"}
+    >
+      <CheckCircle2 className="w-4 h-4" />
+    </button>
+  )
+
+  // Incomplete (X) for open rows, then delete. Shared by grouped rows and single-person cards.
+  const RowActions = ({ r }: { r: Row }) => (
+    <>
+      {!isFinished(r.status) && (
+        <button onClick={() => markIncomplete(r.id)} className="text-gray-400 hover:text-gray-700" title="Mark incomplete (won't be done)">
+          <XCircle className="w-3.5 h-3.5" />
+        </button>
+      )}
+      <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600" title="Delete">
+        <Trash className="w-3.5 h-3.5" />
+      </button>
+    </>
+  )
+
+  const hasSubmission = (r: Row) =>
+    r.status === "Completed" && !!(r.submission_url || r.submission_file_url || r.submission_note)
+
+  const SubmissionPills = ({ r }: { r: Row }) =>
+    hasSubmission(r) ? (
+      <span className="flex flex-wrap items-center gap-1.5">
+        {r.submission_url && (
+          <a href={r.submission_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
+            <Link2 className="w-3.5 h-3.5" /> Link
+          </a>
+        )}
+        {r.submission_file_url && (
+          <a href={r.submission_file_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
+            <Paperclip className="w-3.5 h-3.5" /> File
+          </a>
+        )}
+        {r.submission_note && (
+          <button
+            onClick={() => setOpen((o) => ({ ...o, [noteKey(r)]: !o[noteKey(r)] }))}
+            className={open[noteKey(r)] ? SUBMISSION_PILL_ACTIVE : SUBMISSION_PILL}
+          >
+            <StickyNote className="w-3.5 h-3.5" /> {open[noteKey(r)] ? "Hide notes" : "Notes"}
+          </button>
+        )}
+      </span>
+    ) : null
+
+  const NotesPanel = ({ r, className }: { r: Row; className: string }) =>
+    r.submission_note && open[noteKey(r)] ? (
+      <div
+        className={`rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap break-words ${className}`}
+      >
+        {r.submission_note}
+      </div>
+    ) : null
+
+  const EditButton = ({ g, small }: { g: Group; small?: boolean }) => (
+    <button
+      onClick={(e) => {
+        e.stopPropagation()
+        openEditGroup(g)
+      }}
+      className={`shrink-0 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-0.5 font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800 ${
+        small ? "text-[11px]" : "text-xs"
+      }`}
+      title="Edit title, description or due date"
+    >
+      <Pencil className="w-3 h-3" /> Edit
+    </button>
+  )
+
+  const DueBadge = ({ due }: { due: string | null }) =>
+    due ? (
+      <span className="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium shrink-0 whitespace-nowrap">
+        Due {new Date(due).toLocaleDateString()}
+      </span>
+    ) : null
+
+  // "Mark Received" is shown only to the assigner, and only once everyone is finished.
+  const ReceivedCallout = ({ g }: { g: Group }) => {
+    const receivable = isGroupFinished(g) ? g.rows.filter((r) => r.status === "Completed" && isMine(r)) : []
+    if (!receivable.length) return null
+    return (
+      <div className="mx-3 mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#4ecdc4]/40 bg-[#4ecdc4]/10 px-3 py-2 text-xs text-[#405862]">
+        <span className="flex-1 min-w-[12rem]">All done! Mark Received to start the archive clock.</span>
+        <button
+          onClick={() => markReceived(receivable.map((r) => r.id))}
+          className="inline-flex items-center gap-1 rounded-md bg-[#405862] px-3 py-1.5 font-semibold text-white hover:bg-[#334852]"
+        >
+          <Inbox className="w-3.5 h-3.5" /> Mark Received
+        </button>
+      </div>
+    )
+  }
+
+  // A task assigned to just one person: a flat card showing that person directly, no dropdown.
+  const SingleCard = ({ g }: { g: Group }) => {
+    const r = g.rows[0]
+    return (
+      <div className="border border-gray-200 rounded-xl">
+        <div className="flex items-start gap-3 p-3">
+          <div className="pt-0.5">
+            <StatusToggle r={r} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-800 text-sm break-words">{g.title}</p>
+            {g.description && <p className="text-xs text-gray-500 line-clamp-2 break-words">{g.description}</p>}
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-gray-600">{r._name}</span>
+              <DueBadge due={g.due_date} />
+              <StatusBadge r={r} />
+            </div>
+            {hasSubmission(r) && (
+              <div className="mt-2">
+                <SubmissionPills r={r} />
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <EditButton g={g} small />
+            <RowActions r={r} />
+          </div>
+        </div>
+        <NotesPanel r={r} className="mx-3 mb-3 sm:ml-10" />
+        <ReceivedCallout g={g} />
+      </div>
+    )
+  }
+
   const GroupCard = ({ g }: { g: Group }) => {
+    if (g.rows.length === 1) return <SingleCard g={g} />
     const done = g.rows.filter((r) => isFinished(r.status)).length
     const gk = "g:" + g.key
-    // "Mark Received" is shown only to the assigner, and only once everyone is finished.
-    const receivable = isGroupFinished(g) ? g.rows.filter((r) => r.status === "Completed" && isMine(r)) : []
     return (
       <div className="border border-gray-200 rounded-xl">
         <div
@@ -411,55 +562,29 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
               setOpen((o) => ({ ...o, [gk]: !o[gk] }))
             }
           }}
-          className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 cursor-pointer"
+          className="w-full flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-1.5 p-3 text-left hover:bg-gray-50 cursor-pointer"
         >
-          <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${open[gk] ? "rotate-90" : ""}`} />
+          <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ${open[gk] ? "rotate-90" : ""}`} />
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-gray-800 text-sm truncate">{g.title}</p>
             {g.description && <p className="text-xs text-gray-500 truncate">{g.description}</p>}
           </div>
-          {g.due_date && (
-            <span className="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium shrink-0">
-              Due {new Date(g.due_date).toLocaleDateString()}
+          <div className="flex items-center gap-2 shrink-0 ml-7 sm:ml-0">
+            <DueBadge due={g.due_date} />
+            <EditButton g={g} small />
+            <span className="text-xs text-gray-400 flex items-center gap-1">
+              <Users className="w-3 h-3" />
+              {done}/{g.rows.length}
             </span>
-          )}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              openEditGroup(g)
-            }}
-            className="shrink-0 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800"
-            title="Edit title, description or due date"
-          >
-            <Pencil className="w-3 h-3" /> Edit
-          </button>
-          <span className="text-xs text-gray-400 shrink-0 flex items-center gap-1">
-            <Users className="w-3 h-3" />
-            {done}/{g.rows.length}
-          </span>
+          </div>
         </div>
 
-        {receivable.length > 0 && (
-          <div className="mx-3 mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#4ecdc4]/40 bg-[#4ecdc4]/10 px-3 py-2 text-xs text-[#405862]">
-            <span className="flex-1 min-w-[12rem]">All done! Mark Received to start the archive clock.</span>
-            <button
-              onClick={() => markReceived(receivable.map((r) => r.id))}
-              className="inline-flex items-center gap-1 rounded-md bg-[#405862] px-3 py-1.5 font-semibold text-white hover:bg-[#334852]"
-            >
-              <Inbox className="w-3.5 h-3.5" /> Mark Received
-            </button>
-          </div>
-        )}
+        <ReceivedCallout g={g} />
 
         {open[gk] && (
           <div className="border-t border-gray-100 divide-y divide-gray-50">
             <div className="flex justify-end gap-3 px-3 py-1.5">
-              <button
-                onClick={() => openEditGroup(g)}
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-0.5 text-xs font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800"
-              >
-                <Pencil className="w-3 h-3" /> Edit
-              </button>
+              <EditButton g={g} />
               <button
                 onClick={() => deleteRows(g.rows.map((r) => r.id), g.title)}
                 className="text-xs text-red-500 hover:text-red-700 inline-flex items-center gap-1"
@@ -472,68 +597,16 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
               .sort((a, b) => a._name.localeCompare(b._name))
               .map((r) => (
                 <div key={r.id}>
-                  <div className="flex items-center gap-3 px-3 py-2">
-                    <button
-                      onClick={() => toggleStatus(r.id, r.status)}
-                      className={r.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}
-                      title={r.status === "Completed" || r.status === "Incomplete" ? "Reopen" : "Mark complete"}
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                    </button>
-                    <span className="text-sm text-gray-700 flex-1 truncate">{r._name}</span>
-                    {r.status === "Completed" && (
-                      <span className="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
-                        {r.submission_url && (
-                          <a href={r.submission_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
-                            <Link2 className="w-3.5 h-3.5" /> Link
-                          </a>
-                        )}
-                        {r.submission_file_url && (
-                          <a href={r.submission_file_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
-                            <Paperclip className="w-3.5 h-3.5" /> File
-                          </a>
-                        )}
-                        {r.submission_note && (
-                          <button
-                            onClick={() => setOpen((o) => ({ ...o, ["n:" + r.id]: !o["n:" + r.id] }))}
-                            className={open["n:" + r.id] ? SUBMISSION_PILL_ACTIVE : SUBMISSION_PILL}
-                          >
-                            <StickyNote className="w-3.5 h-3.5" /> {open["n:" + r.id] ? "Hide notes" : "Notes"}
-                          </button>
-                        )}
-                      </span>
-                    )}
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                        r.status === "Completed"
-                          ? "bg-green-100 text-green-800"
-                          : r.status === "Incomplete"
-                            ? "bg-gray-200 text-gray-600"
-                            : r.status === "In Progress"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-amber-100 text-amber-800"
-                      }`}
-                    >
-                      {r.status}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2">
+                    <StatusToggle r={r} />
+                    <span className="text-sm text-gray-700 flex-1 min-w-[8rem] truncate">{r._name}</span>
+                    <SubmissionPills r={r} />
+                    <span className="flex items-center gap-2.5 shrink-0">
+                      <StatusBadge r={r} />
+                      <RowActions r={r} />
                     </span>
-                    {!isFinished(r.status) && (
-                      <button
-                        onClick={() => markIncomplete(r.id)}
-                        className="text-gray-400 hover:text-gray-700"
-                        title="Mark incomplete (won't be done)"
-                      >
-                        <XCircle className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                    <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600" title="Delete">
-                      <Trash className="w-3.5 h-3.5" />
-                    </button>
                   </div>
-                  {r.submission_note && open["n:" + r.id] && (
-                    <div className="mx-3 mb-2 ml-10 rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap break-words">
-                      {r.submission_note}
-                    </div>
-                  )}
+                  <NotesPanel r={r} className="mx-3 mb-2 sm:ml-10" />
                 </div>
               ))}
           </div>
