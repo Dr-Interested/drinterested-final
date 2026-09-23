@@ -34,6 +34,11 @@ type TaskRow = {
 const FINISHED = ["Completed", "Incomplete"]
 const isFinished = (s: string) => FINISHED.includes(s)
 
+// Labeled button for a completed row's submitted link / file / notes.
+const PILL_BASE = "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold"
+const SUBMISSION_PILL = `${PILL_BASE} border-[#4CAF7D]/40 bg-[#4CAF7D]/10 text-[#2d8659] hover:bg-[#4CAF7D]/20`
+const SUBMISSION_PILL_ACTIVE = `${PILL_BASE} border-[#4CAF7D] bg-[#4CAF7D] text-white hover:bg-[#2d8659]`
+
 type MemberRow = {
   id: string
   name: string
@@ -396,9 +401,17 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     const receivable = isGroupFinished(g) ? g.rows.filter((r) => r.status === "Completed" && isMine(r)) : []
     return (
       <div className="border border-gray-200 rounded-xl">
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => setOpen((o) => ({ ...o, [gk]: !o[gk] }))}
-          className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              setOpen((o) => ({ ...o, [gk]: !o[gk] }))
+            }
+          }}
+          className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 cursor-pointer"
         >
           <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${open[gk] ? "rotate-90" : ""}`} />
           <div className="min-w-0 flex-1">
@@ -410,11 +423,21 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
               Due {new Date(g.due_date).toLocaleDateString()}
             </span>
           )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              openEditGroup(g)
+            }}
+            className="shrink-0 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800"
+            title="Edit title, description or due date"
+          >
+            <Pencil className="w-3 h-3" /> Edit
+          </button>
           <span className="text-xs text-gray-400 shrink-0 flex items-center gap-1">
             <Users className="w-3 h-3" />
             {done}/{g.rows.length}
           </span>
-        </button>
+        </div>
 
         {receivable.length > 0 && (
           <div className="mx-3 mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#4ecdc4]/40 bg-[#4ecdc4]/10 px-3 py-2 text-xs text-[#405862]">
@@ -433,7 +456,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
             <div className="flex justify-end gap-3 px-3 py-1.5">
               <button
                 onClick={() => openEditGroup(g)}
-                className="text-xs text-gray-500 hover:text-gray-700 inline-flex items-center gap-1"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-0.5 text-xs font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800"
               >
                 <Pencil className="w-3 h-3" /> Edit
               </button>
@@ -448,59 +471,69 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
               .slice()
               .sort((a, b) => a._name.localeCompare(b._name))
               .map((r) => (
-                <div key={r.id} className="flex items-center gap-3 px-3 py-2">
-                  <button
-                    onClick={() => toggleStatus(r.id, r.status)}
-                    className={r.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}
-                    title={r.status === "Completed" || r.status === "Incomplete" ? "Reopen" : "Mark complete"}
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                  </button>
-                  <span className="text-sm text-gray-700 flex-1 truncate">{r._name}</span>
-                  {r.status === "Completed" && (
-                    <span className="flex items-center gap-1.5 shrink-0 text-gray-400">
-                      {r.submission_url && (
-                        <a href={r.submission_url} target="_blank" rel="noopener noreferrer" title="Submitted link" className="hover:text-[#4CAF7D]">
-                          <Link2 className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                      {r.submission_file_url && (
-                        <a href={r.submission_file_url} target="_blank" rel="noopener noreferrer" title="Attached file" className="hover:text-[#4CAF7D]">
-                          <Paperclip className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                      {r.submission_note && (
-                        <span title={r.submission_note} className="cursor-help">
-                          <StickyNote className="w-3.5 h-3.5" />
-                        </span>
-                      )}
-                    </span>
-                  )}
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                      r.status === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : r.status === "Incomplete"
-                          ? "bg-gray-200 text-gray-600"
-                          : r.status === "In Progress"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-amber-100 text-amber-800"
-                    }`}
-                  >
-                    {r.status}
-                  </span>
-                  {!isFinished(r.status) && (
+                <div key={r.id}>
+                  <div className="flex items-center gap-3 px-3 py-2">
                     <button
-                      onClick={() => markIncomplete(r.id)}
-                      className="text-gray-400 hover:text-gray-700"
-                      title="Mark incomplete (won't be done)"
+                      onClick={() => toggleStatus(r.id, r.status)}
+                      className={r.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}
+                      title={r.status === "Completed" || r.status === "Incomplete" ? "Reopen" : "Mark complete"}
                     >
-                      <XCircle className="w-3.5 h-3.5" />
+                      <CheckCircle2 className="w-4 h-4" />
                     </button>
+                    <span className="text-sm text-gray-700 flex-1 truncate">{r._name}</span>
+                    {r.status === "Completed" && (
+                      <span className="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
+                        {r.submission_url && (
+                          <a href={r.submission_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
+                            <Link2 className="w-3.5 h-3.5" /> Link
+                          </a>
+                        )}
+                        {r.submission_file_url && (
+                          <a href={r.submission_file_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
+                            <Paperclip className="w-3.5 h-3.5" /> File
+                          </a>
+                        )}
+                        {r.submission_note && (
+                          <button
+                            onClick={() => setOpen((o) => ({ ...o, ["n:" + r.id]: !o["n:" + r.id] }))}
+                            className={open["n:" + r.id] ? SUBMISSION_PILL_ACTIVE : SUBMISSION_PILL}
+                          >
+                            <StickyNote className="w-3.5 h-3.5" /> {open["n:" + r.id] ? "Hide notes" : "Notes"}
+                          </button>
+                        )}
+                      </span>
+                    )}
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        r.status === "Completed"
+                          ? "bg-green-100 text-green-800"
+                          : r.status === "Incomplete"
+                            ? "bg-gray-200 text-gray-600"
+                            : r.status === "In Progress"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-amber-100 text-amber-800"
+                      }`}
+                    >
+                      {r.status}
+                    </span>
+                    {!isFinished(r.status) && (
+                      <button
+                        onClick={() => markIncomplete(r.id)}
+                        className="text-gray-400 hover:text-gray-700"
+                        title="Mark incomplete (won't be done)"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600" title="Delete">
+                      <Trash className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  {r.submission_note && open["n:" + r.id] && (
+                    <div className="mx-3 mb-2 ml-10 rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap break-words">
+                      {r.submission_note}
+                    </div>
                   )}
-                  <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600" title="Delete">
-                    <Trash className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               ))}
           </div>
