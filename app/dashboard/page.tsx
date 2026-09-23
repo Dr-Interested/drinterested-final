@@ -18,6 +18,8 @@ import StrikesTab from "@/components/dashboard/StrikesTab"
 import TasksAdminTab from "@/components/dashboard/TasksAdminTab"
 import YourStandingCard from "@/components/dashboard/YourStandingCard"
 import { PRESET_ROLES, subteamsFor } from "@/lib/teams"
+import { OWNER_EMAILS } from "@/lib/owner"
+import TaskFileUploadField from "@/components/dashboard/TaskFileUploadField"
 
 type Member = {
   id: string
@@ -71,7 +73,7 @@ type Blog = {
 //   - director: any other "Director"/"Deputy Director"/"Lead"/"Chair" role — sees ONLY the admin
 //               tab(s) that belong to their own department.
 //   - member:   everyone else (approved, non-director) — tasks and shared resources.
-const OWNER_EMAILS = ["mukhiadil2009@gmail.com"]
+// OWNER_EMAILS lives in lib/owner.ts (shared with server routes that email the owner).
 
 // Admin Team roles that get full owner-tier tab access without being the true owner.
 const ADMIN_TEAM_LEADERSHIP_ROLES = ["Executive Director", "Deputy Executive Director", "Executive Assistant"]
@@ -166,6 +168,8 @@ type Task = {
   status: string
   created_at: string
   submission_url?: string | null
+  submission_note?: string | null
+  submission_file_url?: string | null
   time_spent_minutes?: number | null
   completed_at?: string | null
 }
@@ -271,7 +275,8 @@ export default function DbAdminPage() {
   // Marking a task Completed opens this modal to capture the actual work + time spent,
   // and records the time spent on the task itself.
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
-  const [completionForm, setCompletionForm] = useState({ submission_url: "", time_spent_minutes: "" })
+  const [completionForm, setCompletionForm] = useState({ submission_url: "", submission_note: "", submission_file_url: "" })
+  const [uploadingCompletionFile, setUploadingCompletionFile] = useState(false)
   const [savingCompletion, setSavingCompletion] = useState(false)
   // The task id a reminder/assignment email's "Open the Portal" link points at (?task=<id>),
   // so My Tasks can scroll to and briefly highlight that specific card once it loads.
@@ -541,11 +546,11 @@ export default function DbAdminPage() {
     }
     const nextStatus = nextStatusMap[currentStatus] || "Pending"
 
-    // Marking something Completed captures the actual work + time spent first, rather than
+    // Marking something Completed captures the actual work (link / note / file) first, rather than
     // just flipping a status — see handleSubmitTaskCompletion, which does the status update.
     if (nextStatus === "Completed" && task) {
       setCompletingTask(task)
-      setCompletionForm({ submission_url: "", time_spent_minutes: "" })
+      setCompletionForm({ submission_url: "", submission_note: "", submission_file_url: "" })
       return
     }
 
@@ -568,9 +573,8 @@ export default function DbAdminPage() {
     e.preventDefault()
     if (!completingTask || !currentUser) return
 
-    const minutes = parseInt(completionForm.time_spent_minutes, 10)
-    if (!minutes || minutes <= 0) {
-      alert("Please enter how long this took (in minutes).")
+    if (uploadingCompletionFile) {
+      alert("Please wait for your file to finish uploading.")
       return
     }
 
@@ -583,11 +587,29 @@ export default function DbAdminPage() {
         .update({
           status: "Completed",
           submission_url: completionForm.submission_url.trim() || null,
-          time_spent_minutes: minutes,
+          submission_note: completionForm.submission_note.trim() || null,
+          submission_file_url: completionForm.submission_file_url || null,
           completed_at: nowIso,
         })
         .eq("id", completingTask.id)
       if (taskError) throw taskError
+
+      // Fire-and-forget: emails the reviewer(s) what was submitted, CC'ing the completer.
+      // The route checks the caller's session, so pass the access token along.
+      const completedId = completingTask.id
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) =>
+          fetch("/api/tasks/on-complete", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+            },
+            body: JSON.stringify({ taskId: completedId }),
+          }),
+        )
+        .catch((err) => console.error("Completion email failed:", err))
 
       setCompletingTask(null)
       fetchMemberTasks()
@@ -1417,18 +1439,34 @@ export default function DbAdminPage() {
                       Due {new Date(task.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                     </span>
                   )}
-                  {task.status === "Completed" && (task.submission_url || task.time_spent_minutes) && (
-                    <p className="text-xs text-gray-400 mt-2">
-                      {task.time_spent_minutes && <span>{Math.round(task.time_spent_minutes / 6) / 10} hrs logged</span>}
-                      {task.submission_url && (
-                        <>
-                          {task.time_spent_minutes && " · "}
+                  {task.status === "Pending" && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs bg-amber-50 border border-amber-100 text-amber-800 rounded-lg px-2.5 py-1.5">
+                      <span>Ready to start? Mark this In Progress.</span>
+                      <button
+                        onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}
+                        className="font-semibold text-amber-900 underline hover:no-underline"
+                      >
+                        Mark In Progress
+                      </button>
+                    </div>
+                  )}
+                  {task.status === "Completed" && (task.submission_url || task.submission_file_url || task.submission_note || task.time_spent_minutes) && (
+                    <div className="text-xs text-gray-400 mt-2 space-y-1">
+                      {task.submission_note && <p className="whitespace-pre-wrap break-words">{task.submission_note}</p>}
+                      <p className="space-x-2">
+                        {task.time_spent_minutes ? <span>{Math.round(task.time_spent_minutes / 6) / 10} hrs logged</span> : null}
+                        {task.submission_url && (
                           <a href={task.submission_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
                             View submitted work
                           </a>
-                        </>
-                      )}
-                    </p>
+                        )}
+                        {task.submission_file_url && (
+                          <a href={task.submission_file_url} target="_blank" rel="noopener noreferrer" className="text-[#4CAF7D] hover:underline">
+                            View attached file
+                          </a>
+                        )}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1930,10 +1968,10 @@ export default function DbAdminPage() {
 
       {/* --- MODAL POPUPS --- */}
 
-      {/* Task Completion Modal — captures the actual work + time spent. */}
+      {/* Task Completion Modal — captures the actual work (link / note / file). */}
       {completingTask && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
             <h2 className="text-xl font-bold font-bricolage mb-1 text-[#1a1a1a]">Mark as Complete</h2>
             <p className="text-sm text-gray-500 mb-6">{completingTask.title}</p>
             <form onSubmit={handleSubmitTaskCompletion} className="space-y-4">
@@ -1950,18 +1988,26 @@ export default function DbAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">How long did this take? (minutes) *</label>
-                <input
-                  type="number"
-                  min={1}
-                  required
-                  placeholder="e.g. 45"
-                  value={completionForm.time_spent_minutes}
-                  onChange={(e) => setCompletionForm({ ...completionForm, time_spent_minutes: e.target.value })}
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Notes <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Anything your director should know about this work"
+                  value={completionForm.submission_note}
+                  onChange={(e) => setCompletionForm({ ...completionForm, submission_note: e.target.value })}
                   className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF7D]"
                 />
-                <p className="text-xs text-gray-400 mt-1">Recorded on the task so your director can see the effort involved.</p>
               </div>
+              <TaskFileUploadField
+                pathPrefix={completingTask.id}
+                value={completionForm.submission_file_url}
+                onChange={(url) => setCompletionForm((f) => ({ ...f, submission_file_url: url }))}
+                onUploadingChange={setUploadingCompletionFile}
+              />
+              <p className="text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg p-2.5">
+                Don&apos;t forget to also reply to this task on Discord and log your hours on VolunTime.
+              </p>
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
@@ -1973,7 +2019,7 @@ export default function DbAdminPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={savingCompletion}
+                  disabled={savingCompletion || uploadingCompletionFile}
                   className="flex-1 py-2.5 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                 >
                   {savingCompletion && <Loader2 className="w-4 h-4 animate-spin" />}

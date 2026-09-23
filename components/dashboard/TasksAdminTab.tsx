@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
-import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle, Pencil } from "lucide-react"
+import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle, Pencil, Inbox, Link2, Paperclip, StickyNote } from "lucide-react"
 
 type TaskRow = {
   id: string
@@ -20,12 +20,24 @@ type TaskRow = {
   archived_at: string | null
   completed_at: string | null
   created_at: string
+  submission_url: string | null
+  submission_note: string | null
+  submission_file_url: string | null
+  received_at: string | null
+  received_by: string | null
+  permanently_archived: boolean
+  permanently_archived_at: string | null
 }
 
 // A task is "finished" once it's Completed or Incomplete. A group is finished (moves to the
 // Completed section) only when every row in it is finished.
 const FINISHED = ["Completed", "Incomplete"]
 const isFinished = (s: string) => FINISHED.includes(s)
+
+// Labeled button for a completed row's submitted link / file / notes.
+const PILL_BASE = "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold"
+const SUBMISSION_PILL = `${PILL_BASE} border-[#4CAF7D]/40 bg-[#4CAF7D]/10 text-[#2d8659] hover:bg-[#4CAF7D]/20`
+const SUBMISSION_PILL_ACTIVE = `${PILL_BASE} border-[#4CAF7D] bg-[#4CAF7D] text-white hover:bg-[#2d8659]`
 
 type MemberRow = {
   id: string
@@ -92,7 +104,8 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     setLoading(true)
     try {
       let taskQuery = supabase.from("tasks").select("*").order("created_at", { ascending: false })
-      if (!isTrueOwner) taskQuery = taskQuery.eq("archived", false) // only the owner sees the archive
+      // Directors/deputies see their scope's Archive; only the owner sees the Permanent Archive.
+      if (!isTrueOwner) taskQuery = taskQuery.eq("permanently_archived", false)
       const [{ data: t }, { data: m }] = await Promise.all([
         taskQuery,
         supabase
@@ -143,11 +156,33 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     [isAdminLevel, isDirector, isDeputy, myDept, team],
   )
 
-  // Main view = non-archived, in-scope. The Archive section (owner only) is everything archived.
+  // Main view = non-archived, in-scope. Archive = archived (Received / Incomplete) but not yet
+  // promoted, in-scope. Permanent Archive (owner only, every scope) = 30+ days after Received.
   const scoped = useMemo(() => resolved.filter((t) => !t.archived && inScope(t)), [resolved, inScope])
   const archivedTasks = useMemo(
-    () => resolved.filter((t) => t.archived && inScope(t)).sort((a, b) => (b.archived_at || "").localeCompare(a.archived_at || "")),
+    () =>
+      resolved
+        .filter((t) => t.archived && !t.permanently_archived && inScope(t))
+        .sort((a, b) => (b.archived_at || "").localeCompare(a.archived_at || "")),
     [resolved, inScope],
+  )
+  const permanentTasks = useMemo(
+    () =>
+      isTrueOwner
+        ? resolved
+            .filter((t) => t.permanently_archived)
+            .sort((a, b) => (b.permanently_archived_at || "").localeCompare(a.permanently_archived_at || ""))
+        : [],
+    [resolved, isTrueOwner],
+  )
+
+  // assigned_by is set to `myUserId || myEmail` at creation, so match either.
+  const isMine = useCallback(
+    (t: TaskRow) => {
+      const by = (t.assigned_by || "").toLowerCase()
+      return !!by && (by === (myUserId || "").toLowerCase() || by === (myEmail || "").toLowerCase())
+    },
+    [myUserId, myEmail],
   )
 
   // Group identical tasks (title + description + due date).
@@ -185,10 +220,10 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     return groups
   }, [members])
 
-  async function setStatus(id: string, next: string) {
-    const patch: Record<string, any> = { status: next }
-    // completed_at drives the 14-day auto-archive clock — set it on any finished state, clear
-    // it when a task is reopened.
+  async function setStatus(id: string, next: string, extra: Record<string, any> = {}) {
+    const patch: Record<string, any> = { status: next, ...extra }
+    // completed_at records when a task was finished — set it on any finished state, clear it
+    // when a task is reopened.
     patch.completed_at = isFinished(next) ? new Date().toISOString() : null
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)))
     const { error } = await supabase.from("tasks").update(patch).eq("id", id)
@@ -199,9 +234,40 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
   }
   const toggleStatus = (id: string, status: string) => setStatus(id, STATUS_NEXT[status] || "Pending")
   const markIncomplete = (id: string) => {
-    if (window.confirm("Mark this Incomplete? It moves to Completed as \"not done / no longer needed\".")) {
-      setStatus(id, "Incomplete")
+    if (window.confirm("Mark this Incomplete? It's archived right away as \"not done / no longer needed\".")) {
+      // Nothing to review, so it skips the "Received" step and goes straight to the Archive.
+      // received_at is still stamped because it anchors the 30-day / 90-day cron clock.
+      const now = new Date().toISOString()
+      setStatus(id, "Incomplete", {
+        archived: true,
+        archived_at: now,
+        received_at: now,
+        received_by: myUserId || myEmail,
+      })
     }
+  }
+
+  // Assigner-only: acknowledges the submitted work. Archives the Completed rows now and starts
+  // the clock (see app/api/cron/task-reminders) that promotes them to the Permanent Archive
+  // 30 days after received_at and deletes them 90 days after.
+  async function markReceived(ids: string[]) {
+    if (!ids.length) return
+    const now = new Date().toISOString()
+    const { error } = await supabase
+      .from("tasks")
+      .update({ received_at: now, received_by: myUserId || myEmail, archived: true, archived_at: now })
+      .in("id", ids)
+    if (error) return alert("Failed to mark received: " + error.message)
+    load()
+  }
+
+  async function restore(id: string) {
+    const { error } = await supabase
+      .from("tasks")
+      .update({ archived: false, archived_at: null, received_at: null, received_by: null })
+      .eq("id", id)
+    if (error) return alert("Failed to restore: " + error.message)
+    load()
   }
 
   function openEditGroup(g: Group) {
@@ -328,40 +394,197 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       )
     : [myDept]
 
+  type Row = (typeof scoped)[number]
+  const noteKey = (r: Row) => "n:" + r.id
+
+  const StatusBadge = ({ r }: { r: Row }) => (
+    <span
+      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap ${
+        r.status === "Completed"
+          ? "bg-green-100 text-green-800"
+          : r.status === "Incomplete"
+            ? "bg-gray-200 text-gray-600"
+            : r.status === "In Progress"
+              ? "bg-blue-100 text-blue-800"
+              : "bg-amber-100 text-amber-800"
+      }`}
+    >
+      {r.status}
+    </span>
+  )
+
+  const StatusToggle = ({ r }: { r: Row }) => (
+    <button
+      onClick={() => toggleStatus(r.id, r.status)}
+      className={`shrink-0 ${r.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}`}
+      title={isFinished(r.status) ? "Reopen" : "Advance status"}
+    >
+      <CheckCircle2 className="w-4 h-4" />
+    </button>
+  )
+
+  // Incomplete (X) for open rows, then delete. Shared by grouped rows and single-person cards.
+  const RowActions = ({ r }: { r: Row }) => (
+    <>
+      {!isFinished(r.status) && (
+        <button onClick={() => markIncomplete(r.id)} className="text-gray-400 hover:text-gray-700" title="Mark incomplete (won't be done)">
+          <XCircle className="w-3.5 h-3.5" />
+        </button>
+      )}
+      <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600" title="Delete">
+        <Trash className="w-3.5 h-3.5" />
+      </button>
+    </>
+  )
+
+  const hasSubmission = (r: Row) =>
+    r.status === "Completed" && !!(r.submission_url || r.submission_file_url || r.submission_note)
+
+  const SubmissionPills = ({ r }: { r: Row }) =>
+    hasSubmission(r) ? (
+      <span className="flex flex-wrap items-center gap-1.5">
+        {r.submission_url && (
+          <a href={r.submission_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
+            <Link2 className="w-3.5 h-3.5" /> Link
+          </a>
+        )}
+        {r.submission_file_url && (
+          <a href={r.submission_file_url} target="_blank" rel="noopener noreferrer" className={SUBMISSION_PILL}>
+            <Paperclip className="w-3.5 h-3.5" /> File
+          </a>
+        )}
+        {r.submission_note && (
+          <button
+            onClick={() => setOpen((o) => ({ ...o, [noteKey(r)]: !o[noteKey(r)] }))}
+            className={open[noteKey(r)] ? SUBMISSION_PILL_ACTIVE : SUBMISSION_PILL}
+          >
+            <StickyNote className="w-3.5 h-3.5" /> {open[noteKey(r)] ? "Hide notes" : "Notes"}
+          </button>
+        )}
+      </span>
+    ) : null
+
+  const NotesPanel = ({ r, className }: { r: Row; className: string }) =>
+    r.submission_note && open[noteKey(r)] ? (
+      <div
+        className={`rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap break-words ${className}`}
+      >
+        {r.submission_note}
+      </div>
+    ) : null
+
+  const EditButton = ({ g, small }: { g: Group; small?: boolean }) => (
+    <button
+      onClick={(e) => {
+        e.stopPropagation()
+        openEditGroup(g)
+      }}
+      className={`shrink-0 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-0.5 font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800 ${
+        small ? "text-[11px]" : "text-xs"
+      }`}
+      title="Edit title, description or due date"
+    >
+      <Pencil className="w-3 h-3" /> Edit
+    </button>
+  )
+
+  const DueBadge = ({ due }: { due: string | null }) =>
+    due ? (
+      <span className="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium shrink-0 whitespace-nowrap">
+        Due {new Date(due).toLocaleDateString()}
+      </span>
+    ) : null
+
+  // "Mark Received" is shown only to the assigner, and only once everyone is finished.
+  const ReceivedCallout = ({ g }: { g: Group }) => {
+    const receivable = isGroupFinished(g) ? g.rows.filter((r) => r.status === "Completed" && isMine(r)) : []
+    if (!receivable.length) return null
+    return (
+      <div className="mx-3 mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#4ecdc4]/40 bg-[#4ecdc4]/10 px-3 py-2 text-xs text-[#405862]">
+        <span className="flex-1 min-w-[12rem]">All done! Mark Received to start the archive clock.</span>
+        <button
+          onClick={() => markReceived(receivable.map((r) => r.id))}
+          className="inline-flex items-center gap-1 rounded-md bg-[#405862] px-3 py-1.5 font-semibold text-white hover:bg-[#334852]"
+        >
+          <Inbox className="w-3.5 h-3.5" /> Mark Received
+        </button>
+      </div>
+    )
+  }
+
+  // A task assigned to just one person: a flat card showing that person directly, no dropdown.
+  const SingleCard = ({ g }: { g: Group }) => {
+    const r = g.rows[0]
+    return (
+      <div className="border border-gray-200 rounded-xl">
+        <div className="flex items-start gap-3 p-3">
+          <div className="pt-0.5">
+            <StatusToggle r={r} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-800 text-sm break-words">{g.title}</p>
+            {g.description && <p className="text-xs text-gray-500 line-clamp-2 break-words">{g.description}</p>}
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-gray-600">{r._name}</span>
+              <DueBadge due={g.due_date} />
+              <StatusBadge r={r} />
+            </div>
+            {hasSubmission(r) && (
+              <div className="mt-2">
+                <SubmissionPills r={r} />
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <EditButton g={g} small />
+            <RowActions r={r} />
+          </div>
+        </div>
+        <NotesPanel r={r} className="mx-3 mb-3 sm:ml-10" />
+        <ReceivedCallout g={g} />
+      </div>
+    )
+  }
+
   const GroupCard = ({ g }: { g: Group }) => {
+    if (g.rows.length === 1) return <SingleCard g={g} />
     const done = g.rows.filter((r) => isFinished(r.status)).length
     const gk = "g:" + g.key
     return (
       <div className="border border-gray-200 rounded-xl">
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={() => setOpen((o) => ({ ...o, [gk]: !o[gk] }))}
-          className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              setOpen((o) => ({ ...o, [gk]: !o[gk] }))
+            }
+          }}
+          className="w-full flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-1.5 p-3 text-left hover:bg-gray-50 cursor-pointer"
         >
-          <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${open[gk] ? "rotate-90" : ""}`} />
+          <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ${open[gk] ? "rotate-90" : ""}`} />
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-gray-800 text-sm truncate">{g.title}</p>
             {g.description && <p className="text-xs text-gray-500 truncate">{g.description}</p>}
           </div>
-          {g.due_date && (
-            <span className="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium shrink-0">
-              Due {new Date(g.due_date).toLocaleDateString()}
+          <div className="flex items-center gap-2 shrink-0 ml-7 sm:ml-0">
+            <DueBadge due={g.due_date} />
+            <EditButton g={g} small />
+            <span className="text-xs text-gray-400 flex items-center gap-1">
+              <Users className="w-3 h-3" />
+              {done}/{g.rows.length}
             </span>
-          )}
-          <span className="text-xs text-gray-400 shrink-0 flex items-center gap-1">
-            <Users className="w-3 h-3" />
-            {done}/{g.rows.length}
-          </span>
-        </button>
+          </div>
+        </div>
+
+        <ReceivedCallout g={g} />
 
         {open[gk] && (
           <div className="border-t border-gray-100 divide-y divide-gray-50">
             <div className="flex justify-end gap-3 px-3 py-1.5">
-              <button
-                onClick={() => openEditGroup(g)}
-                className="text-xs text-gray-500 hover:text-gray-700 inline-flex items-center gap-1"
-              >
-                <Pencil className="w-3 h-3" /> Edit
-              </button>
+              <EditButton g={g} />
               <button
                 onClick={() => deleteRows(g.rows.map((r) => r.id), g.title)}
                 className="text-xs text-red-500 hover:text-red-700 inline-flex items-center gap-1"
@@ -373,40 +596,17 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
               .slice()
               .sort((a, b) => a._name.localeCompare(b._name))
               .map((r) => (
-                <div key={r.id} className="flex items-center gap-3 px-3 py-2">
-                  <button
-                    onClick={() => toggleStatus(r.id, r.status)}
-                    className={r.status === "Completed" ? "text-green-500" : "text-gray-300 hover:text-gray-400"}
-                    title={r.status === "Completed" || r.status === "Incomplete" ? "Reopen" : "Mark complete"}
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                  </button>
-                  <span className="text-sm text-gray-700 flex-1 truncate">{r._name}</span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                      r.status === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : r.status === "Incomplete"
-                          ? "bg-gray-200 text-gray-600"
-                          : r.status === "In Progress"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-amber-100 text-amber-800"
-                    }`}
-                  >
-                    {r.status}
-                  </span>
-                  {!isFinished(r.status) && (
-                    <button
-                      onClick={() => markIncomplete(r.id)}
-                      className="text-gray-400 hover:text-gray-700"
-                      title="Mark incomplete (won't be done)"
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                  <button onClick={() => deleteRows([r.id], r._name)} className="text-red-400 hover:text-red-600" title="Delete">
-                    <Trash className="w-3.5 h-3.5" />
-                  </button>
+                <div key={r.id}>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2">
+                    <StatusToggle r={r} />
+                    <span className="text-sm text-gray-700 flex-1 min-w-[8rem] truncate">{r._name}</span>
+                    <SubmissionPills r={r} />
+                    <span className="flex items-center gap-2.5 shrink-0">
+                      <StatusBadge r={r} />
+                      <RowActions r={r} />
+                    </span>
+                  </div>
+                  <NotesPanel r={r} className="mx-3 mb-2 sm:ml-10" />
                 </div>
               ))}
           </div>
@@ -564,7 +764,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       )}
 
       {scoped.length === 0 ? (
-        archivedTasks.length === 0 ? <p className="text-center py-10 text-gray-400 text-sm">No tasks yet.</p> : null
+        archivedTasks.length === 0 && permanentTasks.length === 0 ? <p className="text-center py-10 text-gray-400 text-sm">No tasks yet.</p> : null
       ) : (
         <div className="space-y-3">
           {deptSections.map((dept) => {
@@ -624,8 +824,9 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
         </div>
       )}
 
-      {/* Archive — owner only. Tasks auto-archive 14 days after they're Completed/Incomplete. */}
-      {isTrueOwner && archivedTasks.length > 0 && (
+      {/* Archive — everyone sees their own scope. Tasks land here when the assigner marks them
+          Received (or marks them Incomplete); 30 days after that they move to the Permanent Archive. */}
+      {archivedTasks.length > 0 && (
         <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden">
           <button
             onClick={() => setOpen((o) => ({ ...o, archive: !o.archive }))}
@@ -660,15 +861,52 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
                   <span className="text-[11px] text-gray-400 shrink-0">
                     {r.archived_at ? new Date(r.archived_at).toLocaleDateString() : ""}
                   </span>
-                  <button
-                    onClick={async () => {
-                      await supabase.from("tasks").update({ archived: false, archived_at: null }).eq("id", r.id)
-                      load()
-                    }}
-                    className="text-xs text-[#4CAF7D] hover:underline shrink-0"
-                  >
+                  <button onClick={() => restore(r.id)} className="text-xs text-[#4CAF7D] hover:underline shrink-0">
                     Restore
                   </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Permanent Archive — owner only, read-only. Rows are deleted 90 days after Received. */}
+      {isTrueOwner && permanentTasks.length > 0 && (
+        <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden">
+          <button
+            onClick={() => setOpen((o) => ({ ...o, permArchive: !o.permArchive }))}
+            className="w-full flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 text-left"
+          >
+            <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${open.permArchive ? "rotate-90" : ""}`} />
+            <span className="font-bold text-gray-900">Permanent Archive</span>
+            <span className="text-xs text-gray-400">
+              {permanentTasks.length} task{permanentTasks.length === 1 ? "" : "s"}
+            </span>
+          </button>
+          {open.permArchive && (
+            <div className="divide-y divide-gray-100">
+              {permanentTasks.map((r) => (
+                <div key={r.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+                  <span className="flex-1 min-w-0 truncate text-gray-600">
+                    {r.title} <span className="text-gray-400">· {r._name}</span>
+                    {r._dept !== "Unassigned" && (
+                      <span className="text-gray-400">
+                        {" "}· {r._dept}
+                        {r._team ? ` / ${r._team}` : ""}
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
+                      r.status === "Completed" ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {r.status}
+                  </span>
+                  <span className="text-[11px] text-gray-400 shrink-0" title="Received">
+                    {r.received_at ? new Date(r.received_at).toLocaleDateString() : ""}
+                  </span>
                 </div>
               ))}
             </div>
