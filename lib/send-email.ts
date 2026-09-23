@@ -7,10 +7,12 @@
  */
 export async function sendEmail({
   to,
+  cc,
   subject,
   html,
 }: {
   to: string | string[]
+  cc?: string | string[]
   subject: string
   html: string
 }): Promise<{ sent: boolean; reason?: string }> {
@@ -29,7 +31,7 @@ export async function sendEmail({
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from, to, subject, html }),
+      body: JSON.stringify({ from, to, ...(cc && cc.length ? { cc } : {}), subject, html }),
     })
 
     if (!res.ok) {
@@ -80,14 +82,15 @@ export function taskEmailShell(title: string, bodyHtml: string, portalUrl?: stri
   `
 }
 
-// Deep link into a member's My Tasks tab (and, once there, straight to the task itself —
+// Deep link into a member's My Tasks tab (default), or with tab = "tasks" into the Assign
+// Tasks admin tab, which is where a director/deputy/owner reviews a completed task (and, once there, straight to the task itself —
 // see the "task" query param read in app/dashboard/page.tsx). "login=true" is required even
 // when a task id is present: proxy.ts's middleware only lets a signed-out visitor through to
 // /dashboard with that flag, otherwise it redirects to "/" and every other param is lost.
-export function taskPortalUrl(taskId?: string): string {
+export function taskPortalUrl(taskId?: string, tab: "mytasks" | "tasks" = "mytasks"): string {
   const url = new URL("https://www.drinterested.org/dashboard")
   url.searchParams.set("login", "true")
-  url.searchParams.set("tab", "mytasks")
+  url.searchParams.set("tab", tab)
   if (taskId) url.searchParams.set("task", taskId)
   return url.toString()
 }

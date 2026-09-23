@@ -15,8 +15,10 @@ const fmtDate = (d: string) =>
  *      tasks created in bulk / via SQL that never went through the portal's notify call)
  *   2. "due tomorrow" reminder
  *   3. "due today" reminder
- * Plus a pass 0: archive tasks that have been Completed/Incomplete for 14+ days (only the
- * owner sees archived tasks, in the Assign Tasks panel's Archive section).
+ * Plus a pass 0, keyed off received_at (stamped when the assigner marks a task Received, or
+ * marks it Incomplete — that's also when it's archived, so nothing archives on a timer):
+ *   0a. 30+ days after received_at -> promote to the owner-only Permanent Archive
+ *   0b. 90+ days after received_at -> delete the row
  */
 const FINISHED = ["Completed", "Incomplete"]
 export async function GET(request: Request) {
@@ -35,20 +37,32 @@ export async function GET(request: Request) {
   const today = toDateStr(new Date())
   const tomorrow = toDateStr(new Date(Date.now() + 24 * 60 * 60 * 1000))
 
-  const results = { archived: 0, newAssignments: 0, dayBefore: 0, dueToday: 0, errors: [] as string[] }
+  const results = { permanentlyArchived: 0, deleted: 0, newAssignments: 0, dayBefore: 0, dueToday: 0, errors: [] as string[] }
 
   try {
-    // Pass 0 — archive tasks finished (Completed or Incomplete) 14+ days ago.
-    const archiveCutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
-    const { data: archivedRows, error: archErr } = await supabase
+    const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString()
+
+    // Pass 0a — promote to the Permanent Archive 30 days after the task was marked Received.
+    const { data: promotedRows, error: promoteErr } = await supabase
       .from("tasks")
-      .update({ archived: true, archived_at: new Date().toISOString() })
-      .eq("archived", false)
-      .in("status", FINISHED)
-      .lt("completed_at", archiveCutoff)
+      .update({ permanently_archived: true, permanently_archived_at: new Date().toISOString() })
+      .eq("archived", true)
+      .eq("permanently_archived", false)
+      .lte("received_at", daysAgo(30))
       .select("id")
-    if (archErr) results.errors.push(archErr.message)
-    else results.archived = archivedRows?.length || 0
+    if (promoteErr) results.errors.push(promoteErr.message)
+    else results.permanentlyArchived = promotedRows?.length || 0
+
+    // Pass 0b — hard delete 90 days after received_at. Runs after 0a, and requires the row to
+    // already be permanently archived, so nothing skips the Permanent Archive tier.
+    const { data: deletedRows, error: deleteErr } = await supabase
+      .from("tasks")
+      .delete()
+      .eq("permanently_archived", true)
+      .lte("received_at", daysAgo(90))
+      .select("id")
+    if (deleteErr) results.errors.push(deleteErr.message)
+    else results.deleted = deletedRows?.length || 0
 
     const { data: members } = await supabase.from("members").select("email, name")
     const nameByEmail = new Map((members || []).map((m: any) => [String(m.email).toLowerCase(), m.name]))

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
-import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle, Pencil } from "lucide-react"
+import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle, Pencil, Inbox, Link2, Paperclip, StickyNote } from "lucide-react"
 
 type TaskRow = {
   id: string
@@ -20,6 +20,13 @@ type TaskRow = {
   archived_at: string | null
   completed_at: string | null
   created_at: string
+  submission_url: string | null
+  submission_note: string | null
+  submission_file_url: string | null
+  received_at: string | null
+  received_by: string | null
+  permanently_archived: boolean
+  permanently_archived_at: string | null
 }
 
 // A task is "finished" once it's Completed or Incomplete. A group is finished (moves to the
@@ -92,7 +99,8 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     setLoading(true)
     try {
       let taskQuery = supabase.from("tasks").select("*").order("created_at", { ascending: false })
-      if (!isTrueOwner) taskQuery = taskQuery.eq("archived", false) // only the owner sees the archive
+      // Directors/deputies see their scope's Archive; only the owner sees the Permanent Archive.
+      if (!isTrueOwner) taskQuery = taskQuery.eq("permanently_archived", false)
       const [{ data: t }, { data: m }] = await Promise.all([
         taskQuery,
         supabase
@@ -143,11 +151,33 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     [isAdminLevel, isDirector, isDeputy, myDept, team],
   )
 
-  // Main view = non-archived, in-scope. The Archive section (owner only) is everything archived.
+  // Main view = non-archived, in-scope. Archive = archived (Received / Incomplete) but not yet
+  // promoted, in-scope. Permanent Archive (owner only, every scope) = 30+ days after Received.
   const scoped = useMemo(() => resolved.filter((t) => !t.archived && inScope(t)), [resolved, inScope])
   const archivedTasks = useMemo(
-    () => resolved.filter((t) => t.archived && inScope(t)).sort((a, b) => (b.archived_at || "").localeCompare(a.archived_at || "")),
+    () =>
+      resolved
+        .filter((t) => t.archived && !t.permanently_archived && inScope(t))
+        .sort((a, b) => (b.archived_at || "").localeCompare(a.archived_at || "")),
     [resolved, inScope],
+  )
+  const permanentTasks = useMemo(
+    () =>
+      isTrueOwner
+        ? resolved
+            .filter((t) => t.permanently_archived)
+            .sort((a, b) => (b.permanently_archived_at || "").localeCompare(a.permanently_archived_at || ""))
+        : [],
+    [resolved, isTrueOwner],
+  )
+
+  // assigned_by is set to `myUserId || myEmail` at creation, so match either.
+  const isMine = useCallback(
+    (t: TaskRow) => {
+      const by = (t.assigned_by || "").toLowerCase()
+      return !!by && (by === (myUserId || "").toLowerCase() || by === (myEmail || "").toLowerCase())
+    },
+    [myUserId, myEmail],
   )
 
   // Group identical tasks (title + description + due date).
@@ -185,10 +215,10 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     return groups
   }, [members])
 
-  async function setStatus(id: string, next: string) {
-    const patch: Record<string, any> = { status: next }
-    // completed_at drives the 14-day auto-archive clock — set it on any finished state, clear
-    // it when a task is reopened.
+  async function setStatus(id: string, next: string, extra: Record<string, any> = {}) {
+    const patch: Record<string, any> = { status: next, ...extra }
+    // completed_at records when a task was finished — set it on any finished state, clear it
+    // when a task is reopened.
     patch.completed_at = isFinished(next) ? new Date().toISOString() : null
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)))
     const { error } = await supabase.from("tasks").update(patch).eq("id", id)
@@ -199,9 +229,40 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
   }
   const toggleStatus = (id: string, status: string) => setStatus(id, STATUS_NEXT[status] || "Pending")
   const markIncomplete = (id: string) => {
-    if (window.confirm("Mark this Incomplete? It moves to Completed as \"not done / no longer needed\".")) {
-      setStatus(id, "Incomplete")
+    if (window.confirm("Mark this Incomplete? It's archived right away as \"not done / no longer needed\".")) {
+      // Nothing to review, so it skips the "Received" step and goes straight to the Archive.
+      // received_at is still stamped because it anchors the 30-day / 90-day cron clock.
+      const now = new Date().toISOString()
+      setStatus(id, "Incomplete", {
+        archived: true,
+        archived_at: now,
+        received_at: now,
+        received_by: myUserId || myEmail,
+      })
     }
+  }
+
+  // Assigner-only: acknowledges the submitted work. Archives the Completed rows now and starts
+  // the clock (see app/api/cron/task-reminders) that promotes them to the Permanent Archive
+  // 30 days after received_at and deletes them 90 days after.
+  async function markReceived(ids: string[]) {
+    if (!ids.length) return
+    const now = new Date().toISOString()
+    const { error } = await supabase
+      .from("tasks")
+      .update({ received_at: now, received_by: myUserId || myEmail, archived: true, archived_at: now })
+      .in("id", ids)
+    if (error) return alert("Failed to mark received: " + error.message)
+    load()
+  }
+
+  async function restore(id: string) {
+    const { error } = await supabase
+      .from("tasks")
+      .update({ archived: false, archived_at: null, received_at: null, received_by: null })
+      .eq("id", id)
+    if (error) return alert("Failed to restore: " + error.message)
+    load()
   }
 
   function openEditGroup(g: Group) {
@@ -331,6 +392,8 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
   const GroupCard = ({ g }: { g: Group }) => {
     const done = g.rows.filter((r) => isFinished(r.status)).length
     const gk = "g:" + g.key
+    // "Mark Received" is shown only to the assigner, and only once everyone is finished.
+    const receivable = isGroupFinished(g) ? g.rows.filter((r) => r.status === "Completed" && isMine(r)) : []
     return (
       <div className="border border-gray-200 rounded-xl">
         <button
@@ -352,6 +415,18 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
             {done}/{g.rows.length}
           </span>
         </button>
+
+        {receivable.length > 0 && (
+          <div className="mx-3 mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#4ecdc4]/40 bg-[#4ecdc4]/10 px-3 py-2 text-xs text-[#405862]">
+            <span className="flex-1 min-w-[12rem]">All done! Mark Received to start the archive clock.</span>
+            <button
+              onClick={() => markReceived(receivable.map((r) => r.id))}
+              className="inline-flex items-center gap-1 rounded-md bg-[#405862] px-3 py-1.5 font-semibold text-white hover:bg-[#334852]"
+            >
+              <Inbox className="w-3.5 h-3.5" /> Mark Received
+            </button>
+          </div>
+        )}
 
         {open[gk] && (
           <div className="border-t border-gray-100 divide-y divide-gray-50">
@@ -382,6 +457,25 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
                     <CheckCircle2 className="w-4 h-4" />
                   </button>
                   <span className="text-sm text-gray-700 flex-1 truncate">{r._name}</span>
+                  {r.status === "Completed" && (
+                    <span className="flex items-center gap-1.5 shrink-0 text-gray-400">
+                      {r.submission_url && (
+                        <a href={r.submission_url} target="_blank" rel="noopener noreferrer" title="Submitted link" className="hover:text-[#4CAF7D]">
+                          <Link2 className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {r.submission_file_url && (
+                        <a href={r.submission_file_url} target="_blank" rel="noopener noreferrer" title="Attached file" className="hover:text-[#4CAF7D]">
+                          <Paperclip className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {r.submission_note && (
+                        <span title={r.submission_note} className="cursor-help">
+                          <StickyNote className="w-3.5 h-3.5" />
+                        </span>
+                      )}
+                    </span>
+                  )}
                   <span
                     className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                       r.status === "Completed"
@@ -564,7 +658,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       )}
 
       {scoped.length === 0 ? (
-        archivedTasks.length === 0 ? <p className="text-center py-10 text-gray-400 text-sm">No tasks yet.</p> : null
+        archivedTasks.length === 0 && permanentTasks.length === 0 ? <p className="text-center py-10 text-gray-400 text-sm">No tasks yet.</p> : null
       ) : (
         <div className="space-y-3">
           {deptSections.map((dept) => {
@@ -624,8 +718,9 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
         </div>
       )}
 
-      {/* Archive — owner only. Tasks auto-archive 14 days after they're Completed/Incomplete. */}
-      {isTrueOwner && archivedTasks.length > 0 && (
+      {/* Archive — everyone sees their own scope. Tasks land here when the assigner marks them
+          Received (or marks them Incomplete); 30 days after that they move to the Permanent Archive. */}
+      {archivedTasks.length > 0 && (
         <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden">
           <button
             onClick={() => setOpen((o) => ({ ...o, archive: !o.archive }))}
@@ -660,15 +755,52 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
                   <span className="text-[11px] text-gray-400 shrink-0">
                     {r.archived_at ? new Date(r.archived_at).toLocaleDateString() : ""}
                   </span>
-                  <button
-                    onClick={async () => {
-                      await supabase.from("tasks").update({ archived: false, archived_at: null }).eq("id", r.id)
-                      load()
-                    }}
-                    className="text-xs text-[#4CAF7D] hover:underline shrink-0"
-                  >
+                  <button onClick={() => restore(r.id)} className="text-xs text-[#4CAF7D] hover:underline shrink-0">
                     Restore
                   </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Permanent Archive — owner only, read-only. Rows are deleted 90 days after Received. */}
+      {isTrueOwner && permanentTasks.length > 0 && (
+        <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden">
+          <button
+            onClick={() => setOpen((o) => ({ ...o, permArchive: !o.permArchive }))}
+            className="w-full flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 text-left"
+          >
+            <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${open.permArchive ? "rotate-90" : ""}`} />
+            <span className="font-bold text-gray-900">Permanent Archive</span>
+            <span className="text-xs text-gray-400">
+              {permanentTasks.length} task{permanentTasks.length === 1 ? "" : "s"}
+            </span>
+          </button>
+          {open.permArchive && (
+            <div className="divide-y divide-gray-100">
+              {permanentTasks.map((r) => (
+                <div key={r.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+                  <span className="flex-1 min-w-0 truncate text-gray-600">
+                    {r.title} <span className="text-gray-400">· {r._name}</span>
+                    {r._dept !== "Unassigned" && (
+                      <span className="text-gray-400">
+                        {" "}· {r._dept}
+                        {r._team ? ` / ${r._team}` : ""}
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
+                      r.status === "Completed" ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {r.status}
+                  </span>
+                  <span className="text-[11px] text-gray-400 shrink-0" title="Received">
+                    {r.received_at ? new Date(r.received_at).toLocaleDateString() : ""}
+                  </span>
                 </div>
               ))}
             </div>
