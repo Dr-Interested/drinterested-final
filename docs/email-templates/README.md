@@ -47,6 +47,16 @@ Set these environment variables in Vercel (Production and Preview):
   Without it the app falls back to `onboarding@resend.dev`, which Resend only delivers to the
   Resend account owner, so nobody else gets task emails.
 
+Also make sure `SUPABASE_SERVICE_ROLE_KEY` is set: the server needs it to read tasks before
+emailing them. To check everything at once, open the portal's **Admin** tab and click
+**Send test email**: it emails you and lists any missing or wrong settings, including Resend's
+own error message if it rejects the send.
+
+Assignment emails go out straight from the portal when a task is assigned (batched, so a task for
+a whole department doesn't hit Resend's rate limit). The Supabase "tasks INSERT" webhook to
+`/api/tasks/on-insert` is now optional backup, and the daily 9 AM ET job retries anything that
+failed. Nobody gets the same email twice.
+
 ## 4. Redirect URLs
 
 In **Authentication → URL Configuration**, set Site URL to `https://www.drinterested.org` and add

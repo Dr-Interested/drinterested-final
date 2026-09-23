@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { escapeHtml, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
+import { sendTaskEmails } from "@/lib/task-emails"
 
 export const dynamic = "force-dynamic"
 
@@ -46,29 +46,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ skipped: "already handled" })
   }
 
-  const { data: member } = await supabaseAdmin
-    .from("members")
-    .select("name")
-    .eq("email", String(task.assigned_to).toLowerCase())
-    .maybeSingle()
-
-  const { sent, reason } = await sendEmail({
-    to: task.assigned_to,
-    subject: `New task assigned: ${task.title}`,
-    html: taskEmailShell(
-      `Hi ${escapeHtml(member?.name || "there")}, you've been assigned a task`,
-      taskDetailsHtml(task),
-      taskPortalUrl(task.id),
-      "View the Task"
-    ),
-  })
-
-  if (sent) {
-    await supabaseAdmin
-      .from("tasks")
-      .update({ assigned_email_sent_at: new Date().toISOString() })
-      .eq("id", task.id)
-  }
-
-  return NextResponse.json({ sent, reason })
+  const { sent, failed } = await sendTaskEmails("assigned", [task])
+  return NextResponse.json({ sent, failed })
 }

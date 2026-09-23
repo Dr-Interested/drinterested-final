@@ -9,57 +9,105 @@
  * delivers to the Resend account owner's own inbox, so every other member would silently
  * get nothing.
  */
-export async function sendEmail({
-  to,
-  cc,
-  subject,
-  html,
-}: {
+export type EmailMessage = {
   to: string | string[]
   cc?: string | string[]
   subject: string
   html: string
-}): Promise<{ sent: boolean; reason?: string }> {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    console.warn("RESEND_API_KEY is not configured — skipping email:", subject)
-    return { sent: false, reason: "not_configured" }
-  }
+}
 
-  const from = process.env.RESEND_FROM_EMAIL || "Dr. Interested Portal <onboarding@resend.dev>"
+const RESEND_API = "https://api.resend.com"
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+function fromAddress(): string {
   if (!process.env.RESEND_FROM_EMAIL) {
     console.warn("RESEND_FROM_EMAIL is not set — onboarding@resend.dev only delivers to the Resend account owner.")
   }
+  return process.env.RESEND_FROM_EMAIL || "Dr. Interested Portal <onboarding@resend.dev>"
+}
 
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to,
-        ...(cc && cc.length ? { cc } : {}),
-        subject,
-        html,
-        // A plain-text alternative alongside the HTML noticeably helps inbox placement.
-        text: htmlToText(html),
-      }),
-    })
-
-    if (!res.ok) {
-      const body = await res.text().catch(() => "")
-      console.error("Resend send failed:", res.status, body)
-      return { sent: false, reason: `resend_${res.status}` }
-    }
-
-    return { sent: true }
-  } catch (err) {
-    console.error("Resend send threw:", err)
-    return { sent: false, reason: "network_error" }
+function toPayload(m: EmailMessage, from: string) {
+  return {
+    from,
+    to: m.to,
+    ...(m.cc && m.cc.length ? { cc: m.cc } : {}),
+    subject: m.subject,
+    html: m.html,
+    // A plain-text alternative alongside the HTML noticeably helps inbox placement.
+    text: htmlToText(m.html),
   }
+}
+
+// POST to Resend, retrying when it answers 429. Resend allows only a few requests per second
+// per account, so a burst (a task assigned to a whole department fires one webhook per
+// person at the same moment) used to get most of its emails rejected and silently dropped.
+async function resendPost(path: string, body: unknown): Promise<{ ok: boolean; status: number; text: string }> {
+  const apiKey = process.env.RESEND_API_KEY!
+  let last = { ok: false, status: 0, text: "" }
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const res = await fetch(`${RESEND_API}${path}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+      const text = await res.text().catch(() => "")
+      last = { ok: res.ok, status: res.status, text }
+      if (res.status !== 429 && res.status < 500) return last
+      const retryAfter = Number(res.headers.get("retry-after"))
+      await sleep(retryAfter > 0 ? retryAfter * 1000 : 600 * (attempt + 1) + Math.random() * 400)
+    } catch (err) {
+      last = { ok: false, status: 0, text: String(err) }
+      await sleep(600 * (attempt + 1))
+    }
+  }
+  return last
+}
+
+/**
+ * Minimal Resend email sender — calls Resend's plain HTTP API directly (no SDK dependency).
+ * Requires RESEND_API_KEY and RESEND_FROM_EMAIL in the environment. If the API key is
+ * missing it logs a warning and no-ops rather than throwing, so task actions never fail
+ * just because email isn't set up yet.
+ *
+ * RESEND_FROM_EMAIL must be an address on a domain verified in Resend (e.g.
+ * "Dr. Interested <portal@drinterested.org>"). The fallback onboarding@resend.dev sender only
+ * delivers to the Resend account owner's own inbox, so every other member would silently
+ * get nothing.
+ */
+export async function sendEmail(message: EmailMessage): Promise<{ sent: boolean; reason?: string; detail?: string }> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not configured — skipping email:", message.subject)
+    return { sent: false, reason: "not_configured" }
+  }
+  const res = await resendPost("/emails", toPayload(message, fromAddress()))
+  if (!res.ok) {
+    console.error("Resend send failed:", res.status, res.text)
+    return { sent: false, reason: `resend_${res.status}`, detail: res.text }
+  }
+  return { sent: true }
+}
+
+/**
+ * Sends many emails through Resend's batch endpoint (up to 100 per request), so bulk task
+ * assignments and the daily reminder run don't hit Resend's per-second rate limit. Returns,
+ * in order, whether each message was accepted.
+ */
+export async function sendEmailBatch(messages: EmailMessage[]): Promise<boolean[]> {
+  if (!messages.length) return []
+  if (!process.env.RESEND_API_KEY) {
+    console.warn(`RESEND_API_KEY is not configured — skipping ${messages.length} email(s).`)
+    return messages.map(() => false)
+  }
+  const from = fromAddress()
+  const results: boolean[] = []
+  for (let i = 0; i < messages.length; i += 100) {
+    const chunk = messages.slice(i, i + 100)
+    const res = await resendPost("/emails/batch", chunk.map((m) => toPayload(m, from)))
+    if (!res.ok) console.error("Resend batch send failed:", res.status, res.text)
+    results.push(...chunk.map(() => res.ok))
+  }
+  return results
 }
 
 /** Escape user-controlled text (task titles, notes, names) before it goes into email HTML. */

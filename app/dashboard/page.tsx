@@ -16,6 +16,7 @@ import PortalFirstVisitPrompts from "@/components/dashboard/PortalFirstVisitProm
 import PortalTabSelector from "@/components/dashboard/PortalTabSelector"
 import PortalLogin from "@/components/dashboard/PortalLogin"
 import MyTasksTab from "@/components/dashboard/MyTasksTab"
+import EmailTestCard from "@/components/dashboard/EmailTestCard"
 import DirectoryTab from "@/components/dashboard/DirectoryTab"
 import AttendanceTab from "@/components/dashboard/AttendanceTab"
 import StrikesTab from "@/components/dashboard/StrikesTab"
@@ -991,6 +992,8 @@ export default function DbAdminPage() {
           {activeMainTab === "admin" && (
             <h2 className="text-xl font-bold font-bricolage text-[#1a1a1a] mb-6">Admin Settings</h2>
           )}
+          {userIsTrueOwner && activeMainTab === "admin" && <EmailTestCard />}
+
           {/* Site-wide links (Drive folder, shared calendar) — true-owner-only (not Admin Team
               leadership), since these apply org-wide, not just to HR. Now on their own Admin tab. */}
           {userIsTrueOwner && activeMainTab === "admin" && (

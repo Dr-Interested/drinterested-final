@@ -358,7 +358,10 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       const batch = recipients.length > 1 ? crypto.randomUUID() : null
       const forDept = isAdminLevel ? form.forDept : myDept
       const forTeam = form.target === "team" ? (isDeputy ? team : form.team) || null : isDeputy ? team : null
+      // Ids are generated here (not read back with .select()) so the follow-up email request
+      // knows which rows to send for without depending on SELECT policies for new rows.
       const rows = recipients.map((email) => ({
+        id: crypto.randomUUID(),
         title: form.title.trim(),
         description: form.description.trim() || "",
         assigned_to: email,
@@ -371,6 +374,24 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       }))
       const { error } = await supabase.from("tasks").insert(rows)
       if (error) throw error
+      // Send the assignment emails now (batched, so big group assignments don't hit the email
+      // provider's rate limit). Fire-and-forget: the daily cron retries anything that fails.
+      const taskIds = rows.map((r) => r.id)
+      if (taskIds.length) {
+        supabase.auth
+          .getSession()
+          .then(({ data: { session } }) =>
+            fetch("/api/tasks/notify-new", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+              },
+              body: JSON.stringify({ taskIds }),
+            }),
+          )
+          .catch((err) => console.error("Assignment emails failed:", err))
+      }
       setCreating(false)
       setForm((f) => ({ ...f, title: "", description: "", due_date: "", assigned_to: "" }))
       load()
