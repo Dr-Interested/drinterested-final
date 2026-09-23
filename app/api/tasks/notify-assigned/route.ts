@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { sendEmail, taskEmailShell } from "@/lib/send-email"
+import { sendEmail, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +24,8 @@ export async function POST(request: Request) {
           ${description ? `<p>${description}</p>` : ""}
           ${dueLine}
           ${assigned_by_name ? `<p style="color:#888;font-size:13px;">Assigned by ${assigned_by_name}</p>` : ""}
-        `
+        `,
+        taskPortalUrl()
       ),
     })
 

@@ -273,6 +273,11 @@ export default function DbAdminPage() {
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
   const [completionForm, setCompletionForm] = useState({ submission_url: "", time_spent_minutes: "" })
   const [savingCompletion, setSavingCompletion] = useState(false)
+  // The task id a reminder/assignment email's "Open the Portal" link points at (?task=<id>),
+  // so My Tasks can scroll to and briefly highlight that specific card once it loads.
+  const [deepLinkedTaskId] = useState<string | null>(() =>
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : null
+  )
 
   // Auth Effect — the single place that syncs isAuthenticated with the actual Supabase
   // session AND keeps the portal-session cookie (read by proxy.ts middleware) in lockstep,
@@ -331,8 +336,12 @@ export default function DbAdminPage() {
           const { level, tabs } = resolveAccess(profile || null, user.email)
           setAccessLevel(level)
           setVisibleTabs(tabs)
+          // A task email's "Open the Portal" link carries ?tab=mytasks (and often
+          // &task=<id>, see deepLinkedTaskId below) so it lands the assignee directly on
+          // their tasks instead of the owner/director's default admin tab.
+          const requestedTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null
           setActiveMainTab(
-            tabs.length > 0 ? tabs[0] : level === "deputy" ? "directory" : "mytasks"
+            requestedTab || (tabs.length > 0 ? tabs[0] : level === "deputy" ? "directory" : "mytasks")
           )
         }
       } catch (err) {
@@ -508,6 +517,15 @@ export default function DbAdminPage() {
 
       if (error) throw error
       setMyTasks(data || [])
+      if (deepLinkedTaskId) {
+        const target = (data || []).find((t: Task) => t.id === deepLinkedTaskId)
+        if (target && ["Completed", "Incomplete"].includes(target.status)) setMyTasksShowDone(true)
+        // Deferred so the card has actually painted (and the "Completed" section, if just
+        // expanded above, has re-rendered) before we scroll to it.
+        setTimeout(() => {
+          document.getElementById(`task-${deepLinkedTaskId}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
+        }, 100)
+      }
     } catch (err) {
       console.error("Error fetching member tasks:", err)
     }
@@ -1367,8 +1385,15 @@ export default function DbAdminPage() {
         const doneTasks = myTasks.filter((t) => FINISHED.includes(t.status))
         const renderCard = (task: Task) => {
           const isDone = FINISHED.includes(task.status)
+          const isDeepLinked = task.id === deepLinkedTaskId
           return (
-            <div key={task.id} className="p-4 border border-gray-150 rounded-xl hover:border-gray-300 transition-colors flex items-start gap-3">
+            <div
+              key={task.id}
+              id={`task-${task.id}`}
+              className={`p-4 border rounded-xl transition-colors flex items-start gap-3 ${
+                isDeepLinked ? "border-[#4ecdc4] ring-2 ring-[#4ecdc4]/40" : "border-gray-150 hover:border-gray-300"
+              }`}
+            >
               <div className="flex items-start gap-3 min-w-0 flex-1">
                 <button
                   onClick={() => handleUpdateTaskStatus(task.id, task.status, task)}

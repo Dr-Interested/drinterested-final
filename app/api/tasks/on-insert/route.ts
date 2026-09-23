@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { sendEmail, taskEmailShell } from "@/lib/send-email"
+import { sendEmail, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 
 export const dynamic = "force-dynamic"
 
@@ -63,7 +63,8 @@ export async function POST(request: Request) {
         <p><strong>${task.title}</strong></p>
         ${task.description ? `<p>${task.description}</p>` : ""}
         ${dueLine}
-      `
+      `,
+      taskPortalUrl(task.id)
     ),
   })
 

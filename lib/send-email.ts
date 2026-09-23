@@ -50,7 +50,7 @@ export async function sendEmail({
 // Signup / Magic Link / Reset Password) — same logo, colors (#405862 / #4ecdc4), card layout,
 // and legal footer — so all outgoing mail reads as one consistent, trustworthy sender rather
 // than a mix of styles, which also helps avoid spam/phishing heuristics on bare-link emails.
-export function taskEmailShell(title: string, bodyHtml: string): string {
+export function taskEmailShell(title: string, bodyHtml: string, portalUrl?: string): string {
   return `
     <div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #ffffff;">
       <div style="background: #f5f1eb; padding: 24px; text-align: center; border-radius: 12px 12px 0 0;">
@@ -62,7 +62,7 @@ export function taskEmailShell(title: string, bodyHtml: string): string {
           ${bodyHtml}
         </div>
         <p style="margin: 28px 0 0; text-align: center;">
-          <a href="https://www.drinterested.org/dashboard?login=true" style="background: #4ecdc4; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+          <a href="${portalUrl || "https://www.drinterested.org/dashboard?login=true"}" style="background: #4ecdc4; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
             Open the Portal
           </a>
         </p>
@@ -78,4 +78,16 @@ export function taskEmailShell(title: string, bodyHtml: string): string {
       </div>
     </div>
   `
+}
+
+// Deep link into a member's My Tasks tab (and, once there, straight to the task itself —
+// see the "task" query param read in app/dashboard/page.tsx). "login=true" is required even
+// when a task id is present: proxy.ts's middleware only lets a signed-out visitor through to
+// /dashboard with that flag, otherwise it redirects to "/" and every other param is lost.
+export function taskPortalUrl(taskId?: string): string {
+  const url = new URL("https://www.drinterested.org/dashboard")
+  url.searchParams.set("login", "true")
+  url.searchParams.set("tab", "mytasks")
+  if (taskId) url.searchParams.set("task", taskId)
+  return url.toString()
 }

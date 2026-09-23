@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin"
-import { sendEmail, taskEmailShell } from "@/lib/send-email"
+import { sendEmail, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 
 export const dynamic = "force-dynamic"
 
@@ -85,7 +85,8 @@ export async function GET(request: Request) {
               <p><strong>${task.title}</strong></p>
               ${task.description ? `<p>${task.description}</p>` : ""}
               ${task.due_date ? `<p><strong>Due:</strong> ${fmtDate(task.due_date)}</p>` : ""}
-            `
+            `,
+            taskPortalUrl(task.id)
           ),
         })
 
@@ -124,7 +125,8 @@ export async function GET(request: Request) {
               <p><strong>${task.title}</strong></p>
               ${task.description ? `<p>${task.description}</p>` : ""}
               <p><strong>Due:</strong> ${new Date(task.due_date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
-            `
+            `,
+            taskPortalUrl(task.id)
           ),
         })
 

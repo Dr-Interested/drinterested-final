@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { normalizeDepartmentName, subteamsFor } from "@/lib/teams"
-import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle } from "lucide-react"
+import { Loader2, CheckCircle2, Trash, ChevronRight, Users, XCircle, Pencil } from "lucide-react"
 
 type TaskRow = {
   id: string
@@ -74,6 +74,9 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
   const [creating, setCreating] = useState(false)
   const [saving, setSaving] = useState(false)
   const [open, setOpen] = useState<Record<string, boolean>>({})
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null)
+  const [editForm, setEditForm] = useState({ title: "", description: "", due_date: "" })
+  const [savingEdit, setSavingEdit] = useState(false)
 
   const [form, setForm] = useState({
     title: "",
@@ -201,6 +204,45 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
     }
   }
 
+  function openEditGroup(g: Group) {
+    setEditingGroup(g)
+    setEditForm({ title: g.title, description: g.description || "", due_date: g.due_date || "" })
+  }
+
+  // Edits (title/description/due_date) apply to every row in the group — that's how identical
+  // tasks were grouped in the first place, so this is also the fix for "no way to change the
+  // due date without deleting and recreating the task."
+  async function saveEditGroup() {
+    if (!editingGroup) return
+    if (!editForm.title.trim()) return alert("Give the task a title.")
+    setSavingEdit(true)
+    try {
+      const patch: Record<string, any> = {
+        title: editForm.title.trim(),
+        description: editForm.description.trim() || "",
+        due_date: editForm.due_date || null,
+      }
+      // If the due date moved, clear the "reminder already sent" stamps — otherwise the
+      // daily cron sees them already set (from the old date) and silently skips the
+      // day-before/due-today reminder for the new date.
+      if (patch.due_date !== editingGroup.due_date) {
+        patch.reminder_day_before_sent_at = null
+        patch.reminder_due_sent_at = null
+      }
+      const { error } = await supabase
+        .from("tasks")
+        .update(patch)
+        .in("id", editingGroup.rows.map((r) => r.id))
+      if (error) throw error
+      setEditingGroup(null)
+      load()
+    } catch (err: any) {
+      alert("Failed to save changes: " + err.message)
+    } finally {
+      setSavingEdit(false)
+    }
+  }
+
   async function deleteRows(ids: string[], label: string) {
     if (!window.confirm(`Delete ${ids.length === 1 ? "this task" : `${ids.length} task(s) for "${label}"`}?`)) return
     const { error } = await supabase.from("tasks").delete().in("id", ids)
@@ -313,7 +355,13 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
 
         {open[gk] && (
           <div className="border-t border-gray-100 divide-y divide-gray-50">
-            <div className="flex justify-end px-3 py-1.5">
+            <div className="flex justify-end gap-3 px-3 py-1.5">
+              <button
+                onClick={() => openEditGroup(g)}
+                className="text-xs text-gray-500 hover:text-gray-700 inline-flex items-center gap-1"
+              >
+                <Pencil className="w-3 h-3" /> Edit
+              </button>
               <button
                 onClick={() => deleteRows(g.rows.map((r) => r.id), g.title)}
                 className="text-xs text-red-500 hover:text-red-700 inline-flex items-center gap-1"
@@ -625,6 +673,55 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {editingGroup && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setEditingGroup(null)}>
+          <div
+            className="bg-white rounded-xl p-5 w-full max-w-md space-y-3 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-bold text-gray-800">Edit task{editingGroup.rows.length > 1 ? ` (${editingGroup.rows.length} people)` : ""}</h3>
+            <input
+              type="text"
+              placeholder="Task title *"
+              value={editForm.title}
+              onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+              className="w-full p-2.5 border border-gray-300 rounded"
+            />
+            <textarea
+              placeholder="Description / instructions"
+              value={editForm.description}
+              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+              rows={2}
+              className="w-full p-2.5 border border-gray-300 rounded"
+            />
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Due date</label>
+              <input
+                type="date"
+                value={editForm.due_date}
+                onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })}
+                className="w-full p-2.5 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                onClick={() => setEditingGroup(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditGroup}
+                disabled={savingEdit}
+                className="px-4 py-2 bg-[#4CAF7D] hover:bg-[#2d8659] text-white font-semibold rounded text-sm disabled:opacity-60"
+              >
+                {savingEdit ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
