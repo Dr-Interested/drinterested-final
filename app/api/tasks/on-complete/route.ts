@@ -9,13 +9,13 @@ export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
 /**
- * Called by the portal (app/dashboard/page.tsx, handleSubmitTaskCompletion) right after a
- * member marks a task Completed. Emails the people who should review it, CC'ing the
- * completer, with whatever they submitted (link / note / file):
- *   - completer is a Director or Admin Team leadership -> the owner
- *   - completer is a Deputy Director                   -> their department's Director
- *   - anyone else -> their department's Director + their own team's Deputy Director
- *     (falling back to the owner if neither exists, so nothing silently goes nowhere)
+ * Called by the portal (components/dashboard/MyTasksTab.tsx) right after a member marks a
+ * task Completed. Emails the completer, CC'ing the people who review their work, with
+ * whatever they submitted (link / note / file):
+ *   - completer is a Director or above -> CC the owner
+ *   - completer is a Deputy Director   -> CC their department's Director
+ *   - anyone else                      -> CC their team's Deputy Director + department Director
+ *     (falling back to the owner if neither exists, so the review never goes nowhere)
  *
  * The caller must be signed in as the task's assignee (Authorization: Bearer <access token>),
  * and the task must actually be Completed, so this can't be used to spam reviewers.
@@ -70,20 +70,22 @@ export async function POST(request: Request) {
       )
     : undefined
 
-  let to: string[]
+  // To: the person who completed the task. CC: whoever reviews their work, by role:
+  //   Director or above (Director / Chair / Admin Team leadership) -> the owner
+  //   Deputy Director                                            -> their department's Director
+  //   anyone else (Coordinator etc.)                             -> their team's Deputy Director
+  //                                                                 + their department's Director
+  // If none of those can be found, the owner is CC'd so the review never goes nowhere.
+  let cc: string[]
   if (LEADERSHIP_RANK.includes(role) || (isDirectorRole(role) && !isDeputyRole(role))) {
-    to = [...OWNER_EMAILS]
+    cc = [...OWNER_EMAILS]
   } else if (isDeputyRole(role)) {
-    to = director ? [emailOf(director)] : []
+    cc = director ? [emailOf(director)] : []
   } else {
-    to = [director, deputy].filter(Boolean).map(emailOf)
+    cc = [deputy, director].filter(Boolean).map(emailOf)
   }
-  to = Array.from(new Set(to.filter((e) => e && e !== callerEmail)))
-  if (to.length === 0) to = OWNER_EMAILS.filter((e) => e !== callerEmail)
-  // The owner (or whoever has no one above them) completing their own task still gets the
-  // email as a record, rather than nothing being sent at all.
-  const ccCompleter = to.length > 0
-  if (to.length === 0) to = [callerEmail]
+  cc = Array.from(new Set(cc.filter((e) => e && e !== callerEmail)))
+  if (cc.length === 0) cc = OWNER_EMAILS.filter((e) => e !== callerEmail)
 
   const completerName = completer?.name || callerEmail
   const link = safeUrl(task.submission_url)
@@ -98,8 +100,8 @@ export async function POST(request: Request) {
   ].join("")
 
   const { sent, reason } = await sendEmail({
-    to,
-    cc: ccCompleter ? callerEmail : undefined,
+    to: callerEmail,
+    cc: cc.length ? cc : undefined,
     subject: `Task completed: ${task.title}`,
     html: taskEmailShell(
       `${esc(completerName)} completed a task`,
