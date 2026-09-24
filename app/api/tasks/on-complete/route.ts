@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { escapeHtml as esc, safeHttpUrl as safeUrl, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
-import { isDeputyRole, isDirectorRole, LEADERSHIP_RANK, normalizeDepartmentName } from "@/lib/teams"
-import { OWNER_EMAILS } from "@/lib/owner"
+import { completionReviewers } from "@/lib/completion-reviewers"
 
 export const dynamic = "force-dynamic"
 // Room for retries when Resend is rate limiting, and for bulk sends.
@@ -15,7 +14,7 @@ export const maxDuration = 60
  *   - completer is a Director or above -> CC the owner
  *   - completer is a Deputy Director   -> CC their department's Director
  *   - anyone else                      -> CC their team's Deputy Director + department Director
- *     (falling back to the owner if neither exists, so the review never goes nowhere)
+ *   See lib/completion-reviewers.ts.
  *
  * The caller must be signed in as the task's assignee (Authorization: Bearer <access token>),
  * and the task must actually be Completed, so this can't be used to spam reviewers.
@@ -54,38 +53,7 @@ export async function POST(request: Request) {
 
   const all = members || []
   const completer = all.find((m: any) => String(m.email || "").toLowerCase() === callerEmail)
-  const role = (completer?.role || "").trim()
-  // Same resolution as TasksAdminTab's `resolved` memo: task column first, then the member row.
-  const dept = normalizeDepartmentName(task.department || completer?.department || "")
-  const team = task.team || completer?.team || null
-
-  const emailOf = (m: any) => String(m?.email || "").toLowerCase()
-  const director = all.find(
-    (m: any) =>
-      normalizeDepartmentName(m.department) === dept && isDirectorRole(m.role) && !isDeputyRole(m.role),
-  )
-  const deputy = team
-    ? all.find(
-        (m: any) => normalizeDepartmentName(m.department) === dept && (m.team || "") === team && isDeputyRole(m.role),
-      )
-    : undefined
-
-  // To: the person who completed the task. CC: whoever reviews their work, by role:
-  //   Director or above (Director / Chair / Admin Team leadership) -> the owner
-  //   Deputy Director                                            -> their department's Director
-  //   anyone else (Coordinator etc.)                             -> their team's Deputy Director
-  //                                                                 + their department's Director
-  // If none of those can be found, the owner is CC'd so the review never goes nowhere.
-  let cc: string[]
-  if (LEADERSHIP_RANK.includes(role) || (isDirectorRole(role) && !isDeputyRole(role))) {
-    cc = [...OWNER_EMAILS]
-  } else if (isDeputyRole(role)) {
-    cc = director ? [emailOf(director)] : []
-  } else {
-    cc = [deputy, director].filter(Boolean).map(emailOf)
-  }
-  cc = Array.from(new Set(cc.filter((e) => e && e !== callerEmail)))
-  if (cc.length === 0) cc = OWNER_EMAILS.filter((e) => e !== callerEmail)
+  const { dept, team, cc } = completionReviewers(completer, task, all, callerEmail)
 
   const completerName = completer?.name || callerEmail
   const link = safeUrl(task.submission_url)
