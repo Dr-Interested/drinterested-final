@@ -296,6 +296,7 @@ export default function TasksAdminTab({ accessLevel, isTrueOwner, department, te
       if (patch.due_date !== editingGroup.due_date) {
         patch.reminder_day_before_sent_at = null
         patch.reminder_due_sent_at = null
+        patch.overdue_email_sent_at = null
       }
       const { error } = await supabase
         .from("tasks")

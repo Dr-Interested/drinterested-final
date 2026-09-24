@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { escapeHtml, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl, type EmailMessage } from "@/lib/send-email"
+import { escapeHtml, formatDueDate, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl, type EmailMessage } from "@/lib/send-email"
+import { completionReviewers } from "@/lib/completion-reviewers"
 
 // Server-only. Task assignment / reminder emails, sent exactly once per task even though two
 // things can try to send the assignment email (the Supabase INSERT webhook and the daily
@@ -13,19 +14,45 @@ type TaskRow = {
   description?: string | null
   due_date?: string | null
   assigned_to?: string | null
+  department?: string | null
+  team?: string | null
 }
 
-type SentColumn = "assigned_email_sent_at" | "reminder_day_before_sent_at" | "reminder_due_sent_at"
-export type TaskEmailKind = "assigned" | "due_tomorrow" | "due_today"
+type SentColumn =
+  | "assigned_email_sent_at"
+  | "reminder_day_before_sent_at"
+  | "reminder_due_sent_at"
+  | "overdue_email_sent_at"
+export type TaskEmailKind = "assigned" | "due_tomorrow" | "due_today" | "overdue"
 
 const COLUMN: Record<TaskEmailKind, SentColumn> = {
   assigned: "assigned_email_sent_at",
   due_tomorrow: "reminder_day_before_sent_at",
   due_today: "reminder_due_sent_at",
+  overdue: "overdue_email_sent_at",
 }
 
-function buildMessage(kind: TaskEmailKind, task: TaskRow, name: string | undefined): EmailMessage {
+type MemberRow = { email: string; name: string; role: string | null; department: string | null; team: string | null }
+
+function buildMessage(kind: TaskEmailKind, task: TaskRow, name: string | undefined, cc?: string[]): EmailMessage {
   const hi = `Hi ${escapeHtml(name || "there")}`
+  if (kind === "overdue") {
+    // Sent once, just after midnight ET the day after the due date, CC'ing the same reviewers
+    // as the "Task completed" email (see lib/completion-reviewers.ts).
+    return {
+      to: String(task.assigned_to),
+      ...(cc && cc.length ? { cc } : {}),
+      subject: `Overdue: ${task.title}`,
+      html: taskEmailShell(
+        `${hi}, a task is now overdue`,
+        `${taskDetailsHtml(task)}
+        <p style="margin:12px 0 0;">This task was due by 11:59 PM ET on ${
+          task.due_date ? formatDueDate(task.due_date) : "its due date"
+        } and hasn't been marked complete yet. Please finish it and submit it in the portal as soon as you can, or reach out to your director if you need more time.</p>`,
+        taskPortalUrl(task.id),
+      ),
+    }
+  }
   const subject =
     kind === "assigned"
       ? `New task assigned: ${task.title}`
@@ -48,6 +75,15 @@ async function namesByEmail(emails: string[]): Promise<Map<string, string>> {
   if (!unique.length) return new Map()
   const { data } = await supabaseAdmin.from("members").select("email, name").in("email", unique)
   return new Map((data || []).map((m: { email: string; name: string }) => [String(m.email).toLowerCase(), m.name]))
+}
+
+async function activeMembers(): Promise<MemberRow[]> {
+  const { data } = await supabaseAdmin
+    .from("members")
+    .select("email, name, role, department, team")
+    .eq("approved", true)
+    .eq("archived", false)
+  return (data || []) as MemberRow[]
 }
 
 /** Claims, sends and (on failure) releases the given tasks' emails. Returns how many were sent. */
@@ -75,10 +111,17 @@ export async function sendTaskEmails(kind: TaskEmailKind, tasks: TaskRow[]): Pro
   if (!toSend.length) return { sent: 0, failed: 0 }
 
   const names = await namesByEmail(toSend.map((t) => String(t.assigned_to)))
+  const members = kind === "overdue" ? await activeMembers() : []
+  const ccFor = (t: TaskRow) => {
+    if (kind !== "overdue") return undefined
+    const email = String(t.assigned_to).toLowerCase()
+    const member = members.find((m) => String(m.email || "").toLowerCase() === email)
+    return completionReviewers(member, t, members, email).cc
+  }
   // One email per task, one after another (sendEmail retries if Resend says it's busy).
   const results: boolean[] = []
   for (const t of toSend) {
-    const { sent } = await sendEmail(buildMessage(kind, t, names.get(String(t.assigned_to).toLowerCase())))
+    const { sent } = await sendEmail(buildMessage(kind, t, names.get(String(t.assigned_to).toLowerCase()), ccFor(t)))
     results.push(sent)
   }
 

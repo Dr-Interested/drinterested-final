@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/task-reminders",
       "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/task-overdue",
+      "schedule": "1 5 * * *"
     }
   ]
 }
