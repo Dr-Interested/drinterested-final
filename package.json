@@ -80,7 +80,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.5",
     "postcss": "^8.5",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5"
   },
   "overrides": {
