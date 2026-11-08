@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { rateLimit } from "@/lib/rate-limit"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { escapeHtml, sendEmail, taskEmailShell } from "@/lib/send-email"
 import { OWNER_EMAILS } from "@/lib/owner"
@@ -22,6 +23,9 @@ export async function POST(request: Request) {
   } = await supabaseAdmin.auth.getUser(token)
   const callerEmail = user?.email?.toLowerCase()
   if (!callerEmail) return NextResponse.json({ error: "Not signed in." }, { status: 401 })
+  if (!rateLimit(`approve:${callerEmail}`, 60, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many requests. Please try again in a few minutes." }, { status: 429 })
+  }
 
   if (!OWNER_EMAILS.includes(callerEmail)) {
     const { data: caller } = await supabaseAdmin

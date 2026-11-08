@@ -35,6 +35,8 @@ export type DriveFolderListing = {
 // real quota, so this only works at all when the connected account is a normal Gmail/Workspace
 // user (ideally the one that already owns the shared folder, so no re-sharing is needed).
 export const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
+// HttpOnly cookie holding the one-time OAuth `state` between /api/drive/oauth/start and callback.
+export const DRIVE_OAUTH_STATE_COOKIE = "drive_oauth_state"
 const DRIVE_API_BASE = "https://www.googleapis.com/drive/v3/files"
 const DRIVE_UPLOAD_BASE = "https://www.googleapis.com/upload/drive/v3/files"
 const FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"

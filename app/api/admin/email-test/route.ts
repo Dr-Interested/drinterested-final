@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { rateLimit } from "@/lib/rate-limit"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { OWNER_EMAILS } from "@/lib/owner"
 import { sendEmail, taskEmailShell } from "@/lib/send-email"
@@ -21,6 +22,9 @@ export async function POST(request: Request) {
   } = token ? await supabaseAdmin.auth.getUser(token) : { data: { user: null } }
   const email = user?.email?.toLowerCase()
   if (!email || !OWNER_EMAILS.includes(email)) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!rateLimit(`email-test:${email}`, 10, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many requests. Please try again in a few minutes." }, { status: 429 })
+  }
 
   // "Send missed task emails": assignment emails for open tasks from the last 14 days that
   // never got one (same thing the daily cron does each morning, on demand).

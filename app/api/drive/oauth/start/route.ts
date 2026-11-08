@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
+import { randomBytes } from "crypto"
 import { OAuth2Client } from "google-auth-library"
-import { DriveApiError, getOAuthClientCredentials, DRIVE_SCOPE } from "@/lib/google-drive"
+import { DriveApiError, getOAuthClientCredentials, DRIVE_SCOPE, DRIVE_OAUTH_STATE_COOKIE } from "@/lib/google-drive"
 
 /**
  * One-time bootstrapping step (see the comment at the top of lib/google-drive.ts for why this
@@ -17,7 +18,11 @@ export async function GET(request: Request) {
     const redirectUri = new URL("/api/drive/oauth/callback", request.url).toString()
 
     const client = new OAuth2Client({ clientId, clientSecret, redirectUri })
+    // One-time `state` value, also kept in an HttpOnly cookie, so the callback only accepts a
+    // Google response to a connection started from this browser (OAuth CSRF protection).
+    const state = randomBytes(24).toString("base64url")
     const url = client.generateAuthUrl({
+      state,
       access_type: "offline",
       // Forces Google to hand back a refresh_token even if this account has connected before —
       // without this, a second connect attempt can silently return no refresh_token at all.
@@ -25,7 +30,16 @@ export async function GET(request: Request) {
       scope: [DRIVE_SCOPE],
     })
 
-    return NextResponse.redirect(url)
+    const res = NextResponse.redirect(url)
+    res.cookies.set(DRIVE_OAUTH_STATE_COOKIE, state, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/api/drive/oauth",
+      maxAge: 10 * 60,
+    })
+    res.headers.set("Cache-Control", "no-store")
+    return res
   } catch (err) {
     if (err instanceof DriveApiError) {
       return NextResponse.json({ error: err.message }, { status: err.status })
