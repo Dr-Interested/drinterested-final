@@ -1,5 +1,9 @@
 import type { MetadataRoute } from "next"
 
+// Server endpoints aren't pages: keep every crawler out of them. (Each named group below needs
+// its own disallow, because a crawler that matches a named group ignores the "*" group.)
+const API_PATHS = ["/api/"]
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -11,11 +15,13 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        disallow: API_PATHS,
       },
       // ChatGPT and OpenAI crawlers
       {
         userAgent: ["ChatGPT-User", "GPTBot", "GPT-Actions", "OAI-SearchBot"],
         allow: "/",
+        disallow: API_PATHS,
       },
       // Major search engines
       {
@@ -31,6 +37,7 @@ export default function robots(): MetadataRoute.Robots {
           "PetalBot", // Huawei Petal Search
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
       // AI and assistant crawlers
       {
@@ -46,6 +53,7 @@ export default function robots(): MetadataRoute.Robots {
           "meta-externalfetcher",
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
       // Social media crawlers
       {
@@ -58,6 +66,7 @@ export default function robots(): MetadataRoute.Robots {
           "OpenGraphXYZBot",
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
       // SEO and analytics tools
       {
@@ -75,6 +84,7 @@ export default function robots(): MetadataRoute.Robots {
           "SeekportBot",
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
       // Monitoring and uptime services
       {
@@ -94,6 +104,7 @@ export default function robots(): MetadataRoute.Robots {
           "Amazon Route 53 Health Check Service",
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
       // Feed readers and content services
       {
@@ -105,6 +116,7 @@ export default function robots(): MetadataRoute.Robots {
           "Cotoyogi",
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
       // Ad and marketing crawlers
       {
@@ -118,11 +130,13 @@ export default function robots(): MetadataRoute.Robots {
           "naver-blueno", // Naver preview
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
       // Security and compliance
       {
         userAgent: ["Detectify", "CookieScript", "Cookiebot", "SBIntuitionsBot"],
         allow: "/",
+        disallow: API_PATHS,
       },
       // Webhook and API services
       {
@@ -140,6 +154,7 @@ export default function robots(): MetadataRoute.Robots {
           "Hookdeck",
         ],
         allow: "/",
+        disallow: API_PATHS,
       },
     ],
     sitemap: [

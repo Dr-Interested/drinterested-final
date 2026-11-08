@@ -55,7 +55,7 @@ export const revalidate = 60; // Revalidate events every 60 seconds (ISR)
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "Join Dr. Interested's engaging events and initiatives designed to educate and inspire future healthcare professionals. From webinars to research competitions, find opportunities to grow.",
+    "Free healthcare events for high school and university students: webinars, conferences and research competitions from Dr. Interested. Find your next event.",
   keywords: [
     "healthcare events",
     "medical webinars",

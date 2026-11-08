@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import ClientPage from "./client-page"
 import { supabase } from "@/lib/supabase-client"
+import SeoSchema from "@/components/seo-schema"
 
 export const revalidate = 300; // Revalidate homepage every 5 minutes (ISR)
 
@@ -119,5 +120,33 @@ export default async function Page() {
     featuredPosts = featuredBlogsData.map(formatBlogPost)
   }
 
-  return <ClientPage recentPost={recentPost} featuredEvent={featuredEvent} featuredPosts={featuredPosts} />
+  return (
+    <>
+      {/* Homepage-only structured data: the site name Google shows in results, and the 2025
+          Impact Report PDF (previously emitted on every page from the root layout). */}
+      <SeoSchema
+        id="website-schema"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Dr. Interested",
+          alternateName: ["Dr Interested", "Doctor Interested"],
+          url: "https://www.drinterested.org",
+        }}
+      />
+      <SeoSchema
+        id="impact-report-schema"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "MediaObject",
+          name: "Dr. Interested 2025 Impact Report",
+          contentUrl: "https://www.drinterested.org/dr-interested-impact-report-2025%20(1).pdf",
+          encodingFormat: "application/pdf",
+          description:
+            "The Dr. Interested 2025 Annual Impact Report: our programs, initiatives and impact in youth healthcare education.",
+        }}
+      />
+      <ClientPage recentPost={recentPost} featuredEvent={featuredEvent} featuredPosts={featuredPosts} />
+    </>
+  )
 }

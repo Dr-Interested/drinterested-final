@@ -94,54 +94,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
+  // Only URLs on www.drinterested.org belong here: search engines ignore sitemap entries for
+  // other hosts (impact., news. and chess.drinterested.org each publish their own sitemap).
   const impactReportPages: MetadataRoute.Sitemap = [
-    {
-      url: "https://impact.drinterested.org",
-      lastModified: currentDate,
-      changeFrequency: "monthly",
-      priority: 1.0,
-    },
-    {
-      url: "https://impact.drinterested.org/2025/annual",
-      lastModified: currentDate,
-      changeFrequency: "yearly",
-      priority: 0.9,
-    },
-    {
-      url: "https://impact.drinterested.org/2025/semi-annual",
-      lastModified: currentDate,
-      changeFrequency: "yearly",
-      priority: 0.8,
-    },
-    {
-      url: "https://impact.drinterested.org/2025.pdf",
-      lastModified: currentDate,
-      changeFrequency: "yearly",
-      priority: 0.7,
-    },
     {
       url: `${baseUrl}/dr-interested-impact-report-2025%20(1).pdf`,
       lastModified: currentDate,
       changeFrequency: "yearly",
       priority: 0.7,
-    },
-  ]
-
-  const newsletterPage: MetadataRoute.Sitemap = [
-    {
-      url: "https://news.drinterested.org",
-      lastModified: currentDate,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-  ]
-
-  const chessPage: MetadataRoute.Sitemap = [
-    {
-      url: "https://chess.drinterested.org",
-      lastModified: currentDate,
-      changeFrequency: "weekly",
-      priority: 0.9,
     },
   ]
 
@@ -163,6 +123,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/events/webinar-series-recap`,
+      lastModified: currentDate,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/events/psychology-conference`,
+      lastModified: currentDate,
+      changeFrequency: "yearly",
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/certificate`,
@@ -363,8 +335,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...medExplorePages,
     ...policyPages,
     ...impactReportPages,
-    ...newsletterPage,
-    ...chessPage,
     ...otherPages,
     ...publicationsCategoryPages,
     ...watchPages,

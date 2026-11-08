@@ -180,18 +180,6 @@ export default function RootLayout({
           <SpeedInsights />
           <AnalyticsConsent />
         </ThemeProvider>
-        <Script id="pdf-schema" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "MediaObject",
-              "name": "Dr Interested 2025 Impact Report",
-              "contentUrl": "https://www.drinterested.org/dr-interested-impact-report-2025 (1).pdf",
-              "encodingFormat": "application/pdf",
-              "description": "Download and view the Dr Interested Annual 2025 Impact Report to learn about our initiatives, programs, and impact in healthcare education."
-            }
-          `}
-        </Script>
       </body>
     </html>
   )

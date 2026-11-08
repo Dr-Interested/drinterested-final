@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import LinksPageClient from "@/components/links/links-client"
 
 export const metadata: Metadata = {
-  title: "Links | Dr. Interested",
+  title: "Links",
   description:
     "Find all Dr. Interested links in one place. Follow us on Instagram, LinkedIn, YouTube, Spotify, Discord and more. Connect with our healthcare community.",
   keywords: [

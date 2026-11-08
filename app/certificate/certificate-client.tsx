@@ -106,7 +106,7 @@ function CertificateForm() {
 export default function CertificateBuilderPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold text-center my-6"></h1>
+      <div className="my-6" aria-hidden="true" />
       <CertificateForm />
     </div>
   )

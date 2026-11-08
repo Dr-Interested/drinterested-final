@@ -120,14 +120,20 @@ export function generateOrganizationSchema() {
       "https://x.com/Dr_Interested_",
       "https://www.tiktok.com/@dr.interested",
       "https://mastodon.social/@drinterested",
-      "https://news.impact.drinterested.org/",
-      "https://www.drinterested.org/annualreport2025.pdf",
-      "https://impact.drinterested.org/2025/annual",
-      "https://impact.drinterested.org",
-      "https://chess.drinterested.org/",
-      "https://link.drinterested.org",
+      // Only profiles on other websites belong in sameAs; the organization's own sites are
+      // listed under hasPart below.
     ],
     hasPart: [
+      {
+        "@type": "WebSite",
+        name: "Dr. Interested Impact",
+        url: "https://impact.drinterested.org",
+      },
+      {
+        "@type": "WebSite",
+        name: "Dr. Interested Impact News",
+        url: "https://news.impact.drinterested.org",
+      },
       {
         "@type": "WebSite",
         name: "Simmon Chang Chess (Against Cancer) Club",

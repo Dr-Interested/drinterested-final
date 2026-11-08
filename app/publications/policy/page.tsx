@@ -11,7 +11,7 @@ export const revalidate = 300
 export const metadata: Metadata = generateSeoMetadata({
   title: "Policy Work",
   description:
-    "Dr. Interested's policy reports, joint statements, and inputs to government bodies and international organizations, including our submission to the UN Human Rights Council.",
+    "Dr. Interested's youth healthcare policy reports, joint statements and submissions to governments and global bodies, including the UN Human Rights Council.",
   url: "https://www.drinterested.org/publications/policy",
   keywords: [
     "Dr. Interested policy work",

@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import CertificatePageClient from "./certificate-client"
 
 export const metadata: Metadata = {
-  title: "Certificate Generator | Dr. Interested",
+  title: "Certificate Generator",
   description:
     "Generate your personalized Dr. Interested certificate. Download PDF certificates for participation in our programs and events.",
   keywords: [

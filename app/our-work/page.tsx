@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import OurWorkClient from "@/components/our-work/OurWorkClient"
 
 const OUR_WORK_DESCRIPTION =
-  "Dr. Interested has impacted 160,000+ youth and reached 3.7M+ people across 106 countries through healthcare education programs, mentorship, research competitions, and a 1,400+ member community. See our impact, events, and initiatives."
+  "Dr. Interested has impacted 160,000+ youth in 106 countries through healthcare education, mentorship and research competitions. See our impact and programs."
 
 export const metadata: Metadata = {
   title: "Our Work",
