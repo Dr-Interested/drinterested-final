@@ -13,6 +13,7 @@ import SeoSchema from "@/components/seo-schema"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
+import AnalyticsConsent from "@/components/analytics-consent"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -105,11 +106,7 @@ export const metadata: Metadata = {
     { rel: "apple-touch-icon", sizes: "180x180", url: "/apple-touch-icon.png" },
     { rel: "manifest", url: "/site.webmanifest" },
   ],
-  generator: "Next.js",
   metadataBase: new URL("https://www.drinterested.org"),
-  verification: {
-    google: "google-site-verification-code",
-  },
   robots: {
     index: true,
     follow: true,
@@ -152,34 +149,9 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        {/* Google tag (gtag.js) */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-6MYCRFPPGE" strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-6MYCRFPPGE');
-          `}
-        </Script>
-        {/* Meta Pixel Code */}
-        <Script id="meta-pixel" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-            n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-            document,'script','https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1742833623581972');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img height="1" width="1" style={{display:"none"}} src="https://www.facebook.com/tr?id=1742833623581972&ev=PageView&noscript=1" alt="" />
-        </noscript>
-        {/* End Meta Pixel Code */}
-        <Script src="https://f.convertkit.com/ckjs/ck.5.js" strategy="lazyOnload" />
+        {/* Google Analytics and the Meta Pixel are loaded by <AnalyticsConsent /> only after a
+            visitor allows them, and never on portal pages. ConvertKit's script is loaded by the
+            newsletter form itself, only where one is shown. */}
         <link
           rel="alternate"
           type="application/rss+xml"
@@ -206,6 +178,7 @@ export default function RootLayout({
           </Suspense>
           <Analytics />
           <SpeedInsights />
+          <AnalyticsConsent />
         </ThemeProvider>
         <Script id="pdf-schema" type="application/ld+json" strategy="afterInteractive">
           {`

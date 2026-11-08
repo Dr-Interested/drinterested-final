@@ -5,8 +5,12 @@ import Image from "next/image"
 import { Instagram, Linkedin, ArrowUp } from "lucide-react"
 import NewsletterForm from "./newsletter-form"
 import DiscordIcon from "@/components/icons/discord-icon"
+import { usePathname } from "next/navigation"
+import { isPortalPath } from "@/components/analytics-consent"
 
 export default function Footer() {
+  // The newsletter widget loads ConvertKit's script, so it isn't shown on portal pages.
+  const portal = isPortalPath(usePathname())
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -183,9 +187,15 @@ export default function Footer() {
             <p className="text-sm mb-3 text-white/80">Subscribe for the latest events and opportunities.</p>
 
             {/* Use our newsletter component with compact styling for the footer */}
-            <div className="bg-[#4f6b75] p-3 rounded">
-              <NewsletterForm darkMode={true} showFirstName={false} compact={true} />
-            </div>
+            {portal ? (
+              <Link href="/" className="inline-block text-sm underline text-white/80 hover:text-white">
+                Subscribe on our homepage
+              </Link>
+            ) : (
+              <div className="bg-[#4f6b75] p-3 rounded">
+                <NewsletterForm darkMode={true} showFirstName={false} compact={true} />
+              </div>
+            )}
           </div>
         </div>
 

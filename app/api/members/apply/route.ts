@@ -30,7 +30,7 @@ const Application = z
     socials: z
       .object({ website: optionalUrl, linkedin: optionalUrl, instagram: optionalUrl })
       .optional()
-      .default({}),
+      .default({ website: null, linkedin: null, instagram: null }),
   })
   .refine((a) => (APPLY_ROLES_BY_DEPARTMENT[a.department] || []).includes(a.role), {
     message: "Please choose a role for your department.",
