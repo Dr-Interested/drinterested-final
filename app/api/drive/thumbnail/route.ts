@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server"
 import { requireApprovedMember } from "@/lib/portal-auth"
-import { DriveApiError, getFileThumbnail } from "@/lib/google-drive"
+import { DriveApiError, assertInDriveRoot, getFileThumbnail } from "@/lib/google-drive"
 
 export async function GET(request: Request) {
   try {
-    await requireApprovedMember(request)
+    const supabase = await requireApprovedMember(request)
 
     const { searchParams } = new URL(request.url)
     const fileId = searchParams.get("fileId")
     if (!fileId) return NextResponse.json({ error: "fileId is required." }, { status: 400 })
+    await assertInDriveRoot(supabase, fileId)
 
     const thumb = await getFileThumbnail(fileId)
     if (!thumb) return NextResponse.json({ error: "No thumbnail available." }, { status: 404 })

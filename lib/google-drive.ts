@@ -307,3 +307,58 @@ export async function resolveRootFolderId(supabase: SupabaseClient): Promise<str
   }
   return match[1]
 }
+
+// ---------------------------------------------------------------------------------------------
+// Folder boundary (security review follow-up 2). The connected Google account can usually see
+// far more than the portal's shared folder, so every file/folder id a member sends is checked to
+// be a well-formed Drive id AND to sit inside the shared root folder (settings.google_drive_url)
+// before anything is listed, thumbnailed, created in, copied or moved.
+
+const DRIVE_ID = /^[A-Za-z0-9_-]{10,200}$/
+const insideRootCache = new Map<string, number>() // `${root}:${id}` -> expiry (ms)
+const INSIDE_ROOT_TTL_MS = 10 * 60 * 1000
+const MAX_FOLDER_DEPTH = 25
+
+function assertDriveId(id: unknown): asserts id is string {
+  if (typeof id !== "string" || !DRIVE_ID.test(id)) throw new DriveApiError(400, "Invalid file or folder id.")
+}
+
+async function driveParent(id: string): Promise<string | undefined> {
+  const meta = await driveFetch(`/${id}`, { fields: "parents", supportsAllDrives: "true" }).catch(() => null)
+  return meta?.parents?.[0]
+}
+
+/** Exported for tests; `getParent` defaults to the real Drive lookup. */
+export async function isInsideRoot(
+  id: string,
+  rootId: string,
+  getParent: (id: string) => Promise<string | undefined> = driveParent,
+): Promise<boolean> {
+  if (id === rootId) return true
+  const now = Date.now()
+  const visited: string[] = []
+  let current = id
+  for (let depth = 0; depth < MAX_FOLDER_DEPTH; depth++) {
+    const cached = insideRootCache.get(`${rootId}:${current}`)
+    if ((cached && cached > now) || current === rootId) {
+      for (const v of visited) insideRootCache.set(`${rootId}:${v}`, now + INSIDE_ROOT_TTL_MS)
+      return true
+    }
+    visited.push(current)
+    const parent = await getParent(current)
+    if (!parent) return false
+    current = parent
+  }
+  return false
+}
+
+/** Throws 400/403 unless every id is a valid Drive id inside the portal's shared folder. */
+export async function assertInDriveRoot(supabase: SupabaseClient, ...ids: unknown[]): Promise<string> {
+  const rootId = await resolveRootFolderId(supabase)
+  for (const id of ids) assertDriveId(id)
+  const results = await Promise.all((ids as string[]).map((id) => isInsideRoot(id, rootId)))
+  if (results.some((ok) => !ok)) {
+    throw new DriveApiError(403, "That file or folder isn't in the portal's shared Drive folder.")
+  }
+  return rootId
+}
