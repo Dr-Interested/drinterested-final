@@ -24,18 +24,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Column 1: Logo and Description */}
           <div className="md:col-span-3">
-            <div className="flex items-center gap-3 mb-4">
-              <Image
-                src="/circle-logo.png"
-                alt="Dr. Interested Logo"
-                width={50}
-                height={50}
-                className="rounded-full"
-                priority
-              />
-              <span className="font-bold text-lg">
-                Dr. <span className="text-[#4ecdc4]">Interested</span>
-              </span>
+            <div className="mb-4 inline-flex rounded-2xl bg-cream px-4 py-3">
+              <Image src="/brand/logo-stacked.png" alt="Dr. Interested" width={120} height={98} className="h-auto w-[104px]" />
             </div>
             <p className="text-sm mb-4 text-white/80">
               A youth led global wellness organization: wellness career education, access to policy spaces, and

@@ -110,16 +110,9 @@ export default function Navbar() {
               <div className="flex flex-col h-full">
                 <div className="p-4 border-b flex items-center">
                   <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-                    <Image
-                      src="/circle-logo.png"
-                      alt="Dr. Interested Logo"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                      priority
-                    />
-                    <span className="font-semibold text-lg">
-                      <span className="text-[#405862]">Dr.</span> Interested
+                    <Image src="/brand/icon.png" alt="" width={36} height={36} priority />
+                    <span className="font-display font-semibold text-lg text-ink">
+                      Dr. <span className="text-teal-deep">Interested</span>
                     </span>
                   </Link>
                 </div>
@@ -210,14 +203,12 @@ export default function Navbar() {
             </SheetContent>
           </Sheet>
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative w-8 h-8 md:w-9 md:h-9 overflow-hidden rounded-full transition-transform duration-300 group-hover:scale-110">
-              <Image src="/circle-logo.png" alt="Dr. Interested Logo" fill sizes="36px" className="rounded-full" priority />
+            <div className="relative w-8 h-8 md:w-9 md:h-9 transition-transform duration-300 group-hover:-rotate-6">
+              <Image src="/brand/icon.png" alt="" fill sizes="36px" priority />
             </div>
-            <div className="font-semibold text-base md:text-lg">
-              <span className="text-[#405862]">Dr.</span>{" "}
-              <span className="text-[#4ecdc4] group-hover:underline decoration-wavy decoration-[#4ecdc4] underline-offset-4 transition-all duration-300">
-                Interested
-              </span>
+            <div className="font-display font-semibold text-base md:text-lg text-ink">
+              Dr. <span className="text-teal-deep">Interested</span>
+              <span className="sr-only"> home</span>
             </div>
           </Link>
         </div>

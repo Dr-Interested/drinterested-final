@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import EventsClientPage from "./EventsClientPage"
 import { supabase } from "@/lib/supabase-client"
+import { recapHrefFor } from "@/data/recaps"
+import { todayET } from "@/lib/dates"
 import SeoSchema from "@/components/seo-schema"
 
 const baseUrl = "https://www.drinterested.org"
@@ -103,8 +105,19 @@ export default async function EventsPage() {
     })
   }
 
-  const rawUpcoming = allEventsData?.filter(e => !e.is_past) || []
-  const rawPast = allEventsData?.filter(e => e.is_past) || []
+  // An event counts as past once its date is behind us (ET), even if nobody has flipped
+  // is_past in the portal yet; that is how the 2026 Explore 3 showed as upcoming. Dates that
+  // can't be parsed ("Details coming soon") fall back to the is_past flag.
+  const today = todayET()
+  const isPast = (e: any) => {
+    if (e.is_past) return true
+    const d = new Date(e.date)
+    if (Number.isNaN(d.getTime())) return false
+    return d.toISOString().slice(0, 10) < today
+  }
+  const withRecap = (e: any) => ({ ...e, recapHref: recapHrefFor(e.title || "", e.date) })
+  const rawUpcoming = (allEventsData?.filter((e) => !isPast(e)) || []).map(withRecap)
+  const rawPast = (allEventsData?.filter(isPast) || []).map(withRecap)
 
   const upcomingEvents = sortEvents(rawUpcoming, true)
   const pastEvents = sortEvents(rawPast, false)

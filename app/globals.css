@@ -56,6 +56,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Headings use Poppins (the impact report and Instagram heading face); body text stays Inter. */
+  h1,
+  h2,
+  h3,
+  .font-bricolage {
+    font-family: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
+    letter-spacing: -0.015em;
+  }
+  h1 {
+    letter-spacing: -0.025em;
+  }
   /* iOS Safari zooms the whole page when a field with text under 16px is focused, and many
      forms here use 14px (text-sm). Keep form text at 16px on phones so tapping a field never
      zooms; from the sm breakpoint up the design's own sizes apply. !important because the
@@ -955,4 +966,31 @@ img.loading {
 .dark .blog-prose blockquote {
   background: #161c24;
   color: #f1ece7;
+}
+
+
+/* ---- 2026 redesign helpers ---- */
+/* Marquees pause on hover and stop entirely for people who prefer reduced motion. */
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
+  }
+}
+/* Soft fade at the edges of horizontal scrollers. */
+.edge-fade-x {
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.edge-fade-y {
+  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+}
+/* A small hand-drawn underline used under key words in headings. */
+.scribble {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8.5C40 3 90 2.5 198 6.5' stroke='%234ecdc4' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 0.45em;
+  background-position: 0 100%;
+  padding-bottom: 0.12em;
 }

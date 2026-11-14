@@ -2,145 +2,111 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Instagram, Linkedin, Link2 } from "lucide-react"
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
+import { ArrowRight, FileText } from "lucide-react"
 import DiscordIcon from "@/components/icons/discord-icon"
-import { fadeIn } from "./animations"
-import { IMPACT_REPORT_2026 } from "@/lib/impact-stats"
+import { BgVideo } from "@/components/site/bg-video"
+import { ALL_TIME, IMPACT_REPORT_2026 } from "@/lib/impact-stats"
+import { PHOTOS, VIDEOS } from "@/lib/media"
 
 export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
+  const reduce = useReducedMotion()
+  const rise = (delay: number) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 14 },
+          animate: isLoaded ? { opacity: 1, y: 0 } : undefined,
+          transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const, delay },
+        }
+
   return (
-    <>
-      {/* Hero Section */}
-      <section className="relative py-10 md:py-16 overflow-hidden bg-gradient-to-b from-[#f5f1eb] to-white">
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%23405862'/%3E%3C/svg%3E\")",
-          }}
-        ></div>
-        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-[#4ecdc4]/5 via-transparent to-[#405862]/5 opacity-70"></div>
-
-        <div className="container relative z-10">
-          <div className="grid gap-6 md:grid-cols-2 md:gap-10 items-center">
-            <motion.div
-              className="space-y-4"
-              initial="hidden"
-              animate={isLoaded ? "visible" : "hidden"}
-              variants={fadeIn}
+    <section className="relative overflow-hidden bg-gradient-to-b from-cream via-cream/60 to-white">
+      <div className="container grid items-center gap-8 py-8 md:grid-cols-[1.05fr_1fr] md:gap-12 md:py-14">
+        <div>
+          {/* First impression: the full stacked logo, icon over the wordmark. */}
+          <motion.div {...rise(0)}>
+            <Image
+              src="/brand/logo-stacked.png"
+              alt="Dr. Interested"
+              width={180}
+              height={146}
+              priority
+              className="mb-5 h-auto w-[112px] md:w-[132px]"
+            />
+          </motion.div>
+          <motion.h1 {...rise(0.05)} className="text-[2.1rem] leading-[1.08] font-semibold text-ink sm:text-5xl lg:text-[3.4rem]">
+            Where young people find their place in <span className="scribble">wellness</span>.
+          </motion.h1>
+          <motion.p {...rise(0.12)} className="mt-4 max-w-xl text-base leading-relaxed text-ink/75 sm:text-lg">
+            We&apos;re a youth led global organization. We help young people explore wellness careers, from health and
+            medicine to law and finance, get a voice in the rooms where policy is made, and find a community that
+            feels like theirs. Free, always.
+          </motion.p>
+          <motion.div {...rise(0.18)} className="mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              href="/members/join"
+              className="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-ink-deep"
             >
-              <div className="inline-block bg-[#4ecdc4]/20 px-3 py-1 rounded-full text-[#405862] font-medium text-sm mb-2 shadow-sm">
-                A Youth Led Global Wellness Organization
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-[#405862]">
-                Welcome to Dr. <span className="text-[#4ecdc4]">Interested</span>
-              </h1>
-              <p className="text-lg text-[#405862]/90 mt-2">
-                Wellness careers, a voice in policy, and a community to belong to
-              </p>
-              <p className="text-[#405862]/80 max-w-md">
-                Dr. Interested helps young people explore careers in wellness, from health and medicine to law and finance,
-                take part in the policy decisions that shape their lives, and find a safe, open space to belong. Everything
-                we run is free and youth led.
-              </p>
-              <div className="flex flex-wrap gap-3 items-center mt-4">
-                <Link
-                  href="https://discord.gg/pzbGRgsGXY"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#405862] text-white hover:bg-[#334852] px-5 py-2.5 rounded-md font-medium inline-flex items-center shadow-md hover:shadow-lg transition-transform hover:scale-105 duration-300"
-                >
-                  Join Our Community
-                </Link>
-
-                <div className="flex items-center gap-3 flex-wrap mt-1">
-                  <Link
-                    href="https://discord.gg/pzbGRgsGXY"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors gap-1 hover:scale-110 duration-200"
-                    aria-label="Discord"
-                  >
-                    <DiscordIcon className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    href="https://www.instagram.com/dr.interested/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors gap-1 hover:scale-110 duration-200"
-                    aria-label="Instagram"
-                  >
-                    <Instagram className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    href="https://www.linkedin.com/company/dr-interested"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors gap-1 hover:scale-110 duration-200"
-                    aria-label="LinkedIn"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    href="/links"
-                    className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors gap-1 hover:scale-110 duration-200"
-                    aria-label="All Links"
-                  >
-                    <Link2 className="h-5 w-5" />
-                  </Link>
-                </div>
-              </div>
-              <Link
-                href="/impact-report"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#405862] underline decoration-[#4ecdc4] decoration-2 underline-offset-4 hover:text-[#2d8659]"
-              >
-                Read our {IMPACT_REPORT_2026.shortTitle}
-              </Link>
-              <div className="mt-6 grid grid-cols-2 gap-4 max-w-sm w-full justify-items-center">
-                <div className="relative h-14 w-full max-w-[140px] rounded-lg overflow-hidden shadow-sm">
-                  <Image
-                    src="/imaginecan.png"
-                    alt="Imagine Canada Member"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-
-                <div className="relative h-14 w-full max-w-[140px] rounded-lg overflow-hidden shadow-sm">
-                  <Image
-                    src="/development.png"
-                    alt="Youth development recognition"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              className="relative flex items-center justify-center order-1 md:order-2 my-6 md:my-0"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={isLoaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.7 }}
+              Join the team
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <a
+              href="https://discord.gg/pzbGRgsGXY"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-white px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-ink/40"
             >
-              <div className="absolute w-[280px] h-[280px] md:w-[320px] md:h-[320px] rounded-full bg-[#4ecdc4]/10 animate-pulse-slow"></div>
-              <div className="absolute w-[260px] h-[260px] md:w-[300px] md:h-[300px] rounded-full border-2 border-dashed border-[#405862]/20 animate-spin-slow"></div>
-              <Image
-                src="/logo.png"
-                alt="Dr. Interested logo"
-                width={240}
-                height={240}
-                className="object-contain z-10 rounded-lg hover:scale-105 transition-transform duration-500"
-                priority
-              />
-            </motion.div>
-          </div>
+              <DiscordIcon className="h-4 w-4" />
+              Join our Discord
+            </a>
+            <Link
+              href="/impact-report"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/80 underline decoration-teal decoration-2 underline-offset-4 hover:text-ink"
+            >
+              <FileText className="h-4 w-4" />
+              {IMPACT_REPORT_2026.shortTitle}
+            </Link>
+          </motion.div>
+          <motion.dl {...rise(0.24)} className="mt-7 grid max-w-md grid-cols-3 gap-4 border-t border-ink/10 pt-5">
+            {[
+              [ALL_TIME.youthImpacted, "youth impacted"],
+              [ALL_TIME.countries, "countries and territories"],
+              [ALL_TIME.executives, "youth executives"],
+            ].map(([n, l]) => (
+              <div key={l}>
+                <dt className="sr-only">{l}</dt>
+                <dd className="font-display text-xl font-semibold text-ink sm:text-2xl">{n}</dd>
+                <dd className="text-xs leading-snug text-ink/60">{l}</dd>
+              </div>
+            ))}
+          </motion.dl>
         </div>
 
-        {/* Decorative elements */}
-        <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-r from-[#4ecdc4]/20 via-white to-[#405862]/20 opacity-70"></div>
-      </section>
-    </>
+        {/* Moving photography: a real clip from Explore 3, with a photo tucked in front. */}
+        <motion.div
+          initial={reduce ? false : { opacity: 0, scale: 0.97 }}
+          animate={isLoaded ? { opacity: 1, scale: 1 } : undefined}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto w-full max-w-xl pb-10 md:pb-0"
+        >
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] shadow-xl ring-1 ring-black/5">
+            <BgVideo {...VIDEOS.hero} label="Students at the Explore 3 Case Competition" />
+            <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-ink shadow-sm">
+              Explore 3 Case Competition
+            </span>
+          </div>
+          <div className="absolute -bottom-2 -left-3 w-[44%] rotate-[-3deg] overflow-hidden rounded-2xl border-4 border-white shadow-lg sm:-left-6 md:-bottom-8">
+            <div className="relative aspect-[4/3]">
+              <Image src={PHOTOS.medexplore[0].src} alt={PHOTOS.medexplore[0].alt} fill sizes="240px" className="object-cover" priority />
+            </div>
+          </div>
+          <div className="absolute -right-2 bottom-4 rounded-2xl bg-white px-4 py-3 shadow-lg ring-1 ring-black/5 sm:-right-4 md:-bottom-4">
+            <p className="font-display text-lg font-semibold leading-none text-ink">{ALL_TIME.volunteerHours}</p>
+            <p className="mt-1 text-[11px] text-ink/60">volunteer hours given</p>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   )
 }

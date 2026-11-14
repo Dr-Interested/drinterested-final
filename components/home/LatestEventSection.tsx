@@ -12,13 +12,13 @@ export default function LatestEventSection({ latestEvent }: { latestEvent: any }
     <>
       {/* Latest Event Section */}
       {latestEvent && (
-        <section className="py-10 bg-white">
+        <section className="pb-12 md:pb-16">
           <div className="container">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-[#405862] flex items-center">
-                Latest Event
-                <div className="w-12 h-1 bg-[#4ecdc4] ml-3"></div>
-              </h2>
+            <div className="flex items-end justify-between mb-5 gap-4">
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-teal-deep">Coming up</p>
+                <h2 className="text-2xl md:text-3xl font-semibold text-ink">Our next event</h2>
+              </div>
               <Link href="/events" className="text-[#405862] hover:text-[#4ecdc4] text-sm flex items-center group">
                 <span>View all events</span>
                 <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -31,9 +31,9 @@ export default function LatestEventSection({ latestEvent }: { latestEvent: any }
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <Card className="overflow-hidden border-[#405862]/10 shadow-md hover:shadow-lg transition-all duration-300 group">
+              <Card className="overflow-hidden rounded-2xl border-ink/10 shadow-sm hover:shadow-md transition-all duration-300 group">
                 <div className="grid md:grid-cols-2">
-                  <div className="relative h-48 md:h-auto">
+                  <div className="relative h-48 md:h-auto md:min-h-[260px]">
                     <Image
                       src={latestEvent.image || "/logo.png"}
                       alt={`Dr. Interested Event: ${latestEvent.title} for youth`}

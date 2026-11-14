@@ -1,129 +1,48 @@
-"use client"
-
 import Image from "next/image"
-import Link from "next/link"
-import { ExternalLink, ShoppingBag, ShoppingCart, Tag } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { motion } from "framer-motion"
-import { fadeIn } from "./animations"
+import { ExternalLink } from "lucide-react"
+import { Reveal } from "@/components/site/reveal"
 
+const ITEMS = [
+  { src: "/tshirt.jpg", alt: "Dr. Interested t-shirt" },
+  { src: "/hoodie.jpg", alt: "Dr. Interested hoodie" },
+  { src: "/sticker.jpg", alt: "Dr. Interested sticker" },
+  { src: "/mug.jpg", alt: "Dr. Interested mug" },
+]
+
+/** A compact merch strip: four products and one link out. */
 export default function MerchSection() {
   return (
-    <>
-      {/* Merch Store Section */}
-      <section className="py-10 bg-[#f5f1eb]/30">
-        <div className="container">
-          <motion.div
-            className="text-center mb-6"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
-            <h2 className="text-2xl font-bold text-[#405862] inline-flex flex-col items-center">
-              Merch Store
-              <div className="w-16 h-1 bg-[#4ecdc4] mt-2"></div>
-            </h2>
-            <p className="text-[#405862]/70 max-w-2xl mx-auto mt-2 text-sm">
-              Show your support with Dr. Interested merchandise
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-            className="mb-10"
-          >
-            <Card className="overflow-hidden border-[#405862]/10 shadow-md hover:shadow-lg transition-all duration-300 group">
-              <div className="grid md:grid-cols-2">
-                <div className="relative h-64 md:h-auto overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#405862]/10 to-transparent z-10"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="grid grid-cols-2 gap-2 p-4 w-full h-full">
-                      <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
-                        <Image
-                          src="/tshirt.jpg"
-                          alt="Dr. Interested T-Shirt - Dr. Interested merchandise"
-                          width={120}
-                          height={120}
-                          className="object-contain hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
-                        <Image
-                          src="/hoodie.jpg"
-                          alt="Dr. Interested Hoodie - Dr. Interested merchandise"
-                          width={120}
-                          height={120}
-                          className="object-contain hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
-                        <Image
-                          src="/sticker.jpg"
-                          alt="Dr. Interested Sticker - Dr. Interested merchandise"
-                          width={120}
-                          height={120}
-                          className="object-contain hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
-                        <Image
-                          src="/mug.jpg"
-                          alt="Dr. Interested Mug - Dr. Interested merchandise"
-                          width={120}
-                          height={120}
-                          className="object-contain hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    </div>
-                  </div>
+    <section className="pb-10 md:pb-14">
+      <div className="container">
+        <Reveal className="grid items-center gap-5 rounded-3xl bg-cream/70 p-5 ring-1 ring-ink/5 md:grid-cols-[1fr_auto] md:p-7">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <div className="flex -space-x-3">
+              {ITEMS.map((it, i) => (
+                <div
+                  key={it.src}
+                  className="relative h-16 w-16 overflow-hidden rounded-2xl border-2 border-cream bg-white shadow-sm sm:h-20 sm:w-20"
+                  style={{ transform: `rotate(${[-4, 2, -2, 4][i]}deg)` }}
+                >
+                  <Image src={it.src} alt={it.alt} fill sizes="80px" className="object-contain p-1.5" />
                 </div>
-                <CardContent className="p-5 flex flex-col">
-                  <div>
-                    <h3 className="text-xl font-bold mb-3 text-[#405862]">Dr. Interested Merchandise</h3>
-                    <p className="text-[#405862]/80 mb-4">
-                      Support our mission while showing off your passion for youth wellness! Our merchandise collection
-                      includes t-shirts, hoodies, stickers, mugs, and more - all featuring our iconic Dr. Interested
-                      designs.
-                    </p>
-
-                    <div className="space-y-3 mb-5">
-                      <div className="flex items-center text-sm text-[#405862]/80">
-                        <Tag className="h-4 w-4 mr-2 text-[#4ecdc4]" />
-                        <span>High-quality apparel and accessories</span>
-                      </div>
-                      <div className="flex items-center text-sm text-[#405862]/80">
-                        <ShoppingBag className="h-4 w-4 mr-2 text-[#4ecdc4]" />
-                        <span>Multiple designs and colors available</span>
-                      </div>
-                      <div className="flex items-center text-sm text-[#405862]/80">
-                        <ShoppingCart className="h-4 w-4 mr-2 text-[#4ecdc4]" />
-                        <span>Proceeds support our educational programs</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-auto">
-                    <Button className="w-full bg-[#405862] hover:bg-[#334852] group" asChild>
-                      <Link
-                        href="https://www.teepublic.com/user/dr-interested"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Visit Our TeePublic Store
-                        <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-    </>
+              ))}
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-ink md:text-xl">Wear the mission</h2>
+              <p className="text-sm text-ink/70">T-shirts, hoodies, stickers and mugs. Every order supports our free programs.</p>
+            </div>
+          </div>
+          <a
+            href="https://www.teepublic.com/user/dr-interested"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/20 bg-white px-5 py-2.5 text-sm font-semibold text-ink hover:border-ink/40"
+          >
+            Shop on TeePublic
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        </Reveal>
+      </div>
+    </section>
   )
 }

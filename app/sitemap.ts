@@ -7,6 +7,7 @@ import documentManifest from "@/public/medexplore-2026/letters-manifest.json"
 import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
 import { getEpisodesByCategory } from "@/lib/episodes"
 import { IMPACT_REPORT_2025, IMPACT_REPORT_2026 } from "@/lib/impact-stats"
+import { RECAPS } from "@/data/recaps"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.drinterested.org"
@@ -126,6 +127,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
   ]
+
+  const recapPages: MetadataRoute.Sitemap = RECAPS.map((r) => ({
+    url: `${baseUrl}/events/${r.slug}`,
+    lastModified: new Date(IMPACT_REPORT_2026.published),
+    changeFrequency: "yearly" as const,
+    priority: 0.7,
+    images: Array.from(new Set([r.cover.src, ...r.gallery.map((g) => g.src)])).map(absoluteUrl),
+  }))
 
   const otherPages: MetadataRoute.Sitemap = [
     {
@@ -357,6 +366,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...medExplorePages,
     ...policyPages,
     ...impactReportPages,
+    ...recapPages,
     ...otherPages,
     ...publicationsCategoryPages,
     ...watchPages,

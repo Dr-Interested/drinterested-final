@@ -13,23 +13,15 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
   return (
     <>
       {/* Latest Content Section */}
-      <section className="py-10 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container">
-          <motion.div
-            className="text-center mb-6"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
-            <h2 className="text-2xl font-bold text-[#405862] inline-flex flex-col items-center">
-              Latest Content
-              <div className="w-16 h-1 bg-[#4ecdc4] mt-2"></div>
-            </h2>
-            <p className="text-[#405862]/70 max-w-2xl mx-auto mt-2 text-sm">
-              Explore our latest blog posts and podcast episodes
+          <div className="mb-6">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-teal-deep">Youth educating youth</p>
+            <h2 className="text-2xl md:text-3xl font-semibold text-ink">Fresh from our writers and podcast</h2>
+            <p className="mt-2 max-w-2xl text-[15px] text-ink/70">
+              55 articles across 18 topics and 39 podcast episodes in 2026, written and hosted by our members.
             </p>
-          </motion.div>
+          </div>
 
           {/* Blog Section */}
           {recentPost && (
@@ -38,7 +30,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
-              className="mb-10"
+              className="mb-8"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-[#405862]">Latest from Our Publications</h3>
@@ -48,7 +40,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                 </Link>
               </div>
 
-              <Card className="overflow-hidden border-[#405862]/10 shadow-md hover:shadow-lg transition-all duration-300 group">
+              <Card className="overflow-hidden rounded-2xl border-ink/10 shadow-sm hover:shadow-md transition-all duration-300 group">
                 <div className="grid md:grid-cols-2">
                   <div className="relative h-48 md:h-auto overflow-hidden">
                     <Image

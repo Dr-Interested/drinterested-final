@@ -1,7 +1,7 @@
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Poppins } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
@@ -16,7 +16,14 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 import AnalyticsConsent from "@/components/analytics-consent"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" })
+// Poppins is the heading face of the impact report and our Instagram graphics.
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+})
 
 const SITE_TITLE = "Dr. Interested | Youth Led Global Wellness Organization"
 const SITE_DESCRIPTION = `Youth led global wellness organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free wellness career education, policy access, and community spaces.`
@@ -153,7 +160,7 @@ export default function RootLayout({
           href="https://www.drinterested.org/rss.xml"
         />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${inter.variable} ${poppins.variable} ${inter.className}`} suppressHydrationWarning>
         {/* enableSystem={false}: the site is light-by-default and only goes dark via the
             AccessibilityWidget toggle. Letting next-themes also react to the OS
             prefers-color-scheme made its resolved theme disagree with the inline
