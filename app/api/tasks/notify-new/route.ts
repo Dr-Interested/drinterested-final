@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { rateLimit } from "@/lib/rate-limit"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { sendTaskEmails } from "@/lib/task-emails"
 
@@ -20,6 +21,9 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabaseAdmin.auth.getUser(token)
   if (!user?.email) return NextResponse.json({ error: "Not signed in." }, { status: 401 })
+  if (!rateLimit(`assign:${user.email.toLowerCase()}`, 30, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many requests. Please try again in a few minutes." }, { status: 429 })
+  }
 
   let taskIds: unknown
   try {

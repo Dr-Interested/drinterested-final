@@ -3,6 +3,7 @@
 import { Users, TrendingUp, Award, Globe } from "lucide-react"
 import { motion } from "framer-motion"
 import { fadeIn, staggerContainer, scaleIn } from "./animations"
+import { ALL_TIME } from "@/lib/impact-stats"
 
 export default function MissionSection() {
   return (
@@ -29,7 +30,7 @@ export default function MissionSection() {
       <motion.div variants={scaleIn}>
         <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <Users className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-          <div className="text-3xl font-bold text-[#405862] mb-1">160,000+</div>
+          <div className="text-3xl font-bold text-[#405862] mb-1">{ALL_TIME.youthImpacted}</div>
           <div className="text-[#405862]/70 text-xs font-medium">Youth Impacted</div>
         </div>
       </motion.div>
@@ -37,15 +38,15 @@ export default function MissionSection() {
       <motion.div variants={scaleIn}>
         <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <Globe className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-          <div className="text-3xl font-bold text-[#405862] mb-1">106</div>
-          <div className="text-[#405862]/70 text-xs font-medium">Countries Reached</div>
+          <div className="text-3xl font-bold text-[#405862] mb-1">{ALL_TIME.countries}</div>
+          <div className="text-[#405862]/70 text-xs font-medium">Countries and Territories</div>
         </div>
       </motion.div>
 
       <motion.div variants={scaleIn}>
         <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <TrendingUp className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-          <div className="text-3xl font-bold text-[#405862] mb-1">1,400+</div>
+          <div className="text-3xl font-bold text-[#405862] mb-1">{ALL_TIME.members}</div>
           <div className="text-[#405862]/70 text-xs font-medium">Members</div>
         </div>
       </motion.div>
@@ -53,11 +54,18 @@ export default function MissionSection() {
       <motion.div variants={scaleIn}>
         <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <Award className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-          <div className="text-3xl font-bold text-[#405862] mb-1">3.7M+</div>
+          <div className="text-3xl font-bold text-[#405862] mb-1">{ALL_TIME.impressions}</div>
           <div className="text-[#405862]/70 text-xs font-medium">Content Impressions</div>
         </div>
       </motion.div>
     </motion.div>
+    <p className="text-center text-xs text-[#405862]/60 -mt-4 mb-8">
+      2025 and 2026 combined, from our{" "}
+      <a href="/impact-report" className="underline underline-offset-2 hover:text-[#405862]">
+        2026 Annual Impact Report
+      </a>
+      .
+    </p>
 
     {/* PURPOSE SECTION — FIXED NESTING */}
     <div className="text-center mb-10">
@@ -66,8 +74,8 @@ export default function MissionSection() {
         <div className="w-16 h-1 bg-[#4ecdc4] mt-2"></div>
       </h2>
       <p className="text-[#405862]/70 max-w-2xl mx-auto mt-2 text-sm">
-        To bridge the gap between interest and action in youth healthcare leadership
-        by offering accessible resources, mentorship, and research opportunities.
+        To close the gap between interest and action by offering youth accessible career education,
+        a voice in policy spaces, and a safe community to belong to.
       </p>
     </div>
 
@@ -105,9 +113,10 @@ export default function MissionSection() {
             <path d="M4 11V9a2 2 0 0 1 2-2h2" />
           </svg>
         </div>
-        <h3 className="text-base font-bold mb-1 text-[#405862]">Goal</h3>
+        <h3 className="text-base font-bold mb-1 text-[#405862]">Our Three Pillars</h3>
         <p className="text-[#405862]/80 text-sm">
-          To inspire, educate, and support high school students on their journey toward a career in healthcare.
+          Wellness career education, access to policy spaces, and community spaces. Every program we run fits at least
+          one pillar, and the best fit all three.
         </p>
       </motion.div>
 
@@ -134,8 +143,8 @@ export default function MissionSection() {
         </div>
         <h3 className="text-base font-bold mb-1 text-[#405862]">Mission</h3>
         <p className="text-[#405862]/80 text-sm">
-          To empower the next generation of healthcare professionals through education,
-          collaboration, and meaningful experiences.
+          To equip every young person with the soft skills and support they need to explore careers in wellness,
+          contribute to policy, and grow within a safe community.
         </p>
       </motion.div>
 
@@ -162,8 +171,8 @@ export default function MissionSection() {
         </div>
         <h3 className="text-base font-bold mb-1 text-[#405862]">Vision</h3>
         <p className="text-[#405862]/80 text-sm">
-          A world where every young person has the support to discover their passion in medicine
-          and drive change through innovation and advocacy.
+          A world where every young person, regardless of background, is heard, supported, and ready to shape their
+          future and the policies that affect it.
         </p>
       </motion.div>
     </motion.div>

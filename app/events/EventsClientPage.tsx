@@ -31,8 +31,8 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
           <motion.div className="text-center" initial="hidden" animate="visible" variants={fadeIn}>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#405862]">Events & Initiatives</h1>
             <p className="text-lg text-[#405862]/80 mt-3 max-w-2xl mx-auto">
-              Join us for engaging events and initiatives designed to educate and inspire the next generation of
-              healthcare professionals.
+              Free events across our three pillars: wellness career education, access to policy spaces, and community
+              spaces. We ran 25 events in 2026 alone.
             </p>
           </motion.div>
         </div>

@@ -36,7 +36,7 @@ export default function LatestEventSection({ latestEvent }: { latestEvent: any }
                   <div className="relative h-48 md:h-auto">
                     <Image
                       src={latestEvent.image || "/logo.png"}
-                      alt={`Dr. Interested Event: ${latestEvent.title} - Healthcare volunteer opportunity for high school students`}
+                      alt={`Dr. Interested Event: ${latestEvent.title} for youth`}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                       priority

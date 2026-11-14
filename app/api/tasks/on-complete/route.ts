@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { rateLimit } from "@/lib/rate-limit"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import { escapeHtml as esc, safeHttpUrl as safeUrl, sendEmail, taskDetailsHtml, taskEmailShell, taskPortalUrl } from "@/lib/send-email"
 import { completionReviewers } from "@/lib/completion-reviewers"
@@ -29,6 +30,9 @@ export async function POST(request: Request) {
   } = await supabaseAdmin.auth.getUser(token)
   if (userError || !user?.email) return NextResponse.json({ error: "Not signed in." }, { status: 401 })
   const callerEmail = user.email.toLowerCase()
+  if (!rateLimit(`complete:${callerEmail}`, 30, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many requests. Please try again in a few minutes." }, { status: 429 })
+  }
 
   let taskId: string | undefined
   try {

@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import Link from "next/link"
 import { FileText } from "lucide-react"
 import ScrollToTop from "@/components/scroll-to-top"
+import { resetAnalyticsConsent } from "@/components/analytics-consent"
 
 export default function PrivacyPolicyClientPage() {
   // Scroll to top on page load
@@ -16,7 +17,7 @@ export default function PrivacyPolicyClientPage() {
       <ScrollToTop />
       <div className="bg-[#405862] text-white p-6 rounded-lg mb-8 shadow-md">
         <h1 className="text-3xl font-bold mb-2 text-center">Privacy Policy</h1>
-        <p className="text-center mb-0">Last updated: August 30, 2026</p>
+        <p className="text-center mb-0">Last updated: November 14, 2026</p>
       </div>
 
       <div className="space-y-8 bg-white p-8 rounded-lg shadow-md">
@@ -29,8 +30,9 @@ export default function PrivacyPolicyClientPage() {
             Privacy Policy, please do not access the site.
           </p>
           <p className="text-slate-600 mt-3">
-            Dr. Interested is not a registered business, corporation, nonprofit, charity, or other legal entity —
-            see our{" "}
+            Dr. Interested is a Canadian youth-led project; it is not itself a registered business, corporation,
+            nonprofit, charity, or other legal entity. Our nonprofit work runs through Future Interested, a fiscally
+            sponsored US 501(c)(3) public charity. See our{" "}
             <Link href="/terms" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
               Terms and Conditions
             </Link>{" "}
@@ -114,19 +116,66 @@ export default function PrivacyPolicyClientPage() {
             to your personal information only to perform these tasks on our behalf and are obligated not to disclose
             or use it for any other purpose.
           </p>
-          <p className="text-slate-600 mt-2">
-            We use ConvertKit as our email marketing platform. By subscribing to our newsletter, your information
-            will be transferred to ConvertKit for processing in accordance with their Privacy Policy and Terms.
-          </p>
+          <p className="text-slate-600 mt-2">The service providers we currently use are:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1 text-slate-600">
+            <li>
+              <strong>Kit (ConvertKit)</strong>: our email newsletter. If you subscribe, your name and email are sent to
+              Kit and handled under its Privacy Policy and Terms.
+            </li>
+            <li>
+              <strong>Formspree</strong>: receives messages sent through our contact form.
+            </li>
+            <li>
+              <strong>Supabase</strong>: our database, member accounts and file storage.
+            </li>
+            <li>
+              <strong>Resend</strong>: sends member portal emails (task, reminder and account emails).
+            </li>
+            <li>
+              <strong>Vercel</strong>: hosts the website and provides cookie-free, aggregate page-view and performance
+              statistics (Vercel Web Analytics and Speed Insights).
+            </li>
+            <li>
+              <strong>Google Analytics</strong> and the <strong>Meta Pixel</strong>: website analytics and measuring our
+              social media outreach. These load only if you choose &ldquo;Allow&rdquo; in our cookie banner (see
+              Section 7), and never on member portal pages.
+            </li>
+            <li>
+              <strong>YouTube</strong> and <strong>Spotify</strong>: embedded videos and podcast episodes, which load only
+              when you choose to play them.
+            </li>
+          </ul>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3 text-[#405862]">7. Cookies and Tracking Technologies</h2>
+          <h2 id="cookies" className="text-xl font-semibold mb-3 text-[#405862] scroll-mt-24">
+            7. Cookies and Tracking Technologies
+          </h2>
           <p className="text-slate-600">
-            We may use cookies and similar tracking technologies to track activity on our website and hold certain
-            information. Cookies are files with a small amount of data that may include an anonymous unique
-            identifier. You can instruct your browser to refuse all cookies or to indicate when a cookie is being
-            sent.
+            Cookies are small files that may include an anonymous unique identifier. We use them in two ways:
+          </p>
+          <ul className="list-disc pl-6 mt-2 space-y-1 text-slate-600">
+            <li>
+              <strong>Necessary:</strong> keeping members signed in to the member portal and remembering settings such
+              as dark mode and your cookie choice. These are always on.
+            </li>
+            <li>
+              <strong>Analytics and advertising measurement (optional):</strong> Google Analytics and the Meta Pixel.
+              They are off until you choose &ldquo;Allow&rdquo; in the cookie banner, and they are never loaded on member
+              portal pages (sign in, password reset, and everything after signing in). If you choose
+              &ldquo;Decline&rdquo; they are not loaded at all.
+            </li>
+          </ul>
+          <p className="text-slate-600 mt-2">
+            You can change your choice at any time:{" "}
+            <button
+              type="button"
+              onClick={resetAnalyticsConsent}
+              className="text-[#2d8659] underline underline-offset-2 hover:text-[#4CAF7D]"
+            >
+              change my cookie choice
+            </button>
+            . You can also set your browser to refuse cookies or to tell you when one is being sent.
           </p>
         </section>
 

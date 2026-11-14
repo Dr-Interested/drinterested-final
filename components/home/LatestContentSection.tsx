@@ -53,7 +53,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   <div className="relative h-48 md:h-auto overflow-hidden">
                     <Image
                       src={recentPost.coverImage || "/logo.png"}
-                      alt={`Dr. Interested Blog: ${recentPost.title} - Healthcare education for high school students`}
+                      alt={`Dr. Interested Blog: ${recentPost.title} from the Dr. Interested blog`}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                       priority
@@ -187,8 +187,8 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
 
             <div className="mt-4 text-center">
               <p className="text-sm text-[#405862]/80 mb-3">
-                Our podcast features interviews with healthcare professionals, discussions about medical careers, and
-                insights into the healthcare industry.
+                Our podcast features youth leaders, changemakers, and professionals talking about health, leadership,
+                wellness careers, and the future.
               </p>
               <div className="flex justify-center items-center gap-4 flex-wrap">
                 <Link

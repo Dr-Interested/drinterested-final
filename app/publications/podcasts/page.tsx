@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     "Every episode of the Dr. Interested Podcast — written and hosted by our members, covering health topics from neuroscience to nutrition to mental health.",
   keywords: [
     "Dr. Interested Podcast",
-    "healthcare podcast",
-    "medical education podcast",
+    "youth wellness podcast",
+    "healthcare careers podcast",
     "youth health podcast",
   ],
   alternates: { canonical: "https://www.drinterested.org/publications/podcasts" },

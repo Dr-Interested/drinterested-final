@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ALL_TIME, IMPACT_REPORT_2025, IMPACT_REPORT_2026, LEGAL_STATUS, ORG_ONE_LINER, YEAR_2026 } from "@/lib/impact-stats"
 
 export interface SEOConfig {
   title: string
@@ -97,8 +98,7 @@ export function generateOrganizationSchema() {
     "@type": "Organization",
     name: "Dr. Interested",
     alternateName: ["Dr Interested", "Doctor Interested", "Dr. Int"],
-    description:
-      "A youth-led global pre-med community that has impacted 160,000+ youth and reached 3.7M+ people across 106 countries, with 1,400+ members and 367+ executives. We help students explore healthcare, research, and advocacy and find their unique 'spark' in medicine through interactive programs, publishing opportunities, and leadership development.",
+    description: `${ORG_ONE_LINER} Across 2025 and 2026 we have impacted ${ALL_TIME.youthImpacted} youth in ${ALL_TIME.countries} countries and territories, with ${ALL_TIME.members} members and ${ALL_TIME.executives} executives. ${LEGAL_STATUS.short}`,
     url: "https://www.drinterested.org",
     logo: "https://www.drinterested.org/android-chrome-512x512.png",
     image: "https://www.drinterested.org/websitebanner.jpg",
@@ -107,6 +107,13 @@ export function generateOrganizationSchema() {
       "@type": "Person",
       name: "Adil Mukhi",
       jobTitle: "Founder & Executive Director",
+      url: "https://adilmukhi.vercel.app/",
+    },
+    // Our nonprofit work runs through our sister organization, a fiscally sponsored 501(c)(3).
+    parentOrganization: {
+      "@type": "NGO",
+      name: "Future Interested",
+      description: LEGAL_STATUS.fiscalSponsor,
     },
     sameAs: [
       "https://www.instagram.com/dr.interested/",
@@ -120,14 +127,30 @@ export function generateOrganizationSchema() {
       "https://x.com/Dr_Interested_",
       "https://www.tiktok.com/@dr.interested",
       "https://mastodon.social/@drinterested",
-      "https://news.impact.drinterested.org/",
-      "https://www.drinterested.org/annualreport2025.pdf",
-      "https://impact.drinterested.org/2025/annual",
-      "https://impact.drinterested.org",
-      "https://chess.drinterested.org/",
-      "https://link.drinterested.org",
+      "https://www.reddit.com/r/drinterested/",
+      "https://github.com/Dr-Interested",
+      "https://linktr.ee/dr.interested",
+      LEGAL_STATUS.unProfile,
+      "https://www.idealist.org/en/community/d61c52b27f234069a12a07d87a5ce523-dr-interested-toronto",
+      "https://hundred.org/en/innovations/dr-interested",
+      "https://www.learning-planet.org/organisation/dr-interested/",
+      "https://www.researchgate.net/lab/Dr-Interested-Pre-Med-Org-Adil-Mukhi",
+      "https://zenodo.org/communities/drinterested",
+      "https://ca.trustpilot.com/review/drinterested.org",
+      // Only profiles on other websites belong in sameAs; the organization's own sites are
+      // listed under hasPart below.
     ],
     hasPart: [
+      {
+        "@type": "WebSite",
+        name: "Dr. Interested Impact",
+        url: "https://impact.drinterested.org",
+      },
+      {
+        "@type": "WebSite",
+        name: "Dr. Interested Impact News",
+        url: "https://news.impact.drinterested.org",
+      },
       {
         "@type": "WebSite",
         name: "Simmon Chang Chess (Against Cancer) Club",
@@ -143,10 +166,17 @@ export function generateOrganizationSchema() {
           "The official Dr. Interested link-in-bio hub — every social profile, program, publication, and policy in one place.",
       },
       {
-        "@type": "WebSite",
-        "name": "2025 Annual Impact Report",
-        "url": "https://impact.drinterested.org/2025/annual",
-        "description": "Dr. Interested's 2025 Annual Impact Report showcasing impact metrics including 160,000+ youth impacted, 3.7M+ people reached, 106 countries reached, 1,400+ members, 367+ executives, 400+ mentor hours, and 600+ service hours earned.",
+        "@type": "Report",
+        name: IMPACT_REPORT_2026.title,
+        url: IMPACT_REPORT_2026.url,
+        datePublished: IMPACT_REPORT_2026.published,
+        description: `${YEAR_2026.youthImpacted} youth impacted in 2026 (${ALL_TIME.youthImpacted} across 2025 and 2026), ${ALL_TIME.members} members in ${ALL_TIME.countries} countries and territories, ${ALL_TIME.executives} executives, ${ALL_TIME.volunteerHours} volunteer hours, and ${ALL_TIME.impressions} impressions.`,
+      },
+      {
+        "@type": "Report",
+        name: IMPACT_REPORT_2025.title,
+        url: IMPACT_REPORT_2025.web,
+        datePublished: "2025",
       },
     ],
     contactPoint: [
@@ -170,31 +200,39 @@ export function generateOrganizationSchema() {
         contactType: "Outreach",
         email: "outreach@drinterested.org",
       },
+      {
+        "@type": "ContactPoint",
+        contactType: "Media Inquiries",
+        email: "admin@drinterested.org",
+      },
     ],
     address: {
       "@type": "PostalAddress",
       addressCountry: "Global",
     },
-    slogan: "Inspiring the Next Generation of Healthcare Professionals",
+    slogan: "A year of youth led change and impact",
+    // Volunteer executives (no paid staff).
     numberOfEmployees: {
       "@type": "QuantitativeValue",
-      value: 367,
+      value: Number(YEAR_2026.executives),
     },
-    memberOf: {
-      "@type": "Organization",
-      name: "Healthcare Education Community",
-    },
+    memberOf: [
+      { "@type": "Organization", name: "Imagine Canada" },
+      { "@type": "Organization", name: "Development and Peace" },
+      { "@type": "Organization", name: "National Canadian Youth Council (NCYC)" },
+    ],
     knowsAbout: [
-      "Healthcare Education",
-      "Medical Careers",
-      "Student Mentorship",
-      "Healthcare Research",
-      "Medical Technology",
-      "Healthcare Leadership",
-      "Pre-Medical Education",
-      "Youth Healthcare Programs",
-      "Medical Volunteering",
-      "Healthcare Advocacy",
+      "Youth Wellness",
+      "Wellness Career Education",
+      "Healthcare Careers",
+      "Law Careers",
+      "Finance Careers",
+      "Youth Participation in Policy",
+      "Youth Mentorship",
+      "Youth Research and Publishing",
+      "Safe Online Communities for Youth",
+      "UN Convention on the Rights of the Child",
+      "Sustainable Development Goals",
     ],
     areaServed: {
       "@type": "Place",
@@ -202,7 +240,7 @@ export function generateOrganizationSchema() {
     },
     audience: {
       "@type": "EducationalAudience",
-      educationalRole: "High School Students",
+      educationalRole: "Youth aged 13 to 24",
     },
   }
 }

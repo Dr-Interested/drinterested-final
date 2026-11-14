@@ -67,7 +67,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
     "@type": "CollectionPage",
     name: "Dr. Interested Blog",
     description:
-      "Explore the latest insights, research, and information about healthcare careers, medical advancements, and educational opportunities.",
+      "Youth written insights, research, and guides on wellness careers, health, medicine, and skill building.",
     url: "https://www.drinterested.org/blog",
     isPartOf: {
       "@type": "WebSite",
@@ -97,8 +97,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
             Dr. Interested Blog
           </h1>
           <p className="text-center text-lg text-[#405862]/80 max-w-2xl mx-auto mb-8">
-            Explore the latest insights, research, and information about healthcare careers, medical advancements, and
-            educational opportunities.
+            Youth written insights, research, and guides on wellness careers, health, medicine, and skill building.
           </p>
 
           <div className="max-w-xl mx-auto relative">
@@ -312,7 +311,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
         <div className="container max-w-4xl text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Never Miss an Article</h2>
           <p className="text-white/80 mb-8 max-w-xl mx-auto">
-            Subscribe to get the latest healthcare insights, career guides, and research breakdowns from our team.
+            Subscribe to get our latest articles, career guides, and research breakdowns.
           </p>
           <div className="max-w-md mx-auto mb-6">
             <NewsletterForm darkMode={true} showFirstName={false} compact={true} />

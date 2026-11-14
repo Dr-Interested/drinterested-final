@@ -46,7 +46,7 @@ export default function MerchSection() {
                       <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
                         <Image
                           src="/tshirt.jpg"
-                          alt="Dr. Interested T-Shirt - Healthcare Club Merchandise"
+                          alt="Dr. Interested T-Shirt - Dr. Interested merchandise"
                           width={120}
                           height={120}
                           className="object-contain hover:scale-105 transition-transform duration-300"
@@ -55,7 +55,7 @@ export default function MerchSection() {
                       <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
                         <Image
                           src="/hoodie.jpg"
-                          alt="Dr. Interested Hoodie - Healthcare Club Merchandise"
+                          alt="Dr. Interested Hoodie - Dr. Interested merchandise"
                           width={120}
                           height={120}
                           className="object-contain hover:scale-105 transition-transform duration-300"
@@ -64,7 +64,7 @@ export default function MerchSection() {
                       <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
                         <Image
                           src="/sticker.jpg"
-                          alt="Dr. Interested Sticker - Healthcare Club Merchandise"
+                          alt="Dr. Interested Sticker - Dr. Interested merchandise"
                           width={120}
                           height={120}
                           className="object-contain hover:scale-105 transition-transform duration-300"
@@ -73,7 +73,7 @@ export default function MerchSection() {
                       <div className="bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center p-2">
                         <Image
                           src="/mug.jpg"
-                          alt="Dr. Interested Mug - Healthcare Club Merchandise"
+                          alt="Dr. Interested Mug - Dr. Interested merchandise"
                           width={120}
                           height={120}
                           className="object-contain hover:scale-105 transition-transform duration-300"
@@ -86,7 +86,7 @@ export default function MerchSection() {
                   <div>
                     <h3 className="text-xl font-bold mb-3 text-[#405862]">Dr. Interested Merchandise</h3>
                     <p className="text-[#405862]/80 mb-4">
-                      Support our mission while showing off your passion for healthcare! Our merchandise collection
+                      Support our mission while showing off your passion for youth wellness! Our merchandise collection
                       includes t-shirts, hoodies, stickers, mugs, and more - all featuring our iconic Dr. Interested
                       designs.
                     </p>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { requireApprovedMember } from "@/lib/portal-auth"
-import { DriveApiError, listDriveFolder, resolveRootFolderId } from "@/lib/google-drive"
+import { DriveApiError, assertInDriveRoot, listDriveFolder, resolveRootFolderId } from "@/lib/google-drive"
 
 export async function GET(request: Request) {
   try {
@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const requestedFolderId = searchParams.get("folderId")
     const folderId = requestedFolderId || (await resolveRootFolderId(supabase))
+    await assertInDriveRoot(supabase, folderId)
 
     const listing = await listDriveFolder(folderId)
     return NextResponse.json(listing)

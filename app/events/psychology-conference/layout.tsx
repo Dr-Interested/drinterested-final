@@ -5,7 +5,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Culture & Psychology Conference",
   description:
-    "Highlights from the Culture & Psychology Conference, where researchers, youth leaders, and mental health professionals explored the influence of culture on psychology, identity, and wellbeing.",
+    "Highlights from Dr. Interested's Culture & Psychology Conference: how culture shapes psychology, identity and wellbeing, with researchers and youth leaders.",
   alternates: {
     canonical: "https://www.drinterested.org/events/psychology-conference",
   },

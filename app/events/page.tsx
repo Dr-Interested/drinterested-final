@@ -55,19 +55,22 @@ export const revalidate = 60; // Revalidate events every 60 seconds (ISR)
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "Join Dr. Interested's engaging events and initiatives designed to educate and inspire future healthcare professionals. From webinars to research competitions, find opportunities to grow.",
+    "Free events for youth from Dr. Interested: wellness career webinars, conferences, case and research competitions, and policy sessions. Find your next event.",
   keywords: [
-    "healthcare events",
-    "medical webinars",
+    "Dr. Interested events",
+    "free youth events",
+    "wellness career webinars",
+    "healthcare career events",
+    "youth policy events",
+    "case competition for high school students",
     "student research competitions",
-    "healthcare workshops",
-    "medical education events",
+    "MedExplore conference",
     "volunteer opportunities",
   ],
   openGraph: {
     title: "Events | Dr. Interested",
     description:
-      "Join Dr. Interested's engaging events and initiatives designed to educate and inspire future healthcare professionals.",
+      "Free Dr. Interested events for youth: wellness career talks, conferences, case competitions, policy sessions and community events.",
     url: "https://www.drinterested.org/events",
     siteName: "Dr. Interested",
     type: "website",

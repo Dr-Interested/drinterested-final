@@ -71,7 +71,7 @@ export default function PublicationsClientPage({
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Dr. Interested Publications",
-    description: "Explore blog posts, op-eds, and policy work on healthcare education and medical advocacy.",
+    description: "Explore youth written blog posts, op-eds, and policy work on wellness careers, health, and policy.",
     url: "https://www.drinterested.org/publications",
     isPartOf: {
       "@type": "WebSite",
@@ -101,7 +101,7 @@ export default function PublicationsClientPage({
             Publications
           </h1>
           <p className="text-center text-lg text-[#405862]/80 max-w-2xl mx-auto mb-3">
-            Explore our blog posts, op-eds, and policy work on healthcare education, medical advocacy, and systemic change.
+            Youth written blog posts, op-eds, and policy work on wellness careers, health, policy, and systemic change.
           </p>
           <p className="text-center text-xs text-[#405862]/50 max-w-2xl mx-auto mb-8">
             Content on this page is for informational and entertainment purposes only and is not medical or career
@@ -144,7 +144,7 @@ export default function PublicationsClientPage({
           <div className="container">
             <CategorySectionHeader
               title="Op-Eds"
-              description="Opinion pieces and thought leadership from Dr. Interested on healthcare policy and youth engagement."
+              description="Opinion pieces from Dr. Interested on health policy, youth voice, and youth engagement."
               href="/publications/op-eds"
               totalCount={opEds.length}
               itemLabel="Op-Eds"
@@ -164,7 +164,7 @@ export default function PublicationsClientPage({
           <div className="container">
             <CategorySectionHeader
               title="Blog"
-              description="Explore insights, research, and information about healthcare careers, medical advancements, and educational opportunities."
+              description="Insights, research, and guides on wellness careers, health, medicine, and skill building."
               href="/publications/blog"
               totalCount={blogs.length}
               itemLabel="Posts"
@@ -223,7 +223,7 @@ export default function PublicationsClientPage({
         <div className="container max-w-4xl text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Never Miss Our Latest Publications</h2>
           <p className="text-white/80 mb-8 max-w-xl mx-auto">
-            Subscribe to get the latest healthcare insights, policy updates, and thought leadership from our team.
+            Subscribe to get our latest articles, policy updates, and opportunities.
           </p>
           <div className="max-w-md mx-auto mb-6">
             <NewsletterForm darkMode={true} showFirstName={false} compact={true} />

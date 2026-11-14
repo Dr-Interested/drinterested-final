@@ -1,7 +1,7 @@
 {
-  "name": "Dr. Interested - Inspiring Future Healthcare Professionals",
+  "name": "Dr. Interested: Youth Led Global Wellness Organization",
   "short_name": "Dr. Interested",
-  "description": "Empowering high school students to explore careers in healthcare through education, research, and mentorship.",
+  "description": "A youth led global wellness organization: wellness career education, access to policy spaces, and a safe community for young people.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en-US",
-  "categories": ["education", "health", "medical"],
+  "categories": ["education", "health", "lifestyle"],
   "icons": [
     {
       "src": "/favicon-16x16.png",

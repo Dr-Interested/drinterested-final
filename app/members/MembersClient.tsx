@@ -12,6 +12,7 @@ import ScrollToTop from "@/components/scroll-to-top"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { supabase } from "@/lib/supabase-client"
 import { generateSlug } from "@/lib/members-data"
+import { ALL_TIME, YEAR_2026 } from "@/lib/impact-stats"
 
 type MemberType = {
   id: string
@@ -341,8 +342,8 @@ export default function MembersClient() {
         <div className="container">
           <h1 className="text-3xl font-bold text-center mb-2 text-[#405862] font-bricolage">Our Team</h1>
           <p className="text-center text-[#405862]/90 mb-6 max-w-2xl mx-auto text-sm">
-            Meet the talented team behind Dr. Interested, dedicated to inspiring the next generation of healthcare
-            professionals.
+            Meet the {YEAR_2026.executives} youth executives, living in {YEAR_2026.teamCountries} countries, who run
+            Dr. Interested, plus the medical student advisors who guide our work.
           </p>
         </div>
       </section>
@@ -1002,14 +1003,15 @@ export default function MembersClient() {
                   Join Our Executive Team
                 </h3>
                 <p>
-                  Dr. Interested is a global youth organization active in <strong>106 countries</strong>,
-                  reaching <strong>160,000+ students</strong> worldwide. We operate fully online through Discord,
-                  with optional in-person opportunities depending on your city.
+                  Dr. Interested is a youth led global wellness organization with members in{" "}
+                  <strong>{ALL_TIME.countries} countries and territories</strong> and{" "}
+                  <strong>{ALL_TIME.youthImpacted} youth impacted</strong> since 2025. We operate mostly online through
+                  Discord, with in person opportunities depending on your city.
                 </p>
                 <p>
-                  We’re recruiting across nearly every field right now — Finance, Tech, Coding, Design,
-                  Outreach, Events, and Healthcare Careers Education. If you like building things that matter,
-                  there’s a seat for you.
+                  You do not need a healthcare background. We’re recruiting across nearly every field right now,
+                  including Finance, Tech, Coding, Design, Outreach, Events, and Education. If you like building
+                  things that matter, there’s a seat for you.
                 </p>
                 <p className="font-semibold text-[#405862]">
                   This isn’t busywork. You’ll be part of a global team that moves fast,
@@ -1030,8 +1032,9 @@ export default function MembersClient() {
                     <ul className="space-y-3.5">
                       {[
                         "Experience working with an international organization that strengthens your résumé",
-                        "Letters of recommendation from medical students",
-                        "Free tickets to represent us at conferences (merit-based)",
+                        "Letters of recommendation from medical students and leaders",
+                        "Merit based tickets to represent us at conferences, including United Nations affiliated events",
+                        "Serve as an editor on our policy submissions to the United Nations, governments and associations",
                         "Verified volunteer hours",
                         "Real skill growth in leadership, collaboration, and execution"
                       ].map((benefit, idx) => (
@@ -1056,13 +1059,14 @@ export default function MembersClient() {
                       </div>
                     </div>
                     <p className="text-[11px] text-[#405862]/70 mb-3 italic">
-                      Global youth opportunities with support from the GLOCAL Foundation.
+                      Global youth opportunities through our partners, the GLOCAL Foundation of Canada and the Student Innovation Lab.
                     </p>
                     <ul className="space-y-2.5">
                       {[
                         "Apply for microgrants or travel grants to grow your ideas and showcase your work",
                         "Access 100+ virtual workshops and in-person events every year with civic leaders and mentors across Canada",
-                        "After 120 service hours, earn a National Service Recognition Certificate signed by the Honourable Patty Hajdu, Minister of Employment, Workforce Development and Official Languages of Canada"
+                        "After 120 service hours, earn a National Service Recognition Certificate signed by the Honourable Patty Hajdu, Minister of Jobs and Families",
+                        "Access to Student Innovation Lab programming, including wellness programming"
                       ].map((opp, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <Award className="h-4 w-4 text-[#4ecdc4] shrink-0 mt-0.5" />
@@ -1173,7 +1177,7 @@ export default function MembersClient() {
                           Podcast Team
                         </h5>
                         <p className="text-xs text-[#405862]/75 leading-relaxed mt-2">
-                          Create engaging podcast content and amplify healthcare stories from around the world.
+                          Create engaging podcast content and amplify youth voices on health, leadership, and wellness careers from around the world.
                         </p>
                       </div>
                       <Link

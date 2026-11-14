@@ -5,9 +5,9 @@ import { HERO_PHOTO, HIGHLIGHT_PHOTOS } from "./data"
 const SITE_URL = "https://www.drinterested.org"
 
 export const metadata: Metadata = {
-  title: "MedExplore 2026 Recap (MedX 2026) | Dr. Interested",
+  title: "MedExplore 2026 Recap (MedX 2026)",
   description:
-    "See how MedExplore 2026 (MedX 2026) went at the University of Toronto Mississauga, Davis Building on Sunday, August 16, 2026. Over 100 students, 23 speakers, guests, and panelists, and 17 volunteers came together for a full day exploring careers in healthcare. Photos, agenda recap, letters of support, and certificates of recognition.",
+    "MedExplore 2026 (MedX 2026) recap: 100+ students and 23 speakers explored healthcare careers at UTM on August 16, 2026. Photos, agenda and highlights.",
   keywords: [
     "MedExplore 2026",
     "MedX Conference 2026",

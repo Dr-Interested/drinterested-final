@@ -1,0 +1,6 @@
+# Dr. Interested: how to report a security vulnerability (RFC 9116).
+# Please email details and steps to reproduce. Do not access, change or delete member data.
+Contact: mailto:admin@drinterested.org
+Expires: 2027-11-08T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.drinterested.org/.well-known/security.txt

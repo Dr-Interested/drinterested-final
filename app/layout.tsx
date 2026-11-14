@@ -9,57 +9,54 @@ import Footer from "@/components/footer"
 import Script from "next/script"
 import { Toaster } from "@/components/ui/toaster"
 import { generateOrganizationSchema } from "@/lib/seo-utils"
+import { ALL_TIME } from "@/lib/impact-stats"
 import SeoSchema from "@/components/seo-schema"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
+import AnalyticsConsent from "@/components/analytics-consent"
 
 const inter = Inter({ subsets: ["latin"] })
 
+const SITE_TITLE = "Dr. Interested | Youth Led Global Wellness Organization"
+const SITE_DESCRIPTION = `Youth led global wellness organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free wellness career education, policy access, and community spaces.`
+const BANNER_ALT = "Dr. Interested: a youth led global wellness organization"
+
 export const metadata: Metadata = {
   title: {
-    default: "Dr. Interested - Inspiring Future Healthcare Leaders",
+    default: SITE_TITLE,
     template: "%s | Dr. Interested",
   },
-  description:
-    'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+  description: SITE_DESCRIPTION,
   keywords: [
-    "Adil Mukhi",
-    "Mississauga",
     "Dr. Interested",
-    "healthcare education",
-    "medical careers",
-    "high school students",
-    "healthcare mentorship",
-    "medical research",
-    "Dr. Interested",
-    "healthcare internships",
-    "medical technology",
-    "high school club",
-    "volunteer hours",
-    "healthcare volunteer",
-    "student-led organization",
-    "healthcare leadership",
-    "medical podcast",
-    "healthcare blog",
-    "healthcare community",
-    "healthcare workshops",
-    "healthcare research",
-    "highschool research",
-    "doctor interested",
-    "doctor interest",
     "dr interested",
-    "dr interest",
-    "medical students",
-    "healthcare advisors",
-    "impact report",
-    "healthcare impact",
-    "policy spark",
-    "healthcare policy",
-    "healthcare events",
-    "medical webinars",
-    "premed webinars",
-    "healthcare webinars",
+    "doctor interested",
+    "Adil Mukhi",
+    "Future Interested",
+    "youth wellness organization",
+    "youth led organization",
+    "wellness careers",
+    "career education for youth",
+    "youth in policy",
+    "youth voice in policy",
+    "safe online community for youth",
+    "healthcare careers",
+    "medical careers",
+    "law careers for youth",
+    "finance careers for youth",
+    "high school students",
+    "volunteer hours",
+    "youth mentorship",
+    "research proposal competition",
+    "MedExplore",
+    "Explore 3 case competition",
+    "youth podcast",
+    "youth blog",
+    "UN ECOSOC civil society",
+    "impact report 2026",
+    "Mississauga",
+    "Canada",
   ],
   authors: [{ name: "Dr. Interested Team" }],
   creator: "Dr. Interested",
@@ -68,28 +65,26 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://www.drinterested.org",
-    title: "Dr. Interested - Inspiring Future Healthcare Leaders",
-    description:
-      'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     siteName: "Dr. Interested",
     images: [
       {
         url: "/websitebanner.jpg",
         width: 1920,
         height: 1080,
-        alt: "Dr. Interested - Pre-Med Youth Org - Supporting youth in finding their unique 'spark' in medicine!",
+        alt: BANNER_ALT,
         type: "image/jpeg",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dr. Interested - Inspiring Future Healthcare Leaders",
-    description:
-      'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: {
       url: "/websitebanner.jpg",
-      alt: "Dr. Interested - Pre-Med Youth Org - Supporting youth in finding their unique 'spark' in medicine!",
+      alt: BANNER_ALT,
       type: "image/jpeg",
     },
     creator: "@DrInterested",
@@ -105,11 +100,7 @@ export const metadata: Metadata = {
     { rel: "apple-touch-icon", sizes: "180x180", url: "/apple-touch-icon.png" },
     { rel: "manifest", url: "/site.webmanifest" },
   ],
-  generator: "Next.js",
   metadataBase: new URL("https://www.drinterested.org"),
-  verification: {
-    google: "google-site-verification-code",
-  },
   robots: {
     index: true,
     follow: true,
@@ -152,34 +143,9 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        {/* Google tag (gtag.js) */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-6MYCRFPPGE" strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-6MYCRFPPGE');
-          `}
-        </Script>
-        {/* Meta Pixel Code */}
-        <Script id="meta-pixel" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-            n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-            document,'script','https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1742833623581972');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img height="1" width="1" style={{display:"none"}} src="https://www.facebook.com/tr?id=1742833623581972&ev=PageView&noscript=1" alt="" />
-        </noscript>
-        {/* End Meta Pixel Code */}
-        <Script src="https://f.convertkit.com/ckjs/ck.5.js" strategy="lazyOnload" />
+        {/* Google Analytics and the Meta Pixel are loaded by <AnalyticsConsent /> only after a
+            visitor allows them, and never on portal pages. ConvertKit's script is loaded by the
+            newsletter form itself, only where one is shown. */}
         <link
           rel="alternate"
           type="application/rss+xml"
@@ -206,19 +172,8 @@ export default function RootLayout({
           </Suspense>
           <Analytics />
           <SpeedInsights />
+          <AnalyticsConsent />
         </ThemeProvider>
-        <Script id="pdf-schema" type="application/ld+json" strategy="afterInteractive">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "MediaObject",
-              "name": "Dr Interested 2025 Impact Report",
-              "contentUrl": "https://www.drinterested.org/dr-interested-impact-report-2025 (1).pdf",
-              "encodingFormat": "application/pdf",
-              "description": "Download and view the Dr Interested Annual 2025 Impact Report to learn about our initiatives, programs, and impact in healthcare education."
-            }
-          `}
-        </Script>
       </body>
     </html>
   )

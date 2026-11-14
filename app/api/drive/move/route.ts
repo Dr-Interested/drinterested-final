@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { requireApprovedMember } from "@/lib/portal-auth"
-import { DriveApiError, moveDriveFile } from "@/lib/google-drive"
+import { DriveApiError, assertInDriveRoot, moveDriveFile } from "@/lib/google-drive"
 
 /** Moves one or more files/folders in a single request. Each file's move is its own atomic
  *  Drive call (see moveDriveFile), so a failure for one item never affects the others — the
@@ -8,7 +8,7 @@ import { DriveApiError, moveDriveFile } from "@/lib/google-drive"
  *  delete route anywhere in this API; see the comment at the top of lib/google-drive.ts. */
 export async function POST(request: Request) {
   try {
-    await requireApprovedMember(request)
+    const supabase = await requireApprovedMember(request)
 
     const { fileIds, fromParentId, toParentId } = await request.json()
     if (!Array.isArray(fileIds) || fileIds.length === 0) {
@@ -19,6 +19,14 @@ export async function POST(request: Request) {
     }
     if (fromParentId === toParentId) {
       return NextResponse.json({ error: "That's already where these are." }, { status: 400 })
+    }
+
+    if (fileIds.length > 100) {
+      return NextResponse.json({ error: "Move at most 100 items at a time." }, { status: 400 })
+    }
+    const rootId = await assertInDriveRoot(supabase, fromParentId, toParentId, ...fileIds)
+    if (fileIds.includes(rootId)) {
+      return NextResponse.json({ error: "The shared folder itself can't be moved." }, { status: 400 })
     }
 
     const results = await Promise.allSettled(

@@ -6,14 +6,14 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Apply to Join",
   description:
-    "Apply to join the Dr. Interested team. Help build healthcare education programs, publications, events, and community for youth around the world.",
+    "Apply to join the Dr. Interested team. Help build wellness career education, policy, and community programs for youth around the world.",
   alternates: {
     canonical: "https://www.drinterested.org/members/apply",
   },
   openGraph: {
     title: "Apply to Join | Dr. Interested",
     description:
-      "Apply to join the Dr. Interested team and help build healthcare education programs for youth worldwide.",
+      "Apply to join the Dr. Interested team and help build wellness, policy, and community programs for youth worldwide.",
     url: "https://www.drinterested.org/members/apply",
     siteName: "Dr. Interested",
     type: "website",

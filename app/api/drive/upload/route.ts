@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 import { requireApprovedMember } from "@/lib/portal-auth"
-import { DriveApiError, uploadDriveFile, MAX_UPLOAD_BYTES } from "@/lib/google-drive"
+import { DriveApiError, assertInDriveRoot, uploadDriveFile, MAX_UPLOAD_BYTES } from "@/lib/google-drive"
 
 export async function POST(request: Request) {
   try {
-    await requireApprovedMember(request)
+    const supabase = await requireApprovedMember(request)
 
     const formData = await request.formData()
     const parentId = formData.get("parentId")
@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       )
     }
 
+    await assertInDriveRoot(supabase, parentId)
     const bytes = Buffer.from(await file.arrayBuffer())
     const uploaded = await uploadDriveFile(parentId, file.name, file.type, bytes)
     return NextResponse.json(uploaded)

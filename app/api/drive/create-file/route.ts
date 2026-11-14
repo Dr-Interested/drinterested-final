@@ -6,6 +6,7 @@ import {
   copyDriveFile,
   resolveTemplateFileId,
   CREATABLE_GOOGLE_TYPES,
+  assertInDriveRoot,
   type CreatableGoogleType,
 } from "@/lib/google-drive"
 
@@ -22,6 +23,8 @@ export async function POST(request: Request) {
     // If the owner has configured a template for this type (Drive "New" Templates in the
     // dashboard), copy it so the new file follows the house format; otherwise fall back to a
     // blank file of that type.
+    await assertInDriveRoot(supabase, parentId)
+    // The template itself may live anywhere: it's chosen by the owner in Admin settings.
     const templateId = await resolveTemplateFileId(supabase, type as CreatableGoogleType)
     const file = templateId
       ? await copyDriveFile(templateId, parentId, name || undefined)

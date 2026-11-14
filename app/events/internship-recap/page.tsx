@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import InternshipRecapClientPage from "./internship-recap-client"
 
 export const metadata: Metadata = {
-  title: "Medical-Technological Internship Recap | Dr. Interested",
+  title: "Medical-Technological Internship Recap",
   description:
-    "Explore the amazing projects from our Medical-Technological Internship. Students researched cutting-edge healthcare technologies and created presentations on CT scans, ultrasound, PET scans, robotic surgery, DNA sequencing, and 3D bioprinting.",
+    "Student projects from Dr. Interested's Medical-Technological Internship on CT, ultrasound, PET scans, robotic surgery, DNA sequencing and 3D bioprinting.",
   keywords: [
     "internship",
     "medical technology",

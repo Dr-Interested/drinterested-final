@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { OAuth2Client } from "google-auth-library"
-import { DriveApiError, getOAuthClientCredentials } from "@/lib/google-drive"
+import { DriveApiError, getOAuthClientCredentials, DRIVE_OAUTH_STATE_COOKIE } from "@/lib/google-drive"
 
 function escapeHtml(value: string): string {
   return value
@@ -11,10 +11,21 @@ function escapeHtml(value: string): string {
 }
 
 function htmlPage(bodyHtml: string, status = 200) {
-  return new NextResponse(
-    `<!doctype html><html><body style="font-family: sans-serif; max-width: 640px; margin: 40px auto; line-height: 1.5;">${bodyHtml}</body></html>`,
-    { status, headers: { "Content-Type": "text/html; charset=utf-8" } }
+  const res = new NextResponse(
+    `<!doctype html><html><head><meta name="robots" content="noindex"></head><body style="font-family: sans-serif; max-width: 640px; margin: 40px auto; line-height: 1.5;">${bodyHtml}</body></html>`,
+    {
+      status,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        // This page can show a refresh token: never cache it or leak its URL onward.
+        "Cache-Control": "no-store",
+        "Referrer-Policy": "no-referrer",
+      },
+    }
   )
+  // The state cookie is single-use.
+  res.cookies.set(DRIVE_OAUTH_STATE_COOKIE, "", { path: "/api/drive/oauth", maxAge: 0 })
+  return res
 }
 
 export async function GET(request: Request) {
@@ -24,6 +35,17 @@ export async function GET(request: Request) {
 
   if (error) {
     return htmlPage(`<h2>Google Drive connection cancelled</h2><p>Google returned: ${escapeHtml(error)}</p>`, 400)
+  }
+  const expectedState = request.headers
+    .get("cookie")
+    ?.split(/;\s*/)
+    .find((c) => c.startsWith(`${DRIVE_OAUTH_STATE_COOKIE}=`))
+    ?.slice(DRIVE_OAUTH_STATE_COOKIE.length + 1)
+  if (!expectedState || searchParams.get("state") !== expectedState) {
+    return htmlPage(
+      "<h2>Connection expired</h2><p>Start again from the Admin tab (Connect Google Drive Account) in the same browser.</p>",
+      400,
+    )
   }
   if (!code) {
     return htmlPage("<h2>Missing authorization code</h2><p>Try connecting again from /api/drive/oauth/start.</p>", 400)
