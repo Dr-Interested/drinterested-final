@@ -67,7 +67,7 @@ export async function generateMetadata({
   return {
     title: webinar.title,
     description: webinar.description,
-    keywords: ["Dr. Interested", "webinar", "medical education", "premed", "healthcare careers", ...(webinar.tags || [])],
+    keywords: ["Dr. Interested", "webinar", "wellness careers", "premed", "healthcare careers", ...(webinar.tags || [])],
     authors: [{ name: "Dr. Interested" }],
     creator: "Dr. Interested",
     publisher: "Dr. Interested",

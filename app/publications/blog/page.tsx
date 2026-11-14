@@ -16,7 +16,7 @@ export const metadata: Metadata = generateSeoMetadata({
   keywords: [
     "Dr. Interested blog",
     "healthcare careers blog",
-    "premed blog",
+    "wellness careers blog",
     "medical education articles",
     "youth healthcare advocacy",
   ],
