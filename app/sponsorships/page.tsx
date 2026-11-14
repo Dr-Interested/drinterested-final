@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { Mail, Sparkles, Users, Megaphone, Award, Heart, Info, Building2, Share2, UserPlus, Receipt } from "lucide-react"
 import { ALL_TIME, IMPACT_REPORT_2026, LEGAL_STATUS, YEAR_2026 } from "@/lib/impact-stats"
@@ -37,17 +36,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.drinterested.org/sponsorships" },
   robots: { index: true, follow: true },
 }
-
-const SUPPORTERS: { name: string; role: string; logo?: string }[] = [
-  { name: "Canada Service Corps", role: "Funder, MedExplore 2026", logo: "/medx/canada-service-corps-logo.png" },
-  { name: "TakingITGlobal", role: "Sponsor, MedExplore 2026", logo: "/taking-it-global-logo.png" },
-  { name: "Sprout Fellowship", role: "Sponsor, MedExplore 2026", logo: "/sprout-fellowship-logo.png" },
-  { name: "GLOCAL Foundation of Canada", role: "Partner for volunteers, policy access and grants", logo: "/glocal.webp" },
-  { name: "Student Innovation Lab", role: "Partner for volunteer programming and wellness" },
-  { name: "UNESCO Learning Planet Festival", role: "Program partner" },
-  { name: "Curiosity Films", role: "Program partner" },
-  { name: "Hope In Every Hand and Youth Law Advocacy", role: "Explore 3 founding partners" },
-]
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`bg-white rounded-2xl border-2 border-[#4ecdc4]/20 p-6 md:p-10 shadow-sm ${className}`}>{children}</div>
@@ -205,33 +193,6 @@ export default function SponsorshipsPage() {
               </div>
             </div>
           </Card>
-        </div>
-      </section>
-
-      {/* Supporters */}
-      <section className="py-12 md:py-16 bg-white">
-        <div className="container max-w-5xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Partners & Supporters</h2>
-            <p className="text-[#405862]/70">Thank you to the organizations behind our 2026 programs.</p>
-          </div>
-          <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {SUPPORTERS.map((s) => (
-              <li key={s.name} className="rounded-xl border border-[#405862]/10 p-4 flex flex-col items-center text-center gap-2">
-                <div className="relative h-14 w-full">
-                  {s.logo ? (
-                    <Image src={s.logo} alt={`${s.name} logo`} fill sizes="200px" className="object-contain" />
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-[#405862]/40">
-                      <Heart className="h-6 w-6" />
-                    </div>
-                  )}
-                </div>
-                <p className="font-semibold text-sm text-[#405862]">{s.name}</p>
-                <p className="text-xs text-[#405862]/60">{s.role}</p>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
