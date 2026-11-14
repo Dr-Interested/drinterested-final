@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#f5f1eb",
     theme_color: "#405862",
     orientation: "portrait-primary",
-    categories: ["education", "health", "medical"],
+    categories: ["education", "health", "lifestyle"],
     icons: [
       {
         src: "/favicon-16x16.png",

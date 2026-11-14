@@ -84,7 +84,7 @@ export async function generateMetadata({
   return {
     title: `${podcast.title} | Dr. Interested Podcast`,
     description: podcast.description,
-    keywords: ["Dr. Interested", "podcast", "healthcare", "medical education"],
+    keywords: ["Dr. Interested", "podcast", "youth wellness", "healthcare careers"],
     authors: [{ name: "Dr. Interested" }],
     creator: "Dr. Interested",
     publisher: "Dr. Interested",

@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     contentTypeLabel,
     publication.policy_type ? publication.policy_type.replace(/-/g, " ") : undefined,
     "Dr. Interested",
-    "healthcare education",
-    "medical education",
+    "youth wellness",
+    "wellness careers",
     ...String(publication.title || "")
       .split(/\s+/)
       .filter((w: string) => w.length > 3),

@@ -57,11 +57,14 @@ export const metadata: Metadata = {
   description:
     "Free events for youth from Dr. Interested: wellness career webinars, conferences, case and research competitions, and policy sessions. Find your next event.",
   keywords: [
-    "healthcare events",
-    "medical webinars",
+    "Dr. Interested events",
+    "free youth events",
+    "wellness career webinars",
+    "healthcare career events",
+    "youth policy events",
+    "case competition for high school students",
     "student research competitions",
-    "healthcare workshops",
-    "medical education events",
+    "MedExplore conference",
     "volunteer opportunities",
   ],
   openGraph: {
