@@ -174,7 +174,16 @@ export default function SponsorshipsPage() {
       {/* Four levels */}
       <section className="py-12 md:py-16 bg-[#f7f6f2] dark:bg-[#0b0b0b]">
         <div className="container max-w-5xl mx-auto px-4 space-y-6">
-          <p className="text-center text-[#405862]/80">Every level matters.</p>
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-[#4ecdc4]/10 text-[#405862] px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Sparkles className="h-4 w-4" />
+              Four Ways to Help
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-4">More Ways to Support Us</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
+              Not ready to donate? Every level matters, from sharing a post to bringing your company on board.
+            </p>
+          </div>
 
           <Card>
             <LevelHeading level={1} icon={Share2} title="Follow us and share what you learn" />
