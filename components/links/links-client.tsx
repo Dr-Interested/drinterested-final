@@ -90,6 +90,18 @@ export default function LinksPageClient() {
       color: "bg-[#374151] hover:bg-[#1F2937]",
     },
     {
+      title: "Read Our 2026 Impact Report",
+      url: "/impact-report",
+      icon: <BookOpen className="h-5 w-5" />,
+      color: "bg-[#2d8659] hover:bg-[#256f4a]",
+    },
+    {
+      title: "Apply to Join the Team",
+      url: "/members/join",
+      icon: <Users className="h-5 w-5" />,
+      color: "bg-[#405862] hover:bg-[#334852]",
+    },
+    {
       title: "Upcoming Events",
       url: "/events",
       icon: <Calendar className="h-5 w-5" />,
@@ -97,7 +109,7 @@ export default function LinksPageClient() {
     },
     {
       title: "Read Our Blog",
-      url: "/blog",
+      url: "/publications",
       icon: <BookOpen className="h-5 w-5" />,
       color: "bg-[#405862] hover:bg-[#334852]",
     },
@@ -152,7 +164,7 @@ export default function LinksPageClient() {
             Dr. <span className="text-[#4ecdc4]">Interested</span>
           </h1>
           <p className="text-[#405862]/80 text-center mt-2 text-sm max-w-xs">
-            Inspiring the Next Generation of Healthcare Professionals
+            A youth led global wellness organization
           </p>
 
           <div className="flex items-center mt-3 text-sm bg-[#f0ebe3] rounded-full px-3 py-1.5">

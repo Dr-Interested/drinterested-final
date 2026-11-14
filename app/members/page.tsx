@@ -1,21 +1,21 @@
 import type { Metadata } from "next"
 import MembersClient from "./MembersClient"
+import { YEAR_2026 } from "@/lib/impact-stats"
 
 export const metadata: Metadata = {
   title: "Our Team",
-  description:
-    "Meet the 367+ student executives and advisors behind Dr. Interested, a youth-led organization inspiring future healthcare professionals in 106 countries.",
+  description: `Meet the ${YEAR_2026.executives} youth executives in ${YEAR_2026.teamCountries} countries and the advisors behind Dr. Interested, a youth led global wellness organization.`,
   keywords: [
     "Dr. Interested team",
-    "healthcare education leaders",
+    "youth wellness leaders",
     "medical student advisors",
-    "youth healthcare mentors",
+    "youth mentors",
     "student organization executives",
   ],
   openGraph: {
     title: "Our Team | Dr. Interested",
     description:
-      "Meet the talented team behind Dr. Interested - dedicated executives and advisors inspiring the next generation of healthcare professionals.",
+      "Meet the youth executives and advisors behind Dr. Interested, a youth led global wellness organization.",
     url: "https://www.drinterested.org/members",
     siteName: "Dr. Interested",
     type: "website",

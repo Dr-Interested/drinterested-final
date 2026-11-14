@@ -129,6 +129,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/impact-report/2026",
+        destination: "/impact-report",
+        permanent: false,
+      },
+      {
+        source: "/in-the-media",
+        destination: "/our-work/in-the-media",
+        permanent: true,
+      },
+      {
         source: "/medexplore-2026",
         destination: "/medx-2026",
         permanent: true,

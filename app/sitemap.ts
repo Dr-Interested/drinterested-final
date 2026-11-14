@@ -6,6 +6,7 @@ import galleryManifest from "@/public/medexplore-2026/gallery-manifest.json"
 import documentManifest from "@/public/medexplore-2026/letters-manifest.json"
 import { POLICY_SUBMISSIONS } from "@/data/policy-submissions"
 import { getEpisodesByCategory } from "@/lib/episodes"
+import { IMPACT_REPORT_2025, IMPACT_REPORT_2026 } from "@/lib/impact-stats"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.drinterested.org"
@@ -96,12 +97,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Only URLs on www.drinterested.org belong here: search engines ignore sitemap entries for
   // other hosts (impact., news. and chess.drinterested.org each publish their own sitemap).
+  // The 2026 report (HTML page + PDF) carries a higher priority and a fresh lastmod so search
+  // engines treat it as the current report; the 2025 PDF stays listed at a low priority.
   const impactReportPages: MetadataRoute.Sitemap = [
     {
-      url: `${baseUrl}/dr-interested-impact-report-2025%20(1).pdf`,
-      lastModified: currentDate,
+      url: `${baseUrl}/impact-report`,
+      lastModified: new Date(IMPACT_REPORT_2026.published),
+      changeFrequency: "monthly",
+      priority: 1.0,
+      images: [`${baseUrl}${IMPACT_REPORT_2026.cover}`],
+    },
+    {
+      url: IMPACT_REPORT_2026.url,
+      lastModified: new Date(IMPACT_REPORT_2026.published),
       changeFrequency: "yearly",
-      priority: 0.7,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/our-work/in-the-media`,
+      lastModified: new Date(IMPACT_REPORT_2026.published),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}${IMPACT_REPORT_2025.path}`,
+      lastModified: new Date("2025-12-01"),
+      changeFrequency: "never",
+      priority: 0.3,
     },
   ]
 

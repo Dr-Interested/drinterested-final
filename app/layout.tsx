@@ -9,6 +9,7 @@ import Footer from "@/components/footer"
 import Script from "next/script"
 import { Toaster } from "@/components/ui/toaster"
 import { generateOrganizationSchema } from "@/lib/seo-utils"
+import { ALL_TIME } from "@/lib/impact-stats"
 import SeoSchema from "@/components/seo-schema"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -17,50 +18,45 @@ import AnalyticsConsent from "@/components/analytics-consent"
 
 const inter = Inter({ subsets: ["latin"] })
 
+const SITE_TITLE = "Dr. Interested | Youth Led Global Wellness Organization"
+const SITE_DESCRIPTION = `Youth led global wellness organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free wellness career education, policy access, and community spaces.`
+const BANNER_ALT = "Dr. Interested: a youth led global wellness organization"
+
 export const metadata: Metadata = {
   title: {
-    default: "Dr. Interested - Inspiring Future Healthcare Leaders",
+    default: SITE_TITLE,
     template: "%s | Dr. Interested",
   },
-  description:
-    'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+  description: SITE_DESCRIPTION,
   keywords: [
-    "Adil Mukhi",
-    "Mississauga",
     "Dr. Interested",
-    "healthcare education",
-    "medical careers",
-    "high school students",
-    "healthcare mentorship",
-    "medical research",
-    "Dr. Interested",
-    "healthcare internships",
-    "medical technology",
-    "high school club",
-    "volunteer hours",
-    "healthcare volunteer",
-    "student-led organization",
-    "healthcare leadership",
-    "medical podcast",
-    "healthcare blog",
-    "healthcare community",
-    "healthcare workshops",
-    "healthcare research",
-    "highschool research",
-    "doctor interested",
-    "doctor interest",
     "dr interested",
-    "dr interest",
-    "medical students",
-    "healthcare advisors",
-    "impact report",
-    "healthcare impact",
-    "policy spark",
-    "healthcare policy",
-    "healthcare events",
-    "medical webinars",
-    "premed webinars",
-    "healthcare webinars",
+    "doctor interested",
+    "Adil Mukhi",
+    "Future Interested",
+    "youth wellness organization",
+    "youth led organization",
+    "wellness careers",
+    "career education for youth",
+    "youth in policy",
+    "youth voice in policy",
+    "safe online community for youth",
+    "healthcare careers",
+    "medical careers",
+    "law careers for youth",
+    "finance careers for youth",
+    "high school students",
+    "volunteer hours",
+    "youth mentorship",
+    "research proposal competition",
+    "MedExplore",
+    "Explore 3 case competition",
+    "youth podcast",
+    "youth blog",
+    "UN ECOSOC civil society",
+    "impact report 2026",
+    "Mississauga",
+    "Canada",
   ],
   authors: [{ name: "Dr. Interested Team" }],
   creator: "Dr. Interested",
@@ -69,28 +65,26 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://www.drinterested.org",
-    title: "Dr. Interested - Inspiring Future Healthcare Leaders",
-    description:
-      'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     siteName: "Dr. Interested",
     images: [
       {
         url: "/websitebanner.jpg",
         width: 1920,
         height: 1080,
-        alt: "Dr. Interested - Pre-Med Youth Org - Supporting youth in finding their unique 'spark' in medicine!",
+        alt: BANNER_ALT,
         type: "image/jpeg",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dr. Interested - Inspiring Future Healthcare Leaders",
-    description:
-      'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: {
       url: "/websitebanner.jpg",
-      alt: "Dr. Interested - Pre-Med Youth Org - Supporting youth in finding their unique 'spark' in medicine!",
+      alt: BANNER_ALT,
       type: "image/jpeg",
     },
     creator: "@DrInterested",

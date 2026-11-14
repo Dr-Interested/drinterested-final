@@ -3,62 +3,252 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
-import { Quote, Users, TrendingUp, Heart, Award, BookOpen, Sparkles, Globe } from "lucide-react"
+import {
+  Quote,
+  Users,
+  Heart,
+  Award,
+  BookOpen,
+  Sparkles,
+  Globe,
+  GraduationCap,
+  Landmark,
+  Home as HomeIcon,
+  Newspaper,
+  ArrowRight,
+  Clock,
+  CalendarDays,
+  Eye,
+} from "lucide-react"
 import { LiteYouTube, LiteSpotify } from "@/components/lite-embed"
+import { ALL_TIME, IMPACT_REPORT_2026, PILLARS, YEAR_2026 } from "@/lib/impact-stats"
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+}
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+}
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+}
+
+const inView = { initial: "hidden", whileInView: "visible", viewport: { once: true, margin: "-100px" } } as const
+
+const PILLAR_ICONS = { career: GraduationCap, policy: Landmark, community: HomeIcon } as const
+
+const HEADLINE_STATS = [
+  { icon: Users, value: ALL_TIME.youthImpacted, label: "Youth Impacted" },
+  { icon: Globe, value: ALL_TIME.countries, label: "Countries and Territories" },
+  { icon: Heart, value: ALL_TIME.members, label: "Members" },
+  { icon: Award, value: ALL_TIME.executives, label: "Unique Executives" },
+]
+
+const SECONDARY_STATS = [
+  { icon: Clock, value: ALL_TIME.volunteerHours, label: "Volunteer Hours" },
+  { icon: BookOpen, value: ALL_TIME.mentorHours, label: "Mentor Hours" },
+  { icon: CalendarDays, value: ALL_TIME.events, label: "Events" },
+  { icon: Eye, value: ALL_TIME.impressions, label: "Impressions" },
+]
+
+type Pillar = (typeof PILLARS)[number]["id"]
+
+const FLAGSHIPS: {
+  title: string
+  when: string
+  pillars: Pillar[]
+  body: string
+  stats: [string, string][]
+  image?: string
+}[] = [
+  {
+    title: "Research Proposal Competition",
+    when: "October to November 2026 (also ran in 2025)",
+    pillars: ["career", "policy"],
+    body: "Youth from around the world pitch original research ideas, regardless of prior experience. Guided by 10 medical student advisors, participants build skills in research design, scientific communication, and collaborative problem solving. The top 5 submissions receive mentorship, full publication and monetary support, including DOI registration.",
+    stats: [
+      ["400", "submissions"],
+      ["30+", "countries"],
+      ["600", "youth engaged"],
+      ["90K", "impressions"],
+    ],
+    image: "/research.png",
+  },
+  {
+    title: "Office Hours Initiative",
+    when: "May 2025 to December 2026",
+    pillars: ["career", "community"],
+    body: "Recurring open sessions, plus one on one and group meetings, where youth get mentorship, guidance, and community support in a welcoming, low barrier space as they explore education, careers, and personal growth beyond the classroom.",
+    stats: [
+      [YEAR_2026.mentors, "mentors"],
+      ["2,200+", "youth with direct access"],
+      [YEAR_2026.mentorHours, "mentorship hours in 2026"],
+      ["60K", "program impressions"],
+    ],
+    image: "/office-hours.png",
+  },
+  {
+    title: "The Dr. Interested Blog and Webinars",
+    when: "January to December 2026",
+    pillars: ["career", "policy"],
+    body: "A youth educating youth initiative sharing articles on health, leadership, careers, and skill building, with practical advice and stories that help young people explore their interests and learn from peers. Our op eds and policy writing have been featured by partners.",
+    stats: [
+      ["55", "articles"],
+      ["18", "unique topics"],
+      ["130K", "youth impacted"],
+      ["190K", "reached"],
+    ],
+  },
+  {
+    title: "The Dr. Interested Podcast",
+    when: "January to December 2026",
+    pillars: ["career", "community"],
+    body: "Conversations with youth leaders, changemakers, and professionals about health, leadership, and the future, designed to inspire and connect the next generation.",
+    stats: [
+      ["39", "episodes"],
+      ["40+", "volunteers"],
+      ["98K", "youth impacted"],
+      ["140K", "reached"],
+    ],
+  },
+]
+
+const PARTNER_PROGRAMS: {
+  date: string
+  title: string
+  partner: string
+  body: string
+  stats: string
+  image: string
+  /** Logos are letterboxed instead of cropped. */
+  logo?: boolean
+  href?: string
+}[] = [
+  {
+    date: "January 27, 2026",
+    title: "From Classroom to Career: Expanding Pathways in a Changing World",
+    partner: "Part of the Learning Planet Festival, with UNESCO",
+    body: "An online policy session on how education systems can help young people move into work: flexibility, early exposure, and interdisciplinary skills.",
+    stats: "90 youth impacted, 12K reached, with educators participating",
+    image: "/unesco-webinar.png",
+  },
+  {
+    date: "April 17, 2026",
+    title: "The Race to Fight Cancer: Documentary Watch Party and Surgeon Scientist Q&A",
+    partner: "With Curiosity Films",
+    body: "A watch party of a CBC documentary on lung cancer diagnostics, followed by a live Q&A with the Yasufuku Lab team at UHN.",
+    stats: "68 youth impacted, 7K reached, 3 guest speakers",
+    image: "/The Race to Fight Cancer Documentary.png",
+  },
+  {
+    date: "May 11, 2026",
+    title: "Scaling Accessible Healthcare Education",
+    partner: "Hosted during Canadian Innovation Week",
+    body: "A virtual social session with our founder's story, a student innovation showcase, and a mini workshop that turns an idea into action.",
+    stats: "105 youth impacted, 9K reached",
+    image: "/CIWEvent.png",
+  },
+  {
+    date: "June 7, 2026",
+    title: "Code Blue Planet: Indigenous Wisdom and Climate Medicine",
+    partner: "Part of Toronto Climate Week",
+    body: "An in person day at Humber Polytechnic Downtown where high school and university students joined Indigenous Elders, Knowledge Holders, and health experts to explore climate resilient healthcare, traditional healing, and career paths.",
+    stats: "200 youth impacted, 70K reached",
+    image: "/Code Blue Planet.png",
+  },
+  {
+    date: "August 16, 2026",
+    title: "The 2026 MedExplore Conference",
+    partner: "Funded by Canada Service Corps, sponsored by TakingITGlobal and the Sprout Fellowship",
+    body: "Our full day healthcare careers conference at the University of Toronto Mississauga, with opening remarks from elected officials, career talks, panels, and workshops. Supported by 23 letters and certificates, including from the Premier of Ontario, the Mayor of Mississauga, MPPs, councillors, and an MP. Featured in Insauga.",
+    stats: "100+ youth impacted, 300K reached, 23 speakers and panelists, 17 volunteers",
+    image: "/medexplore-2026/MedExplore2026.png",
+    href: "/medx-2026",
+  },
+  {
+    date: "October 25, 2026",
+    title: "The 2026 Explore 3 Case Competition",
+    partner: "Founding partners: Dr. Interested, Hope In Every Hand, and Youth Law Advocacy",
+    body: "High school teams tackle real world problems across medicine, law, and finance, then present to judges at Humber Polytechnic Downtown in Toronto, competing for a cash prize and certificates.",
+    stats: "40 youth impacted, 183K reached",
+    image: "/ex3-logo.png",
+    logo: true,
+  },
+]
+
+const VOICES = [
+  {
+    quote:
+      "Opportunities like MedExplore aren't something I get to experience every day. I left having spoken to my elected officials for the first time, discovered careers I never knew how to access, and connected with a speaker who has since become a mentor.",
+    who: "Racialized and low income student living in Canada, age 16 to 18",
+  },
+  {
+    quote:
+      "Career education should be accessible to everyone, not just students who can afford expensive programs or have parents who know how university admissions work. Dr. Interested helped bridge that gap for me.",
+    who: "First generation and low income student living in Canada, age 16 to 18",
+  },
+  {
+    quote:
+      "Young people from different backgrounds should be part of healthcare policy discussions. We bring experiences and perspectives that might otherwise be overlooked.",
+    who: "Racialized newcomer living in Canada, age 16 to 18",
+  },
+  {
+    quote:
+      "I arrived not knowing many people, but I left feeling connected to a community that I wanted to stay involved with.",
+    who: "Newcomer and first generation student living in Canada, age 14 to 16",
+  },
+  {
+    quote:
+      "Discord gave me a place to ask questions without feeling embarrassed. I could take my time reading through information and reach out when I needed help.",
+    who: "Student with a disability living in Canada, age 14 to 16",
+  },
+  {
+    quote:
+      "My message to the future of education is simple: give young people not only a seat at the table, but a voice in shaping the table itself.",
+    who: "Low income student living in Ghana, age 14 to 16",
+  },
+]
+
+function PillarTags({ ids }: { ids: Pillar[] }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {ids.map((id) => {
+        const p = PILLARS.find((x) => x.id === id)!
+        return (
+          <span key={id} className="bg-[#4ecdc4]/15 text-[#2d6b66] px-2.5 py-1 rounded-full text-[11px] font-semibold">
+            {p.short}
+          </span>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function OurWorkPage() {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-  }
-
-  const fadeInLeft = {
-    hidden: { opacity: 0, x: -30 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-  }
-
-  const fadeInRight = {
-    hidden: { opacity: 0, x: 30 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-  }
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  }
-
-  const scaleIn = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
-  }
-
   return (
     <div>
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="hero-section bg-[#f5f1eb] py-10 md:py-16 relative overflow-hidden">
         <div className="container relative z-10 max-w-5xl mx-auto">
           <motion.div className="text-center" initial="hidden" animate="visible" variants={fadeIn}>
-            <motion.a
-              href="https://impact.drinterested.org/2025/annual"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#4ecdc4]/20 text-[#4ecdc4] px-4 py-2 rounded-full text-sm font-medium mb-4 hover:bg-[#4ecdc4]/30 transition-colors cursor-pointer"
-              variants={fadeIn}
+            <Link
+              href="/impact-report"
+              className="inline-flex items-center gap-2 bg-[#4ecdc4]/20 text-[#2d6b66] px-4 py-2 rounded-full text-sm font-medium mb-4 hover:bg-[#4ecdc4]/30 transition-colors"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Check out our 2025 Annual Impact Report</span>
-            </motion.a>
+              <span>Read our {IMPACT_REPORT_2026.shortTitle}</span>
+            </Link>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#405862] mb-4">
-              Empowering the Next Generation of Healthcare Leaders
+              Youth Led Change in Wellness, Policy, and Community
             </h1>
             <p className="text-[#405862]/80 text-lg mb-6 leading-relaxed max-w-3xl mx-auto">
-              Discover how Dr. Interested is transforming youth healthcare education through innovative programs,
-              mentorship, and community building across the globe.
+              Everything we run fits at least one of our three pillars: wellness career education, access to policy
+              spaces, and community spaces. The best programs fit all three.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <a
@@ -67,9 +257,15 @@ export default function OurWorkPage() {
               >
                 View Our Impact
               </a>
+              <Link
+                href="/our-work/in-the-media"
+                className="bg-[#405862] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#334852] transition-colors"
+              >
+                In the Media
+              </Link>
               <a
                 href="#media"
-                className="bg-[#405862] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#334852] transition-colors"
+                className="bg-white text-[#405862] border border-[#405862]/20 px-6 py-2.5 rounded-lg font-semibold hover:bg-white/70 transition-colors"
               >
                 Watch Our Content
               </a>
@@ -78,429 +274,277 @@ export default function OurWorkPage() {
         </div>
       </section>
 
-      {/* Impact Numbers Section */}
-      <section id="impact" className="py-12 bg-white">
+      {/* Impact numbers */}
+      <section id="impact" className="py-12 bg-white scroll-mt-20">
         <div className="container max-w-5xl mx-auto">
-          <motion.div
-            className="text-center mb-10"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
+          <motion.div className="text-center mb-10" {...inView} variants={fadeIn}>
             <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Impact by the Numbers</h2>
             <p className="text-[#405862]/70 max-w-2xl mx-auto">
-              Real results from our commitment to youth healthcare education and community building
+              2025 and 2026 combined. In 2026 alone, {YEAR_2026.executives} executives and {YEAR_2026.volunteers}{" "}
+              volunteers gave {YEAR_2026.volunteerHours} hours and we reached {YEAR_2026.youthImpacted} young people.
             </p>
           </motion.div>
 
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={scaleIn}>
-              <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                <Users className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-                <div className="text-3xl font-bold text-[#405862] mb-1">160,000+</div>
-                <div className="text-[#405862]/70 text-xs font-medium">Youth Impacted</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={scaleIn}>
-              <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                <Globe className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-                <div className="text-3xl font-bold text-[#405862] mb-1">106</div>
-                <div className="text-[#405862]/70 text-xs font-medium">Countries Reached</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={scaleIn}>
-              <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                <TrendingUp className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-                <div className="text-3xl font-bold text-[#405862] mb-1">1,400+</div>
-                <div className="text-[#405862]/70 text-xs font-medium">Members</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={scaleIn}>
-              <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 hover:border-[#4ecdc4]/40 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                <Award className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
-                <div className="text-3xl font-bold text-[#405862] mb-1">367+</div>
-                <div className="text-[#405862]/70 text-xs font-medium">Executives</div>
-              </div>
-            </motion.div>
+          <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4" {...inView} variants={staggerContainer}>
+            {HEADLINE_STATS.map(({ icon: Icon, value, label }) => (
+              <motion.div key={label} variants={scaleIn}>
+                <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-[#4ecdc4]/5 p-5 rounded-xl text-center border border-[#4ecdc4]/20 h-full">
+                  <Icon className="w-7 h-7 text-[#4ecdc4] mx-auto mb-2" />
+                  <div className="text-3xl font-bold text-[#405862] mb-1">{value}</div>
+                  <div className="text-[#405862]/70 text-xs font-medium">{label}</div>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
 
-          {/* Additional Stats Grid - Condensed */}
-          <motion.div
-            className="grid md:grid-cols-4 gap-4"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-4 rounded-xl text-center">
-                <div className="text-2xl font-bold text-[#4ecdc4] mb-1">400+</div>
-                <div className="text-[#405862]/70 text-xs">Mentor Hours</div>
-              </div>
-            </motion.div>
+          <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" {...inView} variants={staggerContainer}>
+            {SECONDARY_STATS.map(({ icon: Icon, value, label }) => (
+              <motion.div key={label} variants={fadeIn}>
+                <div className="bg-[#f5f1eb] p-4 rounded-xl text-center h-full">
+                  <Icon className="w-5 h-5 text-[#4ecdc4] mx-auto mb-1" />
+                  <div className="text-2xl font-bold text-[#405862] mb-1">{value}</div>
+                  <div className="text-[#405862]/70 text-xs">{label}</div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+          <p className="text-center text-xs text-[#405862]/60 mt-4">
+            Source:{" "}
+            <Link href="/impact-report" className="underline underline-offset-2 hover:text-[#405862]">
+              {IMPACT_REPORT_2026.title}
+            </Link>
+            , figures as of {IMPACT_REPORT_2026.asOf}.
+          </p>
+        </div>
+      </section>
 
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-4 rounded-xl text-center">
-                <div className="text-2xl font-bold text-[#4ecdc4] mb-1">106%</div>
-                <div className="text-[#405862]/70 text-xs">Weekly Growth Rate</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-4 rounded-xl text-center">
-                <div className="text-2xl font-bold text-[#4ecdc4] mb-1">3.7M+</div>
-                <div className="text-[#405862]/70 text-xs">Content Impressions</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-4 rounded-xl text-center">
-                <div className="text-2xl font-bold text-[#4ecdc4] mb-1">600+</div>
-                <div className="text-[#405862]/70 text-xs">Service Hours Earned</div>
-              </div>
-            </motion.div>
+      {/* Three pillars */}
+      <section id="pillars" className="py-12 bg-[#f5f1eb]/50 scroll-mt-20">
+        <div className="container max-w-5xl mx-auto">
+          <motion.div className="text-center mb-10" {...inView} variants={fadeIn}>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Three Pillars</h2>
+            <p className="text-[#405862]/70 max-w-2xl mx-auto">
+              Guided by the UN Convention on the Rights of the Child (Articles 6 and 12) and SDGs 3, 4, and 10.
+            </p>
+          </motion.div>
+          <motion.div className="grid md:grid-cols-3 gap-5" {...inView} variants={staggerContainer}>
+            {PILLARS.map((p) => {
+              const Icon = PILLAR_ICONS[p.id]
+              return (
+                <motion.div key={p.id} variants={fadeIn} className="bg-white rounded-xl p-6 shadow-sm border border-[#405862]/10">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-[#4ecdc4]/15 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-[#2d6b66]" />
+                    </div>
+                    <span className="text-xs font-semibold text-[#405862]/60">Pillar {p.number}</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-[#405862] mb-2">{p.name}</h3>
+                  <p className="text-sm text-[#405862]/80 leading-relaxed">{p.description}</p>
+                </motion.div>
+              )
+            })}
           </motion.div>
         </div>
       </section>
 
-      <section className="py-12 bg-[#f5f1eb]/50">
+      {/* Flagship initiatives */}
+      <section className="py-12 bg-white">
         <div className="container max-w-5xl mx-auto">
-          <motion.div
-            className="text-center mb-10"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Events & Initiatives</h2>
-            <p className="text-[#405862]/70 max-w-2xl mx-auto">
-              Transformative programs designed to inspire, educate, and empower youth in healthcare
-            </p>
+          <motion.div className="text-center mb-10" {...inView} variants={fadeIn}>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Flagship Initiatives</h2>
+            <p className="text-[#405862]/70 max-w-2xl mx-auto">Programs that run all year and reach youth everywhere.</p>
           </motion.div>
 
-          <div className="space-y-10">
-            {/* Research Proposal Competition */}
-            <motion.div
-              className="grid md:grid-cols-2 gap-6 items-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInLeft}
-            >
-              <div className="space-y-3">
-                <div className="inline-block bg-[#4ecdc4]/10 text-[#4ecdc4] px-3 py-1.5 rounded-full text-xs font-semibold">
-                  Research Competition
-                </div>
-                  <h3 className="text-xl font-bold text-[#405862]">
-                    The Annual Dr. Interested Research Proposal Competition
-                  </h3>
-                  <p className="text-[#405862]/80 text-sm leading-relaxed">
-                    Bringing together over 200 participants from 30+ countries, this competition empowers youth to explore research through guided webinars and mentorship. Top submissions earn one-on-one mentorship from medical students and research professionals.
-                  </p>
-                <div className="bg-white p-3 rounded-lg border-l-4 border-[#4ecdc4]">
-                  <div className="flex gap-2">
-                    <Quote className="w-4 h-4 text-[#4ecdc4] flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-[#405862]/80 text-xs italic mb-1">
-                        "This Research Competition for me was a wonderful experience as it helped me with learning the
-                        importance of biomedical engineering which is something I want to pursue in the future."
-                      </p>
-                      <p className="text-[#405862]/60 text-xs">— 15 y.o., Low Income, USA</p>
-                    </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {FLAGSHIPS.map((f) => (
+              <motion.article
+                key={f.title}
+                {...inView}
+                variants={fadeIn}
+                className="bg-[#f5f1eb]/60 rounded-xl overflow-hidden border border-[#405862]/10 flex flex-col"
+              >
+                {f.image && (
+                  <div className="relative h-48">
+                    <Image src={f.image} alt={f.title} fill sizes="(max-width: 768px) 100vw, 480px" className="object-cover" />
+                  </div>
+                )}
+                <div className="p-5 flex flex-col gap-3 flex-1">
+                  <PillarTags ids={f.pillars} />
+                  <div>
+                    <h3 className="text-xl font-bold text-[#405862]">{f.title}</h3>
+                    <p className="text-xs text-[#405862]/60 mt-0.5">{f.when}</p>
+                  </div>
+                  <p className="text-sm text-[#405862]/80 leading-relaxed flex-1">{f.body}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {f.stats.map(([n, l]) => (
+                      <div key={l} className="bg-white rounded-lg p-2 text-center">
+                        <div className="text-lg font-bold text-[#2d8659]">{n}</div>
+                        <div className="text-[11px] text-[#405862]/70 leading-tight">{l}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
-              <div className="relative h-[280px] rounded-xl overflow-hidden shadow-xl">
-                <Image
-                  src="/research.png"
-                  alt="Research Competition"
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </motion.div>
-
-            {/* Resilient Minds Project */}
-            <motion.div
-              className="grid md:grid-cols-2 gap-6 items-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInRight}
-            >
-              <div className="order-2 md:order-1 relative h-[280px] rounded-xl overflow-hidden shadow-xl">
-                <Image
-                  src="/mindsproject.png"
-                  alt="Resilient Minds Project"
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-              <div className="order-1 md:order-2 space-y-3">
-                <div className="inline-block bg-[#4ecdc4]/10 text-[#4ecdc4] px-3 py-1.5 rounded-full text-xs font-semibold">
-                  Mental Health Initiative
-                </div>
-                <h3 className="text-xl font-bold text-[#405862]">The Resilient Minds Project</h3>
-                <p className="text-[#405862]/80 text-sm leading-relaxed">
-                  A mental health-focused event series fostering resilience, emotional literacy, and peer connection.
-                  Over 400 youth impacted with a $60 toolkit provided to 300+ participants.
-                </p>
-                <div className="bg-white p-3 rounded-lg border-l-4 border-[#4ecdc4]">
-                  <div className="flex gap-2">
-                    <Quote className="w-4 h-4 text-[#4ecdc4] flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-[#405862]/80 text-xs italic mb-1">
-                        "Being part of Dr. Interested—especially through the Resilient Minds event—opened my eyes to how
-                        mental health and medicine connect."
-                      </p>
-                      <p className="text-[#405862]/60 text-xs">— 14 y.o., Black, Canada</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Cards for Nurses */}
-            <motion.div
-              className="grid md:grid-cols-2 gap-6 items-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInLeft}
-            >
-              <div className="space-y-3">
-                <div className="inline-block bg-[#4ecdc4]/10 text-[#4ecdc4] px-3 py-1.5 rounded-full text-xs font-semibold">
-                  Community Service
-                </div>
-                <h3 className="text-xl font-bold text-[#405862]">Virtual Cards for Nurses Initiative</h3>
-                <p className="text-[#405862]/80 text-sm leading-relaxed">
-                  Members earned volunteer hours while learning about the vital role and everyday challenges faced by
-                  nurses, fostering both empathy and civic engagement.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white p-3 rounded-lg text-center">
-                    <div className="text-xl font-bold text-[#4ecdc4] mb-0.5">375+</div>
-                    <div className="text-[#405862]/70 text-xs">Cards Collected</div>
-                  </div>
-                  <div className="bg-white p-3 rounded-lg text-center">
-                    <div className="text-xl font-bold text-[#4ecdc4] mb-0.5">5+</div>
-                    <div className="text-[#405862]/70 text-xs">Care Centers</div>
-                  </div>
-                </div>
-              </div>
-              <div className="relative h-[280px] rounded-xl overflow-hidden shadow-xl">
-                <Image
-                  src="/cards.png"
-                  alt="Cards for Nurses"
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </motion.div>
-
-            {/* Creative Contest */}
-            <motion.div
-              className="grid md:grid-cols-2 gap-6 items-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInRight}
-            >
-              <div className="order-2 md:order-1 relative h-[280px] rounded-xl overflow-hidden shadow-xl">
-                <Image
-                  src="/competition.png"
-                  alt="Creative Contest"
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-              <div className="order-1 md:order-2 space-y-3">
-                <div className="inline-block bg-[#4ecdc4]/10 text-[#4ecdc4] px-3 py-1.5 rounded-full text-xs font-semibold">
-                  Creative Expression
-                </div>
-                <h3 className="text-xl font-bold text-[#405862]">Creative Arts & Writing Competition</h3>
-                <p className="text-[#405862]/80 text-sm leading-relaxed">
-                  This contest encouraged youth to express themselves through storytelling and art, showing how
-                  creativity can drive advocacy in healthcare and medicine. 35+ youth engaged with 20+ text and 15+ art
-                  submissions.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Chess Club */}
-            <motion.div
-              className="grid md:grid-cols-2 gap-6 items-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInLeft}
-            >
-              <div className="space-y-3">
-                <div className="inline-block bg-[#4ecdc4]/10 text-[#4ecdc4] px-3 py-1.5 rounded-full text-xs font-semibold">
-                  Community Fundraising
-                </div>
-                <h3 className="text-xl font-bold text-[#405862]">
-                  <Link href="https://chess.drinterested.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#4ecdc4] transition-colors">
-                    Simmon Chang Chess (Against Cancer) Club
-                  </Link>
-                </h3>
-                <p className="text-[#405862]/80 text-sm leading-relaxed">
-                  The{" "}
-                  <Link
-                    href="https://chess.drinterested.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#4ecdc4] font-medium hover:underline"
-                  >
-                    Simmon Chang Chess (Against Cancer) Club
-                  </Link>{" "}
-                  runs CFC-rated chess tournaments that donate 100% of proceeds to the Pediatric Cancer Research
-                  Foundation, in honour of Simmon Chang.
-                </p>
-              </div>
-              <div className="relative h-[280px] rounded-xl overflow-hidden shadow-xl">
-                <Image
-                  src="/chessdrint.png"
-                  alt="Simmon Chang Chess (Against Cancer) Club"
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </motion.div>
+              </motion.article>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-12 bg-white">
+      {/* Programs with partners */}
+      <section className="py-12 bg-[#f5f1eb]/50">
         <div className="container max-w-5xl mx-auto">
-          <motion.div
-            className="text-center mb-10"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Voices from Our Community</h2>
+          <motion.div className="text-center mb-10" {...inView} variants={fadeIn}>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Programs With Partners in 2026</h2>
             <p className="text-[#405862]/70 max-w-2xl mx-auto">
-              Real stories from youth who have grown through Dr. Interested programs
+              A few of the {YEAR_2026.events} events we ran this year, plus the community events we showed up for, like
+              the MYAC Fair and the Ward 3 BBQ.
             </p>
           </motion.div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {PARTNER_PROGRAMS.map((e) => {
+              const card = (
+                <>
+                  <div className="relative h-40 bg-[#f5f1eb]">
+                    <Image
+                      src={e.image}
+                      alt={e.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 320px"
+                      className={e.logo ? "object-contain p-6" : "object-cover"}
+                    />
+                  </div>
+                  <div className="p-4 flex flex-col gap-2 flex-1">
+                    <p className="text-xs font-semibold text-[#2d8659]">{e.date}</p>
+                    <h3 className="font-bold text-[#405862] leading-snug">{e.title}</h3>
+                    <p className="text-xs text-[#405862]/60">{e.partner}</p>
+                    <p className="text-sm text-[#405862]/80 leading-relaxed flex-1">{e.body}</p>
+                    <p className="text-xs font-semibold text-[#405862] bg-[#4ecdc4]/10 rounded-md px-2 py-1.5">{e.stats}</p>
+                  </div>
+                </>
+              )
+              const cls =
+                "bg-white rounded-xl overflow-hidden shadow-sm border border-[#405862]/10 flex flex-col hover:shadow-md transition-shadow"
+              return e.href ? (
+                <Link key={e.title} href={e.href} className={cls}>
+                  {card}
+                </Link>
+              ) : (
+                <div key={e.title} className={cls}>
+                  {card}
+                </div>
+              )
+            })}
+          </div>
+          <div className="text-center mt-8">
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-2 text-[#405862] font-semibold hover:text-[#2d8659]"
+            >
+              See all {YEAR_2026.events} events from 2026
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-          <motion.div
-            className="grid md:grid-cols-3 gap-5"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-5 rounded-xl h-full flex flex-col">
-                <Quote className="w-6 h-6 text-[#4ecdc4] mb-3" />
-                <p className="text-[#405862]/80 text-xs italic mb-3 flex-grow">
-                  "I thoroughly enjoyed participating in the competition because it gave me a chance to grow and look
-                  back at my personal lackings while embracing new challenges in the journey."
-                </p>
-                <div className="text-[#405862]/60 text-xs font-medium">— Research Competition Participant</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-5 rounded-xl h-full flex flex-col">
-                <Quote className="w-6 h-6 text-[#4ecdc4] mb-3" />
-                <p className="text-[#405862]/80 text-xs italic mb-3 flex-grow">
-                  "I used to feel intimidated by the idea of starting my own venture. However, I've come to realize that
-                  this opportunity is simply a way to advocate for my passion."
-                </p>
-                <div className="text-[#405862]/60 text-xs font-medium">— Webinar Attendee</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-5 rounded-xl h-full flex flex-col">
-                <Quote className="w-6 h-6 text-[#4ecdc4] mb-3" />
-                <p className="text-[#405862]/80 text-xs italic mb-3 flex-grow">
-                  "Dr. Interested helped me level up as a leader by teaching me how to actually communicate clearly and
-                  confidently. Being a leader isn't about being loud, it's about being reliable."
-                </p>
-                <div className="text-[#405862]/60 text-xs font-medium">— Team Member</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-5 rounded-xl h-full flex flex-col">
-                <Quote className="w-6 h-6 text-[#4ecdc4] mb-3" />
-                <p className="text-[#405862]/80 text-xs italic mb-3 flex-grow">
-                  "The Discord community has been such a supportive space. I've met people who genuinely understand my
-                  journey and are always willing to share advice or encouragement."
-                </p>
-                <div className="text-[#405862]/60 text-xs font-medium">— Discord Member</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-5 rounded-xl h-full flex flex-col">
-                <Quote className="w-6 h-6 text-[#4ecdc4] mb-3" />
-                <p className="text-[#405862]/80 text-xs italic mb-3 flex-grow">
-                  "This was a really insightful experience. As someone who's always aspired to work on a research paper
-                  of her own, it provided me with the guidance I'd needed."
-                </p>
-                <div className="text-[#405862]/60 text-xs font-medium">— Research Participant</div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn}>
-              <div className="bg-[#f5f1eb] p-5 rounded-xl h-full flex flex-col">
-                <Quote className="w-6 h-6 text-[#4ecdc4] mb-3" />
-                <p className="text-[#405862]/80 text-xs italic mb-3 flex-grow">
-                  "Understanding ways I could make an impact as a highschooler! Learning about the importance of having
-                  a numerical way to track individuals who want to share the same passion as you."
-                </p>
-                <div className="text-[#405862]/60 text-xs font-medium">— Webinar Participant</div>
-              </div>
-            </motion.div>
+      {/* Chess club */}
+      <section className="py-12 bg-white">
+        <div className="container max-w-5xl mx-auto">
+          <motion.div className="grid md:grid-cols-2 gap-6 items-center" {...inView} variants={fadeIn}>
+            <div className="space-y-3">
+              <PillarTags ids={["community"]} />
+              <h2 className="text-2xl font-bold text-[#405862]">
+                <Link href="https://chess.drinterested.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#2d8659]">
+                  Simmon Chang Chess (Against Cancer) Club
+                </Link>
+              </h2>
+              <p className="text-xs text-[#405862]/60">November 2025 to present</p>
+              <p className="text-[#405862]/80 text-sm leading-relaxed">
+                Through chess tournaments, including the Terry Fox International and the Weiss Open, we raise funds for
+                the Pediatric Cancer Research Fund. The club honours Simmon Chang, a young Canadian whose passion for
+                chess and strength in the face of osteosarcoma continue to inspire our community, and carries his name
+                with his family&apos;s permission. Within one year, Dr. Interested became one of the top 10 fundraisers
+                for the Pediatric Cancer Research Fund.
+              </p>
+              <p className="text-xs font-semibold text-[#405862] bg-[#4ecdc4]/10 rounded-md px-2 py-1.5 inline-block">
+                30 youth impacted, 14K reached
+              </p>
+            </div>
+            <div className="relative h-[280px] rounded-xl overflow-hidden shadow-xl">
+              <Image src="/chessdrint.png" alt="Simmon Chang Chess (Against Cancer) Club" fill className="object-cover" />
+            </div>
           </motion.div>
         </div>
       </section>
 
-      <section id="media" className="py-12 bg-[#f5f1eb]/50">
+      {/* Voices */}
+      <section className="py-12 bg-[#f5f1eb]/50">
+        <div className="container max-w-5xl mx-auto">
+          <motion.div className="text-center mb-10" {...inView} variants={fadeIn}>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Real Opinions From Real Youth</h2>
+            <p className="text-[#405862]/70 max-w-2xl mx-auto">
+              From our 2026 member and team surveys. We share how people describe themselves, never their names.
+            </p>
+          </motion.div>
+          <motion.div className="grid md:grid-cols-3 gap-5" {...inView} variants={staggerContainer}>
+            {VOICES.map((v) => (
+              <motion.figure key={v.quote} variants={fadeIn} className="bg-white p-5 rounded-xl h-full flex flex-col">
+                <Quote className="w-6 h-6 text-[#4ecdc4] mb-3" />
+                <blockquote className="text-[#405862]/80 text-sm italic mb-3 flex-grow">&ldquo;{v.quote}&rdquo;</blockquote>
+                <figcaption className="text-[#405862]/60 text-xs font-medium">{v.who}</figcaption>
+              </motion.figure>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* In the media teaser */}
+      <section className="py-12 bg-white">
         <div className="container max-w-5xl mx-auto">
           <motion.div
-            className="text-center mb-10"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            {...inView}
             variants={fadeIn}
+            className="rounded-2xl bg-[#405862] text-white p-6 md:p-10 grid md:grid-cols-[1fr_auto] gap-6 items-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Content & Media</h2>
+            <div>
+              <div className="flex items-center gap-2 text-[#4ecdc4] text-sm font-semibold mb-2">
+                <Newspaper className="w-4 h-4" />
+                In the Media
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Featured by CBC Radio, OMNI News, Insauga and more</h2>
+              <p className="text-white/80 text-sm leading-relaxed">
+                Coverage, podcasts, and recognition, including a Canadian Choice Award finalist spot and a listing as a
+                civil society organization with the UN Department of Economic and Social Affairs.
+              </p>
+            </div>
+            <Link
+              href="/our-work/in-the-media"
+              className="inline-flex items-center justify-center gap-2 bg-[#4ecdc4] text-[#405862] px-6 py-3 rounded-lg font-semibold hover:bg-[#4ecdc4]/90"
+            >
+              See our media features
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Content and media */}
+      <section id="media" className="py-12 bg-[#f5f1eb]/50 scroll-mt-20">
+        <div className="container max-w-5xl mx-auto">
+          <motion.div className="text-center mb-10" {...inView} variants={fadeIn}>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Content</h2>
             <p className="text-[#405862]/70 max-w-2xl mx-auto">
-              Watch our webinar series and listen to our podcast episodes on healthcare, advocacy, and youth leadership
+              Watch our webinars and listen to our podcast on wellness careers, policy, and youth leadership.
             </p>
           </motion.div>
 
-          {/* Webinar Series */}
-          <motion.div
-            className="mb-10"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
+          <motion.div className="mb-10" {...inView} variants={fadeIn}>
             <h3 className="text-xl font-bold text-[#405862] mb-5 flex items-center gap-2">
               <div className="w-1 h-6 bg-[#4ecdc4] rounded-full"></div>
               Webinar Series
             </h3>
             <div className="grid md:grid-cols-2 gap-5">
-              <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg">
                 <div className="p-3 pb-0">
                   <LiteYouTube
                     id="8Mp9ulR7L4Y"
@@ -509,14 +553,14 @@ export default function OurWorkPage() {
                   />
                 </div>
                 <div className="p-3">
-                  <h4 className="font-semibold text-[#405862] text-sm mb-1">Healthcare Advocacy & Policy Webinar</h4>
+                  <h4 className="font-semibold text-[#405862] text-sm mb-1">How Youth Can Impact Health Policy</h4>
                   <p className="text-[#405862]/70 text-xs">
-                    Learn how to create your own opportunities and make an impact in healthcare policy
+                    Learn how to create your own opportunities and get your voice into policy spaces.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg">
                 <div className="p-3 pb-0">
                   <LiteYouTube
                     id="dZj0Oi0aKPw"
@@ -525,15 +569,14 @@ export default function OurWorkPage() {
                   />
                 </div>
                 <div className="p-3">
-                  <h4 className="font-semibold text-[#405862] text-sm mb-1">Youth Leadership in Healthcare</h4>
+                  <h4 className="font-semibold text-[#405862] text-sm mb-1">Pathways to Med School</h4>
                   <p className="text-[#405862]/70 text-xs">
-                    Discover strategies for building your own healthcare initiative and community
+                    Master&apos;s, PhD, and gap year options, explained by people who took them.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Spotify Webinar */}
             <div className="mt-5 bg-white rounded-xl p-5 shadow-lg">
               <h4 className="font-semibold text-[#405862] mb-3 text-sm">Listen on Spotify</h4>
               <LiteSpotify
@@ -544,19 +587,13 @@ export default function OurWorkPage() {
             </div>
           </motion.div>
 
-          {/* Podcast Series */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
+          <motion.div {...inView} variants={fadeIn}>
             <h3 className="text-xl font-bold text-[#405862] mb-5 flex items-center gap-2">
               <div className="w-1 h-6 bg-[#4ecdc4] rounded-full"></div>
               Podcast Episodes
             </h3>
             <div className="grid md:grid-cols-2 gap-5">
-              <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg">
                 <div className="p-3 pb-0">
                   <LiteYouTube
                     id="dQiELtTYjQs"
@@ -565,9 +602,9 @@ export default function OurWorkPage() {
                   />
                 </div>
                 <div className="p-3">
-                  <h4 className="font-semibold text-[#405862] text-sm mb-1">Healthcare Insights Podcast</h4>
+                  <h4 className="font-semibold text-[#405862] text-sm mb-1">The Dr. Interested Podcast</h4>
                   <p className="text-[#405862]/70 text-xs">
-                    Deep conversations about medicine, research, and youth empowerment
+                    39 episodes in 2026 with youth leaders, changemakers, and professionals.
                   </p>
                 </div>
               </div>
@@ -585,55 +622,33 @@ export default function OurWorkPage() {
         </div>
       </section>
 
+      {/* Community */}
       <section className="py-12 bg-white">
         <div className="container max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInLeft}
-            >
-              <h2 className="text-3xl font-bold text-[#405862] mb-3">Join Our Thriving Community</h2>
+            <motion.div {...inView} variants={fadeIn}>
+              <h2 className="text-3xl font-bold text-[#405862] mb-3">A Safe Space to Belong</h2>
               <p className="text-[#405862]/80 mb-5 text-sm leading-relaxed">
-                Our Discord server is the heart of Dr. Interested—a safe, inclusive space where 1,400+ members connect,
-                collaborate, and support each other daily. With a 106% weekly growth rate, we're building something
-                special.
+                Our Discord server is the heart of our third pillar: a safe, moderated space where {YEAR_2026.members}{" "}
+                members from {YEAR_2026.memberCountries} countries and territories connect, ask questions, and support
+                each other every day.
               </p>
               <div className="space-y-3 mb-5">
-                <div className="flex items-start gap-2">
-                  <div className="w-8 h-8 bg-[#4ecdc4]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Users className="w-4 h-4 text-[#4ecdc4]" />
+                {[
+                  { icon: Users, title: "Real Time Support", text: "Ask questions and get guidance from peers, mentors, and advisors." },
+                  { icon: BookOpen, title: "Office Hours and Mentorship", text: "Recurring sessions with mentors and medical students." },
+                  { icon: Heart, title: "Safe and Inclusive", text: "Especially welcoming for newcomers, first generation, and low income students." },
+                ].map(({ icon: Icon, title, text }) => (
+                  <div key={title} className="flex items-start gap-2">
+                    <div className="w-8 h-8 bg-[#4ecdc4]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-[#4ecdc4]" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-[#405862] text-sm mb-0.5">{title}</h3>
+                      <p className="text-[#405862]/70 text-xs">{text}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-[#405862] text-sm mb-0.5">Real-Time Support</h4>
-                    <p className="text-[#405862]/70 text-xs">
-                      Get instant feedback, mentorship, and guidance from peers and advisors
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="w-8 h-8 bg-[#4ecdc4]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-4 h-4 text-[#4ecdc4]" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-[#405862] text-sm mb-0.5">Office Hours & Mentorship</h4>
-                    <p className="text-[#405862]/70 text-xs">
-                      Regular sessions with medical students and healthcare professionals
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="w-8 h-8 bg-[#4ecdc4]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Heart className="w-4 h-4 text-[#4ecdc4]" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-[#405862] text-sm mb-0.5">Safe & Inclusive Space</h4>
-                    <p className="text-[#405862]/70 text-xs">
-                      Especially welcoming for marginalized youth and first-generation students
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
               <a
                 href="https://discord.gg/pzbGRgsGXY"
@@ -642,45 +657,37 @@ export default function OurWorkPage() {
                 className="inline-flex items-center gap-2 bg-[#4ecdc4] text-[#405862] px-6 py-2.5 rounded-lg font-semibold hover:bg-[#4ecdc4]/90 transition-colors text-sm"
               >
                 Join Our Discord
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z" />
-                </svg>
               </a>
             </motion.div>
-            <motion.div
-              className="relative h-[320px] rounded-xl overflow-hidden shadow-xl"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInRight}
-            >
-              <Image src="/office-hours.png" alt="Discord Community" fill className="object-cover" />
+            <motion.div className="relative h-[320px] rounded-xl overflow-hidden shadow-xl" {...inView} variants={fadeIn}>
+              <Image src="/office-hours.png" alt="Dr. Interested online community" fill className="object-cover" />
             </motion.div>
           </div>
         </div>
       </section>
 
+      {/* CTA */}
       <section className="py-12 bg-gradient-to-br from-[#405862] to-[#2d4149] text-white">
         <div className="container max-w-4xl text-center mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}>
+          <motion.div {...inView} variants={fadeIn}>
             <h2 className="text-3xl md:text-4xl font-bold mb-3">Ready to Make an Impact?</h2>
             <p className="text-white/90 mb-6 text-base leading-relaxed max-w-2xl mx-auto">
-              Join 1,400+ youth from around the world who are discovering their passion in healthcare and making a
-              difference in their communities.
+              Join {ALL_TIME.members} youth from {ALL_TIME.countries} countries and territories exploring wellness
+              careers, speaking up in policy spaces, and building community.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <a
-                href="/contact"
+              <Link
+                href="/members/join"
                 className="bg-[#4ecdc4] text-[#405862] px-7 py-2.5 rounded-lg font-semibold hover:bg-[#4ecdc4]/90 transition-colors"
               >
-                Get Involved
-              </a>
-              <a
-                href="/publications"
-                className="bg-white/10 text-white px-7 py-2.5 rounded-lg font-semibold hover:bg-white/20 transition-colors backdrop-blur-sm"
+                Join Our Team
+              </Link>
+              <Link
+                href="/sponsorships"
+                className="bg-white/10 text-white px-7 py-2.5 rounded-lg font-semibold hover:bg-white/20 transition-colors"
               >
-                Read Our Publications
-              </a>
+                Support Our Work
+              </Link>
             </div>
           </motion.div>
         </div>

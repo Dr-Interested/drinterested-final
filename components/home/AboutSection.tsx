@@ -26,9 +26,10 @@ export default function AboutSection() {
               <h2 className="text-2xl font-bold text-[#405862]">About Dr. Interested</h2>
               <div className="w-16 h-1 bg-[#4ecdc4]"></div>
               <p className="text-[#405862]/90">
-                Dr. Interested is a student-led organization empowering high school students to explore careers in
-                healthcare and medical research. Through engaging events, leadership opportunities, and collaborative
-                projects, we bridge the gap between passion and profession.
+                Dr. Interested is a youth led global wellness community guided by the UN Convention on the Rights of the
+                Child. We began with medicine and have grown well beyond it: today we introduce youth to wellness as a
+                whole, including health, law, finance, and any career that improves human wellbeing, while helping them
+                reach the rooms where policy is made and giving them a safe community to grow in.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <Link
@@ -59,7 +60,7 @@ export default function AboutSection() {
                 <div className="absolute inset-0 bg-[#405862]/10 rounded-lg transform rotate-3"></div>
                 <Image
                   src="/mindsproject.png"
-                  alt="Dr. Interested - Resilent Minds Program Photo"
+                  alt="Dr. Interested Resilient Minds program"
                   fill
                   sizes="(max-width: 768px) 220px, 280px"
                   className="object-contain rounded-lg transform -rotate-3 hover:rotate-0 transition-transform duration-500"

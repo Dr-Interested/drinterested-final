@@ -2,13 +2,14 @@ import type { Metadata } from "next"
 import ClientPage from "./client-page"
 import { supabase } from "@/lib/supabase-client"
 import SeoSchema from "@/components/seo-schema"
+import { ALL_TIME, IMPACT_REPORT_2026, YEAR_2026 } from "@/lib/impact-stats"
 
 export const revalidate = 300; // Revalidate homepage every 5 minutes (ISR)
 
 export const metadata: Metadata = {
-  title: "Dr. Interested - Inspiring Future Healthcare Leaders",
-  description:
-    'Dr. Interested supports youth in finding their unique "spark" in medicine through programs & opportunities. Earn volunteer hours while building your future!',
+  // An absolute title: the root template would otherwise append "| Dr. Interested" twice.
+  title: { absolute: "Dr. Interested | Youth Led Global Wellness Organization" },
+  description: `Youth led global wellness organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free wellness career education, policy access, and community spaces.`,
   alternates: {
     canonical: "https://www.drinterested.org",
     languages: {
@@ -122,8 +123,8 @@ export default async function Page() {
 
   return (
     <>
-      {/* Homepage-only structured data: the site name Google shows in results, and the 2025
-          Impact Report PDF (previously emitted on every page from the root layout). */}
+      {/* Homepage-only structured data: the site name Google shows in results, and the latest
+          Impact Report (the 2026 report is listed first so it is the one search engines surface). */}
       <SeoSchema
         id="website-schema"
         schema={{
@@ -138,12 +139,16 @@ export default async function Page() {
         id="impact-report-schema"
         schema={{
           "@context": "https://schema.org",
-          "@type": "MediaObject",
-          name: "Dr. Interested 2025 Impact Report",
-          contentUrl: "https://www.drinterested.org/dr-interested-impact-report-2025%20(1).pdf",
+          "@type": "Report",
+          name: IMPACT_REPORT_2026.title,
+          url: "https://www.drinterested.org/impact-report",
           encodingFormat: "application/pdf",
-          description:
-            "The Dr. Interested 2025 Annual Impact Report: our programs, initiatives and impact in youth healthcare education.",
+          contentUrl: IMPACT_REPORT_2026.url,
+          thumbnailUrl: `https://www.drinterested.org${IMPACT_REPORT_2026.cover}`,
+          datePublished: IMPACT_REPORT_2026.published,
+          inLanguage: "en",
+          author: { "@type": "Organization", name: "Dr. Interested", url: "https://www.drinterested.org" },
+          description: `Dr. Interested's 2026 Annual Impact Report: ${YEAR_2026.youthImpacted} youth impacted in 2026 and ${ALL_TIME.youthImpacted} across 2025 and 2026, through wellness career education, access to policy spaces, and community spaces.`,
         }}
       />
       <ClientPage recentPost={recentPost} featuredEvent={featuredEvent} featuredPosts={featuredPosts} />

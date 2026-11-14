@@ -5,9 +5,9 @@ import { CheckCircle, ArrowRight } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Thank You for Subscribing | Dr. Interested",
+  title: "Thank You for Subscribing",
   description:
-    "Thank you for confirming your subscription to the Dr. Interested newsletter. You're now part of our community of healthcare enthusiasts!",
+    "Thank you for confirming your subscription to the Dr. Interested newsletter. You're now part of our global youth community!",
   robots: {
     index: false,
     follow: true,
@@ -65,7 +65,7 @@ export default function ThankYouPage() {
 
           <p className="text-[#405862] mb-6">
             Your subscription to the Dr. Interested newsletter has been confirmed. We're excited to share the latest
-            healthcare opportunities, events, and resources with you!
+            opportunities in wellness careers, policy, and community with you!
           </p>
 
           <div className="space-y-4">

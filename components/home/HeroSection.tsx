@@ -6,6 +6,7 @@ import { Instagram, Linkedin, Link2 } from "lucide-react"
 import { motion } from "framer-motion"
 import DiscordIcon from "@/components/icons/discord-icon"
 import { fadeIn } from "./animations"
+import { IMPACT_REPORT_2026 } from "@/lib/impact-stats"
 
 export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
   return (
@@ -30,17 +31,18 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
               variants={fadeIn}
             >
               <div className="inline-block bg-[#4ecdc4]/20 px-3 py-1 rounded-full text-[#405862] font-medium text-sm mb-2 shadow-sm">
-                Empowering Future Healthcare Leaders
+                A Youth Led Global Wellness Organization
               </div>
               <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl text-[#405862]">
                 Welcome to Dr. <span className="text-[#4ecdc4]">Interested</span>
               </h1>
               <p className="text-lg text-[#405862]/90 mt-2">
-                Inspiring the Next Generation of Healthcare Professionals
+                Wellness careers, a voice in policy, and a community to belong to
               </p>
               <p className="text-[#405862]/80 max-w-md">
-                Dr. Interested is a global organization helping students explore the vast world of healthcare, research, and advocacy. 
-                We support youth in finding their unique "spark" in medicine through interactive programs, publishing opportunities, and leadership development.
+                Dr. Interested helps young people explore careers in wellness, from health and medicine to law and finance,
+                take part in the policy decisions that shape their lives, and find a safe, open space to belong. Everything
+                we run is free and youth led.
               </p>
               <div className="flex flex-wrap gap-3 items-center mt-4">
                 <Link
@@ -89,6 +91,12 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
                   </Link>
                 </div>
               </div>
+              <Link
+                href="/impact-report"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#405862] underline decoration-[#4ecdc4] decoration-2 underline-offset-4 hover:text-[#2d8659]"
+              >
+                Read our {IMPACT_REPORT_2026.shortTitle}
+              </Link>
               <div className="mt-6 grid grid-cols-2 gap-4 max-w-sm w-full justify-items-center">
                 <div className="relative h-14 w-full max-w-[140px] rounded-lg overflow-hidden shadow-sm">
                   <Image
@@ -120,7 +128,7 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
               <div className="absolute w-[260px] h-[260px] md:w-[300px] md:h-[300px] rounded-full border-2 border-dashed border-[#405862]/20 animate-spin-slow"></div>
               <Image
                 src="/logo.png"
-                alt="Dr. Interested Logo - High School Healthcare Club"
+                alt="Dr. Interested logo"
                 width={240}
                 height={240}
                 className="object-contain z-10 rounded-lg hover:scale-105 transition-transform duration-500"

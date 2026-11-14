@@ -4,18 +4,19 @@ import ContactClientPage from "./contact-client-page"
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Get in touch with Dr. Interested for questions about our events, collaborations, or joining our team. We're here to help aspiring healthcare professionals.",
+    "Contact Dr. Interested about programs, partnerships, media inquiries, or joining our team, and find every official profile in our Profiles Hub.",
   keywords: [
     "contact Dr. Interested",
-    "healthcare education contact",
-    "medical mentorship inquiry",
-    "student organization contact",
-    "healthcare events questions",
+    "Dr. Interested media inquiries",
+    "Dr. Interested press contact",
+    "Dr. Interested profiles",
+    "youth wellness organization contact",
+    "partner with Dr. Interested",
   ],
   openGraph: {
     title: "Contact Us | Dr. Interested",
     description:
-      "Get in touch with Dr. Interested for questions about our events, collaborations, or joining our team.",
+      "Contact Dr. Interested about programs, partnerships, media inquiries, or joining our team.",
     url: "https://www.drinterested.org/contact",
     siteName: "Dr. Interested",
     type: "website",
