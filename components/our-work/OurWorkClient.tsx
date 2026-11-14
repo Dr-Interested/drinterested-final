@@ -677,7 +677,7 @@ export default function OurWorkPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/members/apply"
+                href="/members/join"
                 className="bg-[#4ecdc4] text-[#405862] px-7 py-2.5 rounded-lg font-semibold hover:bg-[#4ecdc4]/90 transition-colors"
               >
                 Join Our Team

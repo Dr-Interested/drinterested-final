@@ -219,7 +219,7 @@ export default function SponsorshipsPage() {
               {YEAR_2026.teamCountries} countries.
             </p>
             <Link
-              href="/members/apply"
+              href="/members/join"
               className="inline-flex items-center gap-2 bg-[#405862] text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-[#334852]"
             >
               Apply to join

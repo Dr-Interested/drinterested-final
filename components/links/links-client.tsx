@@ -97,7 +97,7 @@ export default function LinksPageClient() {
     },
     {
       title: "Apply to Join the Team",
-      url: "/members/apply",
+      url: "/members/join",
       icon: <Users className="h-5 w-5" />,
       color: "bg-[#405862] hover:bg-[#334852]",
     },

@@ -128,12 +128,6 @@ const nextConfig = {
         destination: "/members/apply",
         permanent: true,
       },
-      // The 2026 Impact Report links here.
-      {
-        source: "/members/join",
-        destination: "/members/apply",
-        permanent: true,
-      },
       {
         source: "/impact-report/2026",
         destination: "/impact-report",
