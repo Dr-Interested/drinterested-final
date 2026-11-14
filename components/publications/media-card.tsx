@@ -33,7 +33,7 @@ export default function MediaCard({ item, index, href }: { item: MediaItem; inde
       <Link href={href} className="relative h-48 w-full bg-[#f5f1eb] block">
         <SafeImage
           src={item.thumbnailPath}
-          fallbackSrc="/websitebanner.jpg"
+          fallbackSrc="/og-2026.jpg"
           alt={item.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -42,19 +42,19 @@ export default function MediaCard({ item, index, href }: { item: MediaItem; inde
       </Link>
       <CardContent className="p-6 flex flex-col flex-grow">
         <div>
-          <Link href={href} className="block group-hover:text-[#4ecdc4] transition-colors">
-            <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+          <Link href={href} className="block group-hover:text-teal-deep transition-colors">
+            <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors">
               {item.title}
             </h3>
           </Link>
-          <p className="text-[#405862]/80 mb-3 text-sm leading-relaxed line-clamp-3">{item.description}</p>
-          <p className="text-xs text-[#405862]/60 mb-4">
+          <p className="text-[#405862]/90 mb-3 text-sm leading-relaxed line-clamp-3">{item.description}</p>
+          <p className="text-xs text-[#405862]/85 mb-4">
             {item.speaker && <span className="font-medium">{item.speaker} &middot; </span>}
             {item.date}
           </p>
         </div>
         <div className="mt-auto flex items-center justify-between pt-4 border-t border-[#405862]/10">
-          <Link href={href} className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-medium">
+          <Link href={href} className="text-teal-deep hover:text-[#405862] transition-colors text-sm font-medium">
             View Episode
           </Link>
           <div className="flex items-center gap-2">
@@ -63,7 +63,7 @@ export default function MediaCard({ item, index, href }: { item: MediaItem; inde
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Watch "${item.title}" on YouTube`}
-              className="text-[#405862]/50 hover:text-red-600 transition-colors"
+              className="text-[#405862]/85 hover:text-red-600 transition-colors"
             >
               <YoutubeIcon className="h-5 w-5" />
             </a>
@@ -73,7 +73,7 @@ export default function MediaCard({ item, index, href }: { item: MediaItem; inde
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Listen to "${item.title}" on Spotify`}
-                className="text-[#405862]/50 hover:text-green-600 transition-colors"
+                className="text-[#405862]/85 hover:text-green-600 transition-colors"
               >
                 <SpotifyIcon className="h-5 w-5" />
               </a>

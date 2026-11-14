@@ -18,7 +18,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
           <div className="mb-6">
             <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-teal-deep">Youth educating youth</p>
             <h2 className="text-2xl md:text-3xl font-semibold text-ink">Fresh from our writers and podcast</h2>
-            <p className="mt-2 max-w-2xl text-[15px] text-ink/70">
+            <p className="mt-2 max-w-2xl text-[15px] text-ink/85">
               55 articles across 18 topics and 39 podcast episodes in 2026, written and hosted by our members.
             </p>
           </div>
@@ -34,7 +34,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-[#405862]">Latest from Our Publications</h3>
-                <Link href="/publications" className="text-[#405862] hover:text-[#4ecdc4] text-sm flex items-center group">
+                <Link href="/publications" className="text-[#405862] hover:text-teal-deep text-sm flex items-center group">
                   <span>View all posts</span>
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
@@ -54,7 +54,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   </div>
                   <CardContent className="p-5 flex flex-col">
                     <div>
-                      <div className="flex items-center text-xs text-[#405862]/70 mb-2 flex-wrap gap-2">
+                      <div className="flex items-center text-xs text-[#405862]/85 mb-2 flex-wrap gap-2">
                         <span className="bg-[#405862]/10 px-2.5 py-0.5 rounded-full">{recentPost.topic}</span>
                         <span className="flex items-center">
                           <Clock className="h-3 w-3 mr-1" />
@@ -66,11 +66,11 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                         </span>
                       </div>
                       <Link href={`/publications/${recentPost.slug}`}>
-                        <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+                        <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors">
                           {recentPost.title}
                         </h3>
                       </Link>
-                      <p className="text-[#405862]/80 mb-4 text-sm line-clamp-2">{recentPost.excerpt}</p>
+                      <p className="text-[#405862]/90 mb-4 text-sm line-clamp-2">{recentPost.excerpt}</p>
                     </div>
                     <div className="mt-auto">
                       <div className="flex items-center mb-3">
@@ -178,7 +178,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
             </div>
 
             <div className="mt-4 text-center">
-              <p className="text-sm text-[#405862]/80 mb-3">
+              <p className="text-sm text-[#405862]/90 mb-3">
                 Our podcast features youth leaders, changemakers, and professionals talking about health, leadership,
                 wellness careers, and the future.
               </p>

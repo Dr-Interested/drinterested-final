@@ -67,7 +67,7 @@ export function ReportBand() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Just released</p>
             <h2 className="mt-1 text-2xl font-semibold leading-tight md:text-3xl">The 2026 Annual Impact Report</h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/75">
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
               {YEAR_2026.youthImpactedExact} young people reached this year, {ALL_TIME.youthImpacted} since 2025. Every
               number, every program, and where every dollar went.
             </p>

@@ -47,7 +47,7 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
     return (
       <div className="container py-16 text-center">
         <h1 className="text-2xl font-bold text-[#405862] mb-4">Topic not found</h1>
-        <p className="text-[#405862]/70 mb-6">The topic you're looking for doesn't exist or has been moved.</p>
+        <p className="text-[#405862]/85 mb-6">The topic you're looking for doesn't exist or has been moved.</p>
         <Button asChild>
           <Link href="/publications">Back to Publications</Link>
         </Button>
@@ -63,7 +63,7 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
       <section className="hero-section bg-[#f5f1eb] py-12">
         <div className="container">
           <div className="flex items-center gap-2 mb-6">
-            <Link href="/publications" className="text-[#405862] hover:text-[#4ecdc4] transition-colors flex items-center">
+            <Link href="/publications" className="text-[#405862] hover:text-teal-deep transition-colors flex items-center">
               <ChevronLeft className="h-4 w-4 mr-1" />
               Back to All Publications
             </Link>
@@ -71,7 +71,7 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
 
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-[#405862] mb-4">{topic.name}</h1>
-            <p className="text-[#405862]/80 mb-6">{topic.description}</p>
+            <p className="text-[#405862]/90 mb-6">{topic.description}</p>
           </div>
         </div>
       </section>
@@ -87,7 +87,7 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
           {initialPosts.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-xl font-medium text-[#405862] mb-2">No articles found</h3>
-              <p className="text-[#405862]/70 mb-6">We're working on adding content to this topic</p>
+              <p className="text-[#405862]/85 mb-6">We're working on adding content to this topic</p>
               <Button asChild>
                 <Link href="/publications">View All Publications</Link>
               </Button>
@@ -109,7 +109,7 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
                   </div>
                   <CardContent className="p-6 flex flex-col flex-grow">
                     <div>
-                      <div className="text-sm text-[#405862]/70 mb-2 flex items-center flex-wrap">
+                      <div className="text-sm text-[#405862]/85 mb-2 flex items-center flex-wrap">
                         <span className="bg-[#f5f1eb] px-2 py-1 rounded-full text-xs">{post.topic}</span>
                         <span className="mx-2">•</span>
                         <span className="flex items-center">
@@ -117,10 +117,10 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
                           {post.readingTime}
                         </span>
                       </div>
-                      <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+                      <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors">
                         {post.title}
                       </h3>
-                      <p className="text-[#405862]/80 mb-4 text-sm line-clamp-3">{post.excerpt}</p>
+                      <p className="text-[#405862]/90 mb-4 text-sm line-clamp-3">{post.excerpt}</p>
                     </div>
                     <div className="mt-auto">
                       <div className="flex items-center justify-between pt-4 border-t border-[#405862]/10">
@@ -135,12 +135,12 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
                           </div>
                           <div>
                             <span className="text-xs font-medium text-[#405862] block">{post.author.name}</span>
-                            <span className="text-xs text-[#405862]/70">{post.date}</span>
+                            <span className="text-xs text-[#405862]/85">{post.date}</span>
                           </div>
                         </div>
                         <Link
                           href={`/publications/${post.slug}`}
-                          className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-medium flex items-center"
+                          className="text-teal-deep hover:text-[#405862] transition-colors text-sm font-medium flex items-center"
                         >
                           Read
                           <ChevronRight className="h-4 w-4 ml-1" />
@@ -183,10 +183,10 @@ export default function BlogTopicClientPage({ slug, initialPosts }: BlogTopicCli
                     </div>
                   </div>
                   <CardContent className="p-4">
-                    <p className="text-[#405862]/80 text-sm mb-4 line-clamp-2">{otherTopic.description}</p>
+                    <p className="text-[#405862]/90 text-sm mb-4 line-clamp-2">{otherTopic.description}</p>
                     <Link
                       href={`/blog/topic/${otherTopic.slug}`}
-                      className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-medium flex items-center"
+                      className="text-teal-deep hover:text-[#405862] transition-colors text-sm font-medium flex items-center"
                     >
                       View articles
                       <ChevronRight className="h-4 w-4 ml-1" />

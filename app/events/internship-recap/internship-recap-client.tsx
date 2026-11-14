@@ -96,7 +96,7 @@ export default function InternshipRecapClientPage() {
       <section className="hero-section bg-[#f5f1eb] py-12">
         <div className="container">
           <div className="flex items-center gap-2 mb-6">
-            <Link href="/events" className="text-[#405862] hover:text-[#4ecdc4] transition-colors flex items-center">
+            <Link href="/events" className="text-[#405862] hover:text-teal-deep transition-colors flex items-center">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Events
             </Link>
@@ -119,7 +119,7 @@ export default function InternshipRecapClientPage() {
                   <div className="flex flex-col justify-between">
                     <div>
                       <h2 className="text-2xl font-bold text-[#405862] mb-2">{project.title}</h2>
-                      <h3 className="text-lg font-medium text-[#4ecdc4] mb-4">{project.role}</h3>
+                      <h3 className="text-lg font-medium text-teal-deep mb-4">{project.role}</h3>
                       <p className="text-[#405862] mb-4">{project.description}</p>
 
                       <div className="mb-4">

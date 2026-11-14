@@ -88,13 +88,13 @@ export default function MemberCard({ member }: MemberCardProps) {
           {/* Header Row with Brand & Logo Badge */}
           <div className="flex items-start justify-between gap-4 pb-6 border-b border-[#405862]/10">
             <div>
-              <p className="text-xs md:text-sm font-semibold tracking-wider text-[#4ecdc4] uppercase font-bricolage">
+              <p className="text-xs md:text-sm font-semibold tracking-wider text-teal-deep uppercase font-bricolage">
                 Dr. Interested
               </p>
               <h1 className="mt-1 text-2xl md:text-4xl font-bold text-[#405862] font-bricolage tracking-tight">
                 {member.name}
               </h1>
-              <p className="mt-1 text-sm md:text-base font-medium text-[#405862]/75">
+              <p className="mt-1 text-sm md:text-base font-medium text-[#405862]/85">
                 {member.role}
               </p>
             </div>
@@ -131,29 +131,29 @@ export default function MemberCard({ member }: MemberCardProps) {
               {/* Quick Info & Email/Website */}
               <div className="flex-1 space-y-3 text-center sm:text-left">
                 <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-[#405862]/90">
-                  <Mail className="h-4 w-4 text-[#4ecdc4] shrink-0" />
+                  <Mail className="h-4 w-4 text-teal-deep shrink-0" />
                   <a
                     href={`mailto:${formattedEmail}`}
-                    className="hover:text-[#4ecdc4] transition-colors underline-offset-2 hover:underline"
+                    className="hover:text-teal-deep transition-colors underline-offset-2 hover:underline"
                   >
                     {formattedEmail}
                   </a>
                 </div>
 
                 <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-[#405862]/90">
-                  <Globe className="h-4 w-4 text-[#4ecdc4] shrink-0" />
+                  <Globe className="h-4 w-4 text-teal-deep shrink-0" />
                   <a
                     href={websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-[#4ecdc4] transition-colors underline-offset-2 hover:underline"
+                    className="hover:text-teal-deep transition-colors underline-offset-2 hover:underline"
                   >
                     {websiteDisplay}
                   </a>
                 </div>
 
                 {/* Tagline */}
-                <p className="text-xs md:text-sm text-[#405862]/70 italic pt-1">
+                <p className="text-xs md:text-sm text-[#405862]/85 italic pt-1">
                   Helping youth explore wellness careers, reach policy spaces, and find community.
                 </p>
 
@@ -169,7 +169,7 @@ export default function MemberCard({ member }: MemberCardProps) {
             {/* Biography Section */}
             {member.bio && (
               <div className="pt-4 border-t border-[#405862]/10">
-                <h3 className="text-xs uppercase font-bold text-[#405862]/60 tracking-wider mb-2 font-bricolage">
+                <h3 className="text-xs uppercase font-bold text-[#405862]/85 tracking-wider mb-2 font-bricolage">
                   About {member.name.split(" ")[0]}
                 </h3>
                 <p className="text-sm md:text-base text-[#405862]/90 leading-relaxed font-normal">
@@ -187,7 +187,7 @@ export default function MemberCard({ member }: MemberCardProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${member.name}'s LinkedIn`}
-                    className="p-2 rounded-full bg-[#f5f1eb] text-[#405862] hover:text-[#4ecdc4] hover:bg-[#EDFAF9] transition-all border border-[#405862]/10"
+                    className="p-2 rounded-full bg-[#f5f1eb] text-[#405862] hover:text-teal-deep hover:bg-[#EDFAF9] transition-all border border-[#405862]/10"
                   >
                     <Linkedin className="h-5 w-5" />
                   </a>
@@ -199,7 +199,7 @@ export default function MemberCard({ member }: MemberCardProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${member.name}'s Instagram`}
-                    className="p-2 rounded-full bg-[#f5f1eb] text-[#405862] hover:text-[#4ecdc4] hover:bg-[#EDFAF9] transition-all border border-[#405862]/10"
+                    className="p-2 rounded-full bg-[#f5f1eb] text-[#405862] hover:text-teal-deep hover:bg-[#EDFAF9] transition-all border border-[#405862]/10"
                   >
                     <Instagram className="h-5 w-5" />
                   </a>
@@ -211,7 +211,7 @@ export default function MemberCard({ member }: MemberCardProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${member.name}'s Website`}
-                    className="p-2 rounded-full bg-[#f5f1eb] text-[#405862] hover:text-[#4ecdc4] hover:bg-[#EDFAF9] transition-all border border-[#405862]/10"
+                    className="p-2 rounded-full bg-[#f5f1eb] text-[#405862] hover:text-teal-deep hover:bg-[#EDFAF9] transition-all border border-[#405862]/10"
                   >
                     <Globe className="h-5 w-5" />
                   </a>

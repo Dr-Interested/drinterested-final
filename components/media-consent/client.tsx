@@ -66,15 +66,15 @@ export default function MediaConsentClientPage() {
           <h2 className="text-xl font-semibold mb-3 text-[#405862]">5. Related Policies</h2>
           <p className="text-slate-600">
             This consent operates alongside our{" "}
-            <Link href="/safeguarding-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/safeguarding-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Safeguarding Policy
             </Link>
             ,{" "}
-            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Privacy Policy
             </Link>
             , and{" "}
-            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Terms and Conditions
             </Link>
             .
@@ -86,7 +86,7 @@ export default function MediaConsentClientPage() {
           <p className="text-slate-600">
             If you have questions about this Media Consent and Release, or want to request that specific media of
             your child be taken down, contact us at{" "}
-            <a href="mailto:admin@drinterested.org" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <a href="mailto:admin@drinterested.org" className="text-[#405862] font-medium underline hover:text-teal-deep">
               admin@drinterested.org
             </a>
             .
@@ -101,7 +101,7 @@ export default function MediaConsentClientPage() {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors">
+        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-teal-deep transition-colors">
           <FileText className="h-4 w-4 mr-2" />
           Return Home
         </Link>

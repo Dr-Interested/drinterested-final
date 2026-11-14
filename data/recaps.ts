@@ -53,9 +53,10 @@ export const RECAPS: Recap[] = [
       ["183K", "reached"],
       ["3", "fields: medicine, law, finance"],
     ],
-    cover: PHOTOS.explore3_2026[0],
+    cover: PHOTOS.explore3_2026[1],
     video: { ...VIDEOS.explore3Panel2026, label: "The speaker panel Q&A at Explore 3 2026" },
-    gallery: [...PHOTOS.explore3_2026, PHOTOS.explore3[0], PHOTOS.explore3[3]],
+    // Only 2026 material here; the 2025 photos live on their own recap.
+    gallery: [PHOTOS.explore3_2026[0], PHOTOS.explore3_2026[1]],
     quote: QUOTES.find((q) => q.quote.startsWith("Career education should")),
     links: [{ label: "explore3.live", href: "https://www.explore3.live/" }],
     match: ["explore 3", "explore3", "2026"],

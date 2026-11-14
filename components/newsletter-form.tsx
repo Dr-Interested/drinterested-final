@@ -54,8 +54,8 @@ export default function NewsletterForm({
   const inputBgColor = darkMode ? "bg-[#4f6b75]" : "bg-white"
   const inputBorderColor = darkMode ? "border-[#5a7682]" : "border-[#405862]/20"
   const inputTextColor = darkMode ? "text-white" : "text-[#405862]"
-  const inputPlaceholderColor = darkMode ? "placeholder:text-white/60" : "placeholder:text-gray-500"
-  const linkColor = darkMode ? "text-white/80 hover:text-[#4ecdc4]" : "text-[#405862]/80 hover:text-[#4ecdc4]"
+  const inputPlaceholderColor = darkMode ? "placeholder:text-white/80" : "placeholder:text-gray-500"
+  const linkColor = darkMode ? "text-white hover:text-[#8ee6df]" : "text-[#405862]/90 hover:text-[#4ecdc4]"
 
   // Adjust heading sizes for compact mode
   const headingClass = compact
@@ -63,8 +63,8 @@ export default function NewsletterForm({
     : `text-2xl font-bold mb-3 ${textColor} flex items-center`
 
   const descriptionClass = compact
-    ? `mb-3 text-sm ${darkMode ? "text-white/80" : "text-[#405862]/80"}`
-    : `mb-5 text-base ${darkMode ? "text-white/80" : "text-[#405862]/80"}`
+    ? `mb-3 text-sm ${darkMode ? "text-white/80" : "text-[#405862]/90"}`
+    : `mb-5 text-base ${darkMode ? "text-white/80" : "text-[#405862]/90"}`
 
   // Adjust input padding for mobile
   const inputPadding = isMobile || compact ? "px-3 py-2" : "px-4 py-2.5"
@@ -130,7 +130,7 @@ export default function NewsletterForm({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`formkit-submit formkit-submit bg-[#4ecdc4] hover:bg-[#3dbdb5] text-white ${buttonPadding} rounded-md font-medium w-full flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 text-sm`}
+                className={`formkit-submit formkit-submit bg-[#4ecdc4] hover:bg-[#3dbdb5] text-[#2b3f47] font-semibold ${buttonPadding} rounded-md font-medium w-full flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 text-sm`}
               >
                 <div className="formkit-spinner">
                   <div></div>
@@ -141,7 +141,7 @@ export default function NewsletterForm({
               </button>
             </div>
           </div>
-          <p className={`text-center text-xs mt-1.5 ${darkMode ? "text-white/60" : "text-[#405862]/60"}`}>
+          <p className={`text-center text-xs mt-1.5 ${darkMode ? "text-white" : "text-[#405862]/85"}`}>
             By subscribing, you agree to our{" "}
             <Link href="/terms" className={`${linkColor} transition-colors underline`}>
               Terms

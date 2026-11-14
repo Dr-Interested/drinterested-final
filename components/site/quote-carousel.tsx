@@ -21,7 +21,7 @@ export function QuoteCarousel({ quotes, className, dark = false }: { quotes: Quo
 
   const go = (d: number) => setI((n) => (n + d + quotes.length) % quotes.length)
   const text = dark ? "text-white" : "text-ink"
-  const sub = dark ? "text-white/70" : "text-ink/60"
+  const sub = dark ? "text-white/80" : "text-ink/85"
 
   return (
     <figure

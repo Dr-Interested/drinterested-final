@@ -57,7 +57,7 @@ export default async function PolicyListingPage() {
             ]}
           />
           <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mb-4">Policy Work</h1>
-          <p className="text-[#405862]/80 text-base md:text-lg max-w-2xl">
+          <p className="text-[#405862]/90 text-base md:text-lg max-w-2xl">
             Our policy reports, joint statements, and inputs to government bodies and organizations — {policyWork.length}{" "}
             items and counting.
           </p>
@@ -67,7 +67,7 @@ export default async function PolicyListingPage() {
       <section className="py-12 md:py-16 bg-white">
         <div className="container">
           {policyWork.length === 0 ? (
-            <p className="text-[#405862]/70 text-center py-12">No policy work published yet.</p>
+            <p className="text-[#405862]/85 text-center py-12">No policy work published yet.</p>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {policyWork.map((post, index) => (

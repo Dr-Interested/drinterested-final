@@ -26,7 +26,7 @@ export async function GET() {
       "Dr. Interested official logo - A youth led global wellness organization helping young people explore wellness careers, policy, and community",
     "/circle-logo.png":
       "Dr. Interested circular logo variant",
-    "/websitebanner.jpg":
+    "/og-2026.jpg":
       "Dr. Interested website banner",
 
     // Favicons and app icons
@@ -240,7 +240,7 @@ export async function GET() {
   // ===== Policy Submissions (e.g. UN/OHCHR filings) =====
   POLICY_SUBMISSIONS.forEach((submission) => {
     const policyUrl = `${baseUrl}/publications/policy/${submission.slug}`
-    const policyImage = `${baseUrl}${submission.documents[0]?.pages[0]?.file || "/websitebanner.jpg"}`
+    const policyImage = `${baseUrl}${submission.documents[0]?.pages[0]?.file || "/og-2026.jpg"}`
 
     items.push(`
     <item>

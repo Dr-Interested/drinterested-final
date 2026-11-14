@@ -77,9 +77,9 @@ export const metadata: Metadata = {
     siteName: "Dr. Interested",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: BANNER_ALT,
         type: "image/jpeg",
       },
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: {
-      url: "/websitebanner.jpg",
+      url: "/og-2026.jpg",
       alt: BANNER_ALT,
       type: "image/jpeg",
     },

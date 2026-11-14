@@ -33,7 +33,7 @@ export default function PrivacyPolicyClientPage() {
             Dr. Interested is a Canadian youth-led project; it is not itself a registered business, corporation,
             nonprofit, charity, or other legal entity. Our nonprofit work runs through Future Interested, a fiscally
             sponsored US 501(c)(3) public charity. See our{" "}
-            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Terms and Conditions
             </Link>{" "}
             for details. It is run by its volunteer organizers, who are collectively responsible for the information
@@ -90,7 +90,7 @@ export default function PrivacyPolicyClientPage() {
             We do not use the personal information you provide us to train third-party AI models. Where an AI tool
             is used as part of how our website or internal systems function, that use is limited and described in
             our{" "}
-            <Link href="/ai-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/ai-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               AI Policy
             </Link>
             .
@@ -171,7 +171,7 @@ export default function PrivacyPolicyClientPage() {
             <button
               type="button"
               onClick={resetAnalyticsConsent}
-              className="text-[#2d8659] underline underline-offset-2 hover:text-[#4CAF7D]"
+              className="text-teal-deep underline underline-offset-2 hover:text-[#4CAF7D]"
             >
               change my cookie choice
             </button>
@@ -208,11 +208,11 @@ export default function PrivacyPolicyClientPage() {
             Separately, many participants in our programs and events are minors aged 13–17. Where we photograph,
             film, or record a participant under 18 for public use, we require signed parental or guardian consent
             beforehand — see our{" "}
-            <Link href="/media-consent" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/media-consent" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Media Consent and Release
             </Link>{" "}
             page, and our{" "}
-            <Link href="/safeguarding-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/safeguarding-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Safeguarding Policy
             </Link>
             .
@@ -252,7 +252,7 @@ export default function PrivacyPolicyClientPage() {
             If you have any questions about this Privacy Policy, please contact us at{" "}
             <a
               href="mailto:admin@drinterested.org"
-              className="text-[#405862] font-medium underline hover:text-[#4ecdc4]"
+              className="text-[#405862] font-medium underline hover:text-teal-deep"
             >
               admin@drinterested.org
             </a>
@@ -262,7 +262,7 @@ export default function PrivacyPolicyClientPage() {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors">
+        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-teal-deep transition-colors">
           <FileText className="h-4 w-4 mr-2" />
           Return Home
         </Link>

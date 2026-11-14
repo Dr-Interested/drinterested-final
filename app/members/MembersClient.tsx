@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { PhotoTrio } from "@/components/site/photo-trio"
+import { PHOTOS } from "@/lib/media"
 import Image from "next/image"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
@@ -327,7 +329,7 @@ export default function MembersClient() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-[#405862]">
-        <Loader2 className="w-8 h-8 animate-spin mb-4 text-[#4ecdc4]" />
+        <Loader2 className="w-8 h-8 animate-spin mb-4 text-teal-deep" />
         <p>Loading members...</p>
       </div>
     )
@@ -345,6 +347,7 @@ export default function MembersClient() {
             Meet the {YEAR_2026.executives} youth executives, living in {YEAR_2026.teamCountries} countries, who run
             Dr. Interested, plus the medical student advisors who guide our work.
           </p>
+          <PhotoTrio photos={[PHOTOS.community[4], PHOTOS.awards[0], PHOTOS.community[6]]} priority />
         </div>
       </section>
 
@@ -382,17 +385,17 @@ export default function MembersClient() {
                           </Link>
                         </div>
                         <CardContent className="md:col-span-2 p-4">
-                          <Link href={`/team/${getMemberSlug(executiveDirector)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
-                            <h4 className="text-lg font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{executiveDirector.name}</h4>
+                          <Link href={`/team/${getMemberSlug(executiveDirector)}`} className="inline-block hover:text-teal-deep transition-colors">
+                            <h4 className="text-lg font-semibold text-[#405862] font-bricolage hover:text-teal-deep">{executiveDirector.name}</h4>
                           </Link>
-                          <p className="text-sm text-[#4ecdc4] font-medium mb-2">{executiveDirector.role}</p>
+                          <p className="text-sm text-teal-deep font-medium mb-2">{executiveDirector.role}</p>
                           <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                             {expandedBios[executiveDirector.id] ? (executiveDirector.bio || "") : truncateBio(executiveDirector.bio)}
                           </p>
                           {(executiveDirector.bio || "").length > 150 && (
                             <button
                               onClick={() => toggleBio(executiveDirector.id)}
-                              className="text-[#405862] text-sm font-semibold hover:text-[#4ecdc4] transition-colors mb-3 flex items-center"
+                              className="text-[#405862] text-sm font-semibold hover:text-teal-deep transition-colors mb-3 flex items-center"
                             >
                               {expandedBios[executiveDirector.id] ? (
                                 <>
@@ -411,7 +414,7 @@ export default function MembersClient() {
                                 href={executiveDirector.socialLinks.linkedin}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                className="text-[#405862] hover:text-teal-deep transition-colors"
                               >
                                 <Linkedin className="h-5 w-5" />
                               </Link>
@@ -421,7 +424,7 @@ export default function MembersClient() {
                                 href={executiveDirector.socialLinks.instagram}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                className="text-[#405862] hover:text-teal-deep transition-colors"
                               >
                                 <Instagram className="h-5 w-5" />
                               </Link>
@@ -431,7 +434,7 @@ export default function MembersClient() {
                                 href={executiveDirector.socialLinks.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                className="text-[#405862] hover:text-teal-deep transition-colors"
                               >
                                 <Globe className="h-5 w-5" />
                               </Link>
@@ -460,17 +463,17 @@ export default function MembersClient() {
                               </Link>
                             </div>
                             <CardContent className="md:col-span-2 p-4">
-                              <Link href={`/team/${getMemberSlug(vp)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
-                                <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{vp.name}</h4>
+                              <Link href={`/team/${getMemberSlug(vp)}`} className="inline-block hover:text-teal-deep transition-colors">
+                                <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-teal-deep">{vp.name}</h4>
                               </Link>
-                              <p className="text-sm text-[#4ecdc4] font-medium mb-2">{vp.role}</p>
+                              <p className="text-sm text-teal-deep font-medium mb-2">{vp.role}</p>
                               <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                                 {expandedBios[vp.id] ? (vp.bio || "") : truncateBio(vp.bio, 120)}
                               </p>
                               {(vp.bio || "").length > 120 && (
                                 <button
                                   onClick={() => toggleBio(vp.id)}
-                                  className="text-[#405862] text-sm font-semibold hover:text-[#4ecdc4] transition-colors mb-3 flex items-center"
+                                  className="text-[#405862] text-sm font-semibold hover:text-teal-deep transition-colors mb-3 flex items-center"
                                 >
                                   {expandedBios[vp.id] ? (
                                     <>
@@ -525,17 +528,17 @@ export default function MembersClient() {
                               </Link>
                             </div>
                             <CardContent className="md:col-span-2 p-4">
-                              <Link href={`/team/${getMemberSlug(ea)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
-                                <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{ea.name}</h4>
+                              <Link href={`/team/${getMemberSlug(ea)}`} className="inline-block hover:text-teal-deep transition-colors">
+                                <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-teal-deep">{ea.name}</h4>
                               </Link>
-                              <p className="text-sm text-[#4ecdc4] font-medium mb-2">{ea.role}</p>
+                              <p className="text-sm text-teal-deep font-medium mb-2">{ea.role}</p>
                               <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                                 {expandedBios[ea.id] ? (ea.bio || "") : truncateBio(ea.bio, 120)}
                               </p>
                               {(ea.bio || "").length > 120 && (
                                 <button
                                   onClick={() => toggleBio(ea.id)}
-                                  className="text-[#405862] text-sm font-semibold hover:text-[#4ecdc4] transition-colors mb-3 flex items-center"
+                                  className="text-[#405862] text-sm font-semibold hover:text-teal-deep transition-colors mb-3 flex items-center"
                                 >
                                   {expandedBios[ea.id] ? (
                                     <>
@@ -575,7 +578,7 @@ export default function MembersClient() {
               )}
 
               {!executiveDirector && (!deputyexecdir || deputyexecdir.length === 0) && (!executiveAssistantsList || executiveAssistantsList.length === 0) && (
-                <div className="text-center py-12 text-[#405862]/80">
+                <div className="text-center py-12 text-[#405862]/90">
                   <p>No leadership team members currently listed.</p>
                 </div>
               )}
@@ -596,7 +599,7 @@ export default function MembersClient() {
                     >
                       <div className="p-4 border-b bg-[#f5f1eb]/30">
                         <h3 className="text-lg font-semibold text-[#405862] font-bricolage">{department.name}</h3>
-                        <p className="text-[#405862]/80 text-sm mt-1">{department.description}</p>
+                        <p className="text-[#405862]/90 text-sm mt-1">{department.description}</p>
                       </div>
 
                       {hasDirector && (
@@ -625,17 +628,17 @@ export default function MembersClient() {
                                       </Link>
                                     </div>
                                     <CardContent className="col-span-2 p-3">
-                                      <Link href={`/team/${getMemberSlug(director)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
-                                        <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-[#4ecdc4]">{director.name}</h5>
+                                      <Link href={`/team/${getMemberSlug(director)}`} className="inline-block hover:text-teal-deep transition-colors">
+                                        <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-teal-deep">{director.name}</h5>
                                       </Link>
-                                      <p className="text-xs text-[#4ecdc4] font-medium mb-1">{director.role}</p>
+                                      <p className="text-xs text-teal-deep font-medium mb-1">{director.role}</p>
                                       <p className="text-xs text-[#405862]/90 leading-relaxed mb-1">
                                         {expandedBios[director.id] ? (director.bio || "") : truncateBio(director.bio, 80)}
                                       </p>
                                       {(director.bio || "").length > 80 && (
                                         <button
                                           onClick={() => toggleBio(director.id)}
-                                          className="text-[#405862] text-xs font-semibold hover:text-[#4ecdc4] transition-colors mb-1 flex items-center"
+                                          className="text-[#405862] text-xs font-semibold hover:text-teal-deep transition-colors mb-1 flex items-center"
                                         >
                                           {expandedBios[director.id] ? (
                                             <>
@@ -654,7 +657,7 @@ export default function MembersClient() {
                                             href={director.socialLinks.linkedin}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                            className="text-[#405862] hover:text-teal-deep transition-colors"
                                           >
                                             <Linkedin className="h-4 w-4" />
                                           </Link>
@@ -664,7 +667,7 @@ export default function MembersClient() {
                                             href={director.socialLinks.instagram}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                            className="text-[#405862] hover:text-teal-deep transition-colors"
                                           >
                                             <Instagram className="h-4 w-4" />
                                           </Link>
@@ -705,10 +708,10 @@ export default function MembersClient() {
                                         />
                                       </Link>
                                       <div>
-                                        <Link href={`/team/${getMemberSlug(member)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
-                                          <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-[#4ecdc4]">{member.name}</h5>
+                                        <Link href={`/team/${getMemberSlug(member)}`} className="inline-block hover:text-teal-deep transition-colors">
+                                          <h5 className="font-semibold text-sm text-[#405862] font-bricolage hover:text-teal-deep">{member.name}</h5>
                                         </Link>
-                                        <p className="text-xs text-[#405862]/75">{member.role}</p>
+                                        <p className="text-xs text-[#405862]/85">{member.role}</p>
                                       </div>
                                     </div>
                                     <p className="text-xs text-[#405862]/90 leading-relaxed mb-1">
@@ -717,7 +720,7 @@ export default function MembersClient() {
                                     {(member.bio || "").length > 60 && (
                                       <button
                                         onClick={() => toggleBio(member.id)}
-                                        className="text-[#405862] text-xs font-semibold hover:text-[#4ecdc4] transition-colors mb-1 flex items-center"
+                                        className="text-[#405862] text-xs font-semibold hover:text-teal-deep transition-colors mb-1 flex items-center"
                                       >
                                         {expandedBios[member.id] ? (
                                           <>
@@ -736,7 +739,7 @@ export default function MembersClient() {
                                           href={member.socialLinks.linkedin}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                          className="text-[#405862] hover:text-teal-deep transition-colors"
                                         >
                                           <Linkedin className="h-4 w-4" />
                                         </Link>
@@ -746,7 +749,7 @@ export default function MembersClient() {
                                           href={member.socialLinks.instagram}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                          className="text-[#405862] hover:text-teal-deep transition-colors"
                                         >
                                           <Instagram className="h-4 w-4" />
                                         </Link>
@@ -764,7 +767,7 @@ export default function MembersClient() {
                       {department.id === "hr" && ambassadorsList.length > 0 && (
                         <div className="p-4 border-t border-[#405862]/10">
                           <div className="flex items-center gap-2 mb-3">
-                            <h4 className="text-sm font-semibold text-[#405862]/80 font-bricolage">Organizational Ambassadors</h4>
+                            <h4 className="text-sm font-semibold text-[#405862]/90 font-bricolage">Organizational Ambassadors</h4>
                             <span className="text-[10px] bg-[#4ecdc4]/15 text-[#405862] px-1.5 py-0.5 rounded-full font-medium border border-[#4ecdc4]/25">
                               Sub-team
                             </span>
@@ -787,20 +790,20 @@ export default function MembersClient() {
                                     />
                                   </Link>
                                   <div className="min-w-0">
-                                    <Link href={`/team/${getMemberSlug(ambassador)}`} className="block hover:text-[#4ecdc4] transition-colors">
-                                      <p className="font-medium text-xs text-[#405862] hover:text-[#4ecdc4] truncate font-bricolage">{ambassador.name}</p>
+                                    <Link href={`/team/${getMemberSlug(ambassador)}`} className="block hover:text-teal-deep transition-colors">
+                                      <p className="font-medium text-xs text-[#405862] hover:text-teal-deep truncate font-bricolage">{ambassador.name}</p>
                                     </Link>
-                                    <p className="text-[10px] text-[#405862]/60 truncate">{ambassador.role}</p>
+                                    <p className="text-[10px] text-[#405862]/85 truncate">{ambassador.role}</p>
                                   </div>
                                   {(ambassador.socialLinks?.linkedin || ambassador.socialLinks?.instagram) && (
                                     <div className="flex gap-1 ml-auto shrink-0">
                                       {ambassador.socialLinks?.linkedin && (
-                                        <Link href={ambassador.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#405862]/50 hover:text-[#4ecdc4] transition-colors">
+                                        <Link href={ambassador.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#405862]/85 hover:text-teal-deep transition-colors">
                                           <Linkedin className="h-3 w-3" />
                                         </Link>
                                       )}
                                       {ambassador.socialLinks?.instagram && (
-                                        <Link href={ambassador.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-[#405862]/50 hover:text-[#4ecdc4] transition-colors">
+                                        <Link href={ambassador.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-[#405862]/85 hover:text-teal-deep transition-colors">
                                           <Instagram className="h-3 w-3" />
                                         </Link>
                                       )}
@@ -818,7 +821,7 @@ export default function MembersClient() {
                       {department.id === "publications" && podcastList.length > 0 && (
                         <div className="p-4 border-t border-[#405862]/10">
                           <div className="flex items-center gap-2 mb-3">
-                            <h4 className="text-sm font-semibold text-[#405862]/80 font-bricolage">Podcast Team</h4>
+                            <h4 className="text-sm font-semibold text-[#405862]/90 font-bricolage">Podcast Team</h4>
                             <span className="text-[10px] bg-[#4ecdc4]/15 text-[#405862] px-1.5 py-0.5 rounded-full font-medium border border-[#4ecdc4]/25">
                               Sub-team
                             </span>
@@ -841,20 +844,20 @@ export default function MembersClient() {
                                     />
                                   </Link>
                                   <div className="min-w-0">
-                                    <Link href={`/team/${getMemberSlug(pod)}`} className="block hover:text-[#4ecdc4] transition-colors">
-                                      <p className="font-medium text-xs text-[#405862] hover:text-[#4ecdc4] truncate font-bricolage">{pod.name}</p>
+                                    <Link href={`/team/${getMemberSlug(pod)}`} className="block hover:text-teal-deep transition-colors">
+                                      <p className="font-medium text-xs text-[#405862] hover:text-teal-deep truncate font-bricolage">{pod.name}</p>
                                     </Link>
-                                    <p className="text-[10px] text-[#405862]/60 truncate">{pod.role}</p>
+                                    <p className="text-[10px] text-[#405862]/85 truncate">{pod.role}</p>
                                   </div>
                                   {(pod.socialLinks?.linkedin || pod.socialLinks?.instagram) && (
                                     <div className="flex gap-1 ml-auto shrink-0">
                                       {pod.socialLinks?.linkedin && (
-                                        <Link href={pod.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#405862]/50 hover:text-[#4ecdc4] transition-colors">
+                                        <Link href={pod.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#405862]/85 hover:text-teal-deep transition-colors">
                                           <Linkedin className="h-3 w-3" />
                                         </Link>
                                       )}
                                       {pod.socialLinks?.instagram && (
-                                        <Link href={pod.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-[#405862]/50 hover:text-[#4ecdc4] transition-colors">
+                                        <Link href={pod.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-[#405862]/85 hover:text-teal-deep transition-colors">
                                           <Instagram className="h-3 w-3" />
                                         </Link>
                                       )}
@@ -870,18 +873,18 @@ export default function MembersClient() {
                   );
                 })
               ) : (
-                <div className="text-center py-12 text-[#405862]/80">
+                <div className="text-center py-12 text-[#405862]/90">
                   <p>No department members currently listed.</p>
                 </div>
               )}
 
               <div className="mt-8 p-6 bg-[#4ecdc4]/10 border border-[#4ecdc4]/30 rounded-lg text-center">
                 <h3 className="text-lg font-semibold text-[#405862] mb-2 font-bricolage">Interested in Joining Our Team?</h3>
-                <p className="text-[#405862]/80 mb-3">
-                  Check out the <span className="font-semibold text-[#4ecdc4]">Join Us</span> tab above to learn about
+                <p className="text-[#405862]/90 mb-3">
+                  Check out the <span className="font-semibold text-teal-deep">Join Us</span> tab above to learn about
                   executive opportunities and apply to join our leadership team!
                 </p>
-                <p className="text-sm text-[#405862]/70">
+                <p className="text-sm text-[#405862]/85">
                   Applications are open year-round and reviewed on an ongoing basis.
                 </p>
               </div>
@@ -892,7 +895,7 @@ export default function MembersClient() {
               {advisorsList && advisorsList.length > 0 ? (
                 <div>
                   <h3 className="text-lg font-semibold mb-4 text-center text-[#405862] font-bricolage">Medical Student Advisors</h3>
-                  <p className="text-center text-[#405862]/80 mb-6 max-w-2xl mx-auto text-sm">
+                  <p className="text-center text-[#405862]/90 mb-6 max-w-2xl mx-auto text-sm">
                     Our medical student advisors provide valuable guidance and mentorship, helping bridge the gap between
                     high school and medical education.
                   </p>
@@ -916,17 +919,17 @@ export default function MembersClient() {
                             </Link>
                           </div>
                           <CardContent className="p-4">
-                            <Link href={`/team/${getMemberSlug(advisor)}`} className="inline-block hover:text-[#4ecdc4] transition-colors">
-                              <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-[#4ecdc4]">{advisor.name}</h4>
+                            <Link href={`/team/${getMemberSlug(advisor)}`} className="inline-block hover:text-teal-deep transition-colors">
+                              <h4 className="text-base font-semibold text-[#405862] font-bricolage hover:text-teal-deep">{advisor.name}</h4>
                             </Link>
-                            <p className="text-sm text-[#4ecdc4] font-medium mb-2">{advisor.role}</p>
+                            <p className="text-sm text-teal-deep font-medium mb-2">{advisor.role}</p>
                             <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
                               {expandedBios[advisor.id] ? (advisor.bio || "") : truncateBio(advisor.bio, 120)}
                             </p>
                             {(advisor.bio || "").length > 120 && (
                               <button
                                 onClick={() => toggleBio(advisor.id)}
-                                className="text-[#405862] text-sm font-semibold hover:text-[#4ecdc4] transition-colors mb-3 flex items-center"
+                                className="text-[#405862] text-sm font-semibold hover:text-teal-deep transition-colors mb-3 flex items-center"
                               >
                                 {expandedBios[advisor.id] ? (
                                   <>
@@ -945,7 +948,7 @@ export default function MembersClient() {
                                   href={advisor.socialLinks.linkedin}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                  className="text-[#405862] hover:text-teal-deep transition-colors"
                                 >
                                   <Linkedin className="h-5 w-5" />
                                 </Link>
@@ -955,7 +958,7 @@ export default function MembersClient() {
                                   href={advisor.socialLinks.instagram}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                  className="text-[#405862] hover:text-teal-deep transition-colors"
                                 >
                                   <Instagram className="h-5 w-5" />
                                 </Link>
@@ -965,7 +968,7 @@ export default function MembersClient() {
                                   href={advisor.socialLinks.website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                                  className="text-[#405862] hover:text-teal-deep transition-colors"
                                 >
                                   <Globe className="h-5 w-5" />
                                 </Link>
@@ -978,17 +981,17 @@ export default function MembersClient() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 text-[#405862]/80">
+                <div className="text-center py-12 text-[#405862]/90">
                   <p>No advisors currently listed.</p>
                 </div>
               )}
               <div className="mt-8 p-6 bg-[#4ecdc4]/10 border border-[#4ecdc4]/30 rounded-lg text-center">
                 <h3 className="text-lg font-semibold text-[#405862] mb-2 font-bricolage">Interested in Joining Our Team?</h3>
-                <p className="text-[#405862]/80 mb-3">
-                  Check out the <span className="font-semibold text-[#4ecdc4]">Join Us</span> tab above to learn about
+                <p className="text-[#405862]/90 mb-3">
+                  Check out the <span className="font-semibold text-teal-deep">Join Us</span> tab above to learn about
                   executive opportunities and apply to join our leadership team!
                 </p>
-                <p className="text-sm text-[#405862]/70">
+                <p className="text-sm text-[#405862]/85">
                   Applications are open year-round and reviewed on an ongoing basis.
                 </p>
               </div>
@@ -1026,7 +1029,7 @@ export default function MembersClient() {
                 <div className="space-y-6">
                   <div>
                     <h4 className="text-base md:text-lg font-bold text-[#405862] font-bricolage mb-4 flex items-center gap-2">
-                      <Sparkles className="h-4.5 w-4.5 text-[#4ecdc4]" />
+                      <Sparkles className="h-4.5 w-4.5 text-teal-deep" />
                       What You Get
                     </h4>
                     <ul className="space-y-3.5">
@@ -1039,7 +1042,7 @@ export default function MembersClient() {
                         "Real skill growth in leadership, collaboration, and execution"
                       ].map((benefit, idx) => (
                         <li key={idx} className="flex items-start gap-2.5">
-                          <CheckCircle2 className="h-4.5 w-4.5 text-[#4ecdc4] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="h-4.5 w-4.5 text-teal-deep shrink-0 mt-0.5" />
                           <span className="text-xs md:text-sm text-[#405862]/95 font-medium">
                             {benefit}
                           </span>
@@ -1058,7 +1061,7 @@ export default function MembersClient() {
                         <Image src="/glocal.webp" alt="GLOCAL Foundation Logo" fill sizes="80px" className="object-contain" />
                       </div>
                     </div>
-                    <p className="text-[11px] text-[#405862]/70 mb-3 italic">
+                    <p className="text-[11px] text-[#405862]/85 mb-3 italic">
                       Global youth opportunities through our partners, the GLOCAL Foundation of Canada and the Student Innovation Lab.
                     </p>
                     <ul className="space-y-2.5">
@@ -1069,7 +1072,7 @@ export default function MembersClient() {
                         "Access to Student Innovation Lab programming, including wellness programming"
                       ].map((opp, idx) => (
                         <li key={idx} className="flex items-start gap-2">
-                          <Award className="h-4 w-4 text-[#4ecdc4] shrink-0 mt-0.5" />
+                          <Award className="h-4 w-4 text-teal-deep shrink-0 mt-0.5" />
                           <span className="text-xs text-[#405862]/95 leading-relaxed">
                             {opp}
                           </span>
@@ -1088,7 +1091,7 @@ export default function MembersClient() {
                         New Opportunity
                       </span>
                       <h4 className="text-base font-bold text-[#405862] font-bricolage flex items-center gap-2">
-                        <FileText className="h-4.5 w-4.5 text-[#4ecdc4]" />
+                        <FileText className="h-4.5 w-4.5 text-teal-deep" />
                         Policy & Global Research
                       </h4>
                       <p className="text-xs md:text-sm text-[#405862]/95 leading-relaxed">
@@ -1128,7 +1131,7 @@ export default function MembersClient() {
                         <h5 className="font-bold text-sm text-[#405862] font-bricolage">
                           General Executive
                         </h5>
-                        <p className="text-xs text-[#405862]/75 leading-relaxed mt-2">
+                        <p className="text-xs text-[#405862]/85 leading-relaxed mt-2">
                           Join our core leadership team and help shape the future of Dr. Interested at a global scale.
                         </p>
                       </div>
@@ -1152,7 +1155,7 @@ export default function MembersClient() {
                         <h5 className="font-bold text-sm text-[#405862] font-bricolage">
                           Org Ambassador
                         </h5>
-                        <p className="text-xs text-[#405862]/75 leading-relaxed mt-2">
+                        <p className="text-xs text-[#405862]/85 leading-relaxed mt-2">
                           Represent Dr. Interested in your community and help expand our impact worldwide.
                         </p>
                       </div>
@@ -1176,7 +1179,7 @@ export default function MembersClient() {
                         <h5 className="font-bold text-sm text-[#405862] font-bricolage">
                           Podcast Team
                         </h5>
-                        <p className="text-xs text-[#405862]/75 leading-relaxed mt-2">
+                        <p className="text-xs text-[#405862]/85 leading-relaxed mt-2">
                           Create engaging podcast content and amplify youth voices on health, leadership, and wellness careers from around the world.
                         </p>
                       </div>
@@ -1198,11 +1201,11 @@ export default function MembersClient() {
 
               {/* Questions Support footer */}
               <div className="text-center pt-8">
-                <p className="text-xs md:text-sm text-[#405862]/80">
+                <p className="text-xs md:text-sm text-[#405862]/90">
                   Have questions about joining our team?{" "}
                   <Link
                     href="mailto:hr@drinterested.org"
-                    className="text-[#4ecdc4] hover:text-[#405862] font-semibold transition-colors underline underline-offset-4"
+                    className="text-teal-deep hover:text-[#405862] font-semibold transition-colors underline underline-offset-4"
                   >
                     Contact us at hr@drinterested.org
                   </Link>
@@ -1224,13 +1227,13 @@ export default function MembersClient() {
             <div className="max-w-3xl mx-auto space-y-4">
               {archivedYearsDesc.map((year) => (
                 <div key={year}>
-                  <h3 className="text-sm font-semibold text-[#405862]/70 mb-1">{year}</h3>
+                  <h3 className="text-sm font-semibold text-[#405862]/85 mb-1">{year}</h3>
                   <p className="text-sm text-[#405862]/90 leading-relaxed">
                     {archivedByYear[year].map((m, i) => (
                       <span key={m.id}>
                         <Link
                           href={`/team/${m.slug}`}
-                          className="text-[#405862] hover:text-[#4ecdc4] font-medium transition-colors"
+                          className="text-[#405862] hover:text-teal-deep font-medium transition-colors"
                         >
                           {m.name}
                         </Link>

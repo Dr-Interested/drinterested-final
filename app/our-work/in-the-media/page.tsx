@@ -3,6 +3,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowUpRight, Award, Mail, Newspaper, Radio, Mic, Megaphone, Landmark, CalendarDays } from "lucide-react"
 import SeoSchema from "@/components/seo-schema"
+import { PhotoTrio } from "@/components/site/photo-trio"
+import { PHOTOS } from "@/lib/media"
 import { generateBreadcrumbSchema, generateSeoMetadata } from "@/lib/seo-utils"
 import { AFFILIATIONS, MEDIA_FEATURES, RECOGNITION, type MediaFeature } from "@/data/media-features"
 import { IMPACT_REPORT_2026 } from "@/lib/impact-stats"
@@ -39,11 +41,11 @@ function FeatureCard({ f }: { f: MediaFeature }) {
   const inner = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#2d8659]">{f.outlet}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-teal-deep">{f.outlet}</p>
         {f.url && <ArrowUpRight className="h-4 w-4 text-[#405862]/40 group-hover:text-[#405862] shrink-0" />}
       </div>
       <p className="text-sm font-medium text-[#405862] leading-snug mt-1">{f.title}</p>
-      {f.date && <p className="text-xs text-[#405862]/60 mt-1">{f.date}</p>}
+      {f.date && <p className="text-xs text-[#405862]/85 mt-1">{f.date}</p>}
     </>
   )
   const cls = "group block rounded-xl border border-[#405862]/10 bg-white p-4 h-full"
@@ -87,11 +89,11 @@ export default function InTheMediaPage() {
 
       <section className="bg-[#f5f1eb] py-10 md:py-16">
         <div className="container max-w-5xl text-center">
-          <Link href="/our-work" className="text-sm text-[#405862]/70 hover:text-[#405862]">
+          <Link href="/our-work" className="text-sm text-[#405862]/85 hover:text-[#405862]">
             Our Work
           </Link>
           <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mt-2 mb-4">In the Media</h1>
-          <p className="text-lg text-[#405862]/80 max-w-2xl mx-auto">
+          <p className="text-lg text-[#405862]/90 max-w-2xl mx-auto">
             Coverage, interviews, podcasts, and recognition for Dr. Interested and our youth, as listed in our{" "}
             <Link href="/impact-report" className="underline underline-offset-2">
               {IMPACT_REPORT_2026.shortTitle}
@@ -113,6 +115,7 @@ export default function InTheMediaPage() {
               Profiles Hub
             </Link>
           </div>
+          <PhotoTrio className="mt-8" photos={[PHOTOS.community[2], PHOTOS.awards[1], PHOTOS.community[1]]} priority />
         </div>
       </section>
 
@@ -120,15 +123,15 @@ export default function InTheMediaPage() {
       <section className="py-12 bg-white">
         <div className="container max-w-5xl">
           <h2 className="text-2xl md:text-3xl font-bold text-[#405862] mb-6 flex items-center gap-2">
-            <Award className="h-6 w-6 text-[#4ecdc4]" />
+            <Award className="h-6 w-6 text-teal-deep" />
             Awards and Recognition
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
             {RECOGNITION.map((r) => (
               <div key={r.title} className="rounded-xl bg-[#4ecdc4]/10 border border-[#4ecdc4]/20 p-5">
-                {r.date && <p className="text-xs font-semibold text-[#2d8659]">{r.date}</p>}
+                {r.date && <p className="text-xs font-semibold text-teal-deep">{r.date}</p>}
                 <h3 className="font-bold text-[#405862] mt-1 mb-1">{r.title}</h3>
-                <p className="text-sm text-[#405862]/80">{r.detail}</p>
+                <p className="text-sm text-[#405862]/90">{r.detail}</p>
               </div>
             ))}
           </div>
@@ -145,7 +148,7 @@ export default function InTheMediaPage() {
             return (
               <div key={g.title}>
                 <h2 className="text-xl md:text-2xl font-bold text-[#405862] mb-4 flex items-center gap-2">
-                  <Icon className="h-5 w-5 text-[#4ecdc4]" />
+                  <Icon className="h-5 w-5 text-teal-deep" />
                   {g.title}
                 </h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -172,7 +175,7 @@ export default function InTheMediaPage() {
                 </li>
               ))}
             </ul>
-            <p className="text-sm text-[#405862]/70 mt-4">
+            <p className="text-sm text-[#405862]/85 mt-4">
               Every profile and directory listing is in our{" "}
               <Link href="/contact#profiles-hub" className="underline underline-offset-2 text-[#405862]">
                 Profiles Hub
@@ -190,7 +193,7 @@ export default function InTheMediaPage() {
                 sizes="(max-width: 768px) 100vw, 480px"
               />
             </a>
-            <figcaption className="text-xs text-[#405862]/60 mt-2 text-center">
+            <figcaption className="text-xs text-[#405862]/85 mt-2 text-center">
               The Media Features page of our 2026 report. Every image links to the original in the PDF.
             </figcaption>
           </figure>

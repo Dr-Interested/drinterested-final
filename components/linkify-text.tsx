@@ -17,7 +17,7 @@ export default function LinkifyText({ text, linkClassName }: { text: string; lin
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className={linkClassName || "text-[#2d8659] underline underline-offset-2 break-all hover:text-[#4CAF7D]"}
+            className={linkClassName || "text-teal-deep underline underline-offset-2 break-all hover:text-[#4CAF7D]"}
           >
             {part}
           </a>

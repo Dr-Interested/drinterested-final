@@ -20,7 +20,7 @@ export default function PillarsSection() {
       <div className="border-y border-ink/10 bg-white py-3">
         <Marquee duration={45}>
           {AS_SEEN_IN.map((name) => (
-            <span key={name} className="mx-5 inline-flex items-center gap-5 whitespace-nowrap text-sm font-medium text-ink/55">
+            <span key={name} className="mx-5 inline-flex items-center gap-5 whitespace-nowrap text-sm font-medium text-ink/85">
               {name}
               <span aria-hidden="true" className="h-1 w-1 rounded-full bg-teal" />
             </span>
@@ -52,7 +52,7 @@ export default function PillarsSection() {
                   </div>
                   <div className="p-5">
                     <h3 className="text-lg font-semibold text-ink">{p.name}</h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-ink/75">{p.description}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-ink/85">{p.description}</p>
                     <Link href={m.href} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-teal-deep hover:text-ink">
                       {m.link}
                       <ArrowUpRight className="h-4 w-4" />

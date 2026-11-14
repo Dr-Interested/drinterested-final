@@ -130,7 +130,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Need our Admin?</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Need our Admin?</div>
                 <a
                   href="mailto:admin@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"
@@ -139,7 +139,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Want to sponsor us?</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Want to sponsor us?</div>
                 <a
                   href="mailto:finance@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"
@@ -148,7 +148,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Want to work with us?</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Want to work with us?</div>
                 <a
                   href="mailto:outreach@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"
@@ -157,7 +157,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Everything else:</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Everything else:</div>
                 <a
                   href="mailto:general@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"

@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: "Dr. Interested - Thank You",
       },
     ],
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: "Thank You for Subscribing | Dr. Interested",
     description: "Thank you for confirming your subscription to the Dr. Interested newsletter.",
     images: {
-      url: "/websitebanner.jpg",
+      url: "/og-2026.jpg",
       alt: "Dr. Interested - Thank You",
     },
   },
@@ -58,7 +58,7 @@ export default function ThankYouPage() {
 
         <div className="bg-[#f5f1eb] p-8 rounded-lg shadow-md">
           <div className="inline-flex items-center justify-center p-2 bg-[#4ecdc4]/20 rounded-full mb-6">
-            <CheckCircle className="h-8 w-8 text-[#4ecdc4]" />
+            <CheckCircle className="h-8 w-8 text-teal-deep" />
           </div>
 
           <h1 className="text-3xl font-bold text-[#405862] mb-4">Thank You for Subscribing!</h1>
@@ -90,12 +90,12 @@ export default function ThankYouPage() {
           </div>
         </div>
 
-        <div className="mt-6 text-sm text-[#405862]/70">
+        <div className="mt-6 text-sm text-[#405862]/85">
           <p>
             Follow us on{" "}
             <Link
               href="https://www.instagram.com/dr.interested/"
-              className="text-[#4ecdc4] hover:underline"
+              className="text-teal-deep hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -104,7 +104,7 @@ export default function ThankYouPage() {
             and{" "}
             <Link
               href="https://www.linkedin.com/company/dr-interested"
-              className="text-[#4ecdc4] hover:underline"
+              className="text-teal-deep hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >

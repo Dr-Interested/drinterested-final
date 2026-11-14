@@ -25,11 +25,11 @@ export default function AiPolicyClientPage() {
             This policy explains how Dr. Interested uses artificial intelligence (AI) tools in producing content,
             building and maintaining our website, and supporting our operations, and the limits we place on that use.
             It applies alongside our{" "}
-            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Terms and Conditions
             </Link>{" "}
             and{" "}
-            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Privacy Policy
             </Link>
             .
@@ -58,7 +58,7 @@ export default function AiPolicyClientPage() {
             Regardless of whether a piece of content was written with AI assistance, everything published by Dr.
             Interested — including blog posts, guides, and webinars — is for informational and entertainment
             purposes only and is not medical, legal, financial, or career advice. See our{" "}
-            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Terms and Conditions
             </Link>{" "}
             for more.
@@ -72,7 +72,7 @@ export default function AiPolicyClientPage() {
             registration, or membership application) to train third-party AI models. Where an AI tool processes
             information as part of how our website or internal systems function, that processing is limited to
             performing the requested task and is handled under the same safeguards described in our{" "}
-            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Privacy Policy
             </Link>
             .
@@ -85,7 +85,7 @@ export default function AiPolicyClientPage() {
             AI tools can make mistakes. We take reasonable steps to review AI-assisted content for accuracy before
             publishing it, but we cannot guarantee that every statement is error-free. If you notice something
             incorrect, please let us know at{" "}
-            <a href="mailto:admin@drinterested.org" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <a href="mailto:admin@drinterested.org" className="text-[#405862] font-medium underline hover:text-teal-deep">
               admin@drinterested.org
             </a>{" "}
             and we'll review it.
@@ -104,7 +104,7 @@ export default function AiPolicyClientPage() {
           <h2 className="text-xl font-semibold mb-3 text-[#405862]">7. Contact Us</h2>
           <p className="text-slate-600">
             If you have questions about this AI Policy, please contact us at{" "}
-            <a href="mailto:admin@drinterested.org" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <a href="mailto:admin@drinterested.org" className="text-[#405862] font-medium underline hover:text-teal-deep">
               admin@drinterested.org
             </a>
             .
@@ -113,7 +113,7 @@ export default function AiPolicyClientPage() {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors">
+        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-teal-deep transition-colors">
           <FileText className="h-4 w-4 mr-2" />
           Return Home
         </Link>

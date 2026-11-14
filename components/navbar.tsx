@@ -171,7 +171,7 @@ export default function Navbar() {
                       href="https://discord.gg/pzbGRgsGXY"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                      className="text-[#405862] hover:text-teal-deep transition-colors"
                       aria-label="Discord"
                       onClick={() => setIsOpen(false)}
                     >
@@ -181,7 +181,7 @@ export default function Navbar() {
                       href="https://www.instagram.com/dr.interested/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                      className="text-[#405862] hover:text-teal-deep transition-colors"
                       aria-label="Instagram"
                       onClick={() => setIsOpen(false)}
                     >
@@ -191,7 +191,7 @@ export default function Navbar() {
                       href="https://www.linkedin.com/company/dr-interested"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                      className="text-[#405862] hover:text-teal-deep transition-colors"
                       aria-label="LinkedIn"
                       onClick={() => setIsOpen(false)}
                     >
@@ -235,7 +235,7 @@ export default function Navbar() {
                       <Link
                         key={c.href}
                         href={c.href}
-                        className="block px-4 py-2 text-sm text-[#405862]/80 hover:bg-[#f5f1eb] hover:text-[#405862]"
+                        className="block px-4 py-2 text-sm text-[#405862]/90 hover:bg-[#f5f1eb] hover:text-[#405862]"
                       >
                         {c.label}
                       </Link>
@@ -266,7 +266,7 @@ export default function Navbar() {
               href="https://discord.gg/pzbGRgsGXY"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#405862] hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+              className="text-[#405862] hover:text-teal-deep transition-colors hover:scale-110 duration-200"
               aria-label="Discord"
             >
               <DiscordIcon className="h-5 w-5" />
@@ -275,7 +275,7 @@ export default function Navbar() {
               href="https://www.instagram.com/dr.interested/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#405862] hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+              className="text-[#405862] hover:text-teal-deep transition-colors hover:scale-110 duration-200"
               aria-label="Instagram"
             >
               <Instagram className="h-5 w-5" />
@@ -284,7 +284,7 @@ export default function Navbar() {
               href="https://www.linkedin.com/company/dr-interested"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#405862] hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+              className="text-[#405862] hover:text-teal-deep transition-colors hover:scale-110 duration-200"
               aria-label="LinkedIn"
             >
               <Linkedin className="h-5 w-5" />

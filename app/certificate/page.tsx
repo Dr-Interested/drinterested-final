@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: "Dr. Interested Certificate Generator",
       },
     ],
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     description:
       "Generate your personalized Dr. Interested certificate. Download PDF certificates for participation in our programs.",
     images: {
-      url: "/websitebanner.jpg",
+      url: "/og-2026.jpg",
       alt: "Dr. Interested Certificate Generator",
     },
   },

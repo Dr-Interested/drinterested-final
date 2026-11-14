@@ -116,7 +116,7 @@ export default function MedXConferenceClient() {
         <div className="container max-w-6xl mx-auto flex items-center justify-between text-xs md:text-sm">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 font-medium hover:text-[#4ecdc4] transition-colors group"
+            className="inline-flex items-center gap-2 font-medium hover:text-teal-deep transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
             <span>Return to Main Website</span>
@@ -131,7 +131,7 @@ export default function MedXConferenceClient() {
             >
               {copied ? (
                 <>
-                  <Check className="h-3.5 w-3.5 mr-1 text-[#4ecdc4]" /> Link Copied!
+                  <Check className="h-3.5 w-3.5 mr-1 text-teal-deep" /> Link Copied!
                 </>
               ) : (
                 <>
@@ -178,11 +178,11 @@ export default function MedXConferenceClient() {
                     <Image src="/medx.png" alt="Dr. Interested MedExplore Logo" fill className="object-contain" priority />
                   </div>
                   <div>
-                    <h2 className="text-[#4ecdc4] font-extrabold tracking-wider uppercase text-sm md:text-base">
+                    <h2 className="text-teal-deep font-extrabold tracking-wider uppercase text-sm md:text-base">
                       Dr. Interested Presents
                     </h2>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#405862] dark:text-white leading-tight tracking-tight">
-                      MedExplore 2026 <span className="text-[#4ecdc4]">Recap</span>
+                      MedExplore 2026 <span className="text-teal-deep">Recap</span>
                     </h1>
                   </div>
                 </div>
@@ -201,7 +201,7 @@ export default function MedXConferenceClient() {
 
               <div className="grid sm:grid-cols-3 gap-3 pt-2">
                 <div className="bg-white/80 dark:bg-[#11161d]/80 backdrop-blur-sm p-4 rounded-xl border border-[#4ecdc4]/20 shadow-sm flex items-start gap-3">
-                  <Calendar className="h-5 w-5 text-[#4ecdc4] flex-shrink-0 mt-0.5" />
+                  <Calendar className="h-5 w-5 text-teal-deep flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Date</p>
                     <p className="font-bold text-[#405862] dark:text-white text-sm md:text-base">Sun, Aug 16, 2026</p>
@@ -209,7 +209,7 @@ export default function MedXConferenceClient() {
                 </div>
 
                 <div className="bg-white/80 dark:bg-[#11161d]/80 backdrop-blur-sm p-4 rounded-xl border border-[#4ecdc4]/20 shadow-sm flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-[#4ecdc4] flex-shrink-0 mt-0.5" />
+                  <MapPin className="h-5 w-5 text-teal-deep flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Location</p>
                     <p className="font-bold text-[#405862] dark:text-white text-sm md:text-base">UTM, Davis Building</p>
@@ -217,7 +217,7 @@ export default function MedXConferenceClient() {
                 </div>
 
                 <div className="bg-white/80 dark:bg-[#11161d]/80 backdrop-blur-sm p-4 rounded-xl border border-[#4ecdc4]/20 shadow-sm flex items-start gap-3">
-                  <Users className="h-5 w-5 text-[#4ecdc4] flex-shrink-0 mt-0.5" />
+                  <Users className="h-5 w-5 text-teal-deep flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Turnout</p>
                     <p className="font-bold text-[#405862] dark:text-white text-sm md:text-base">100+ students</p>
@@ -311,7 +311,7 @@ export default function MedXConferenceClient() {
                   className="bg-white dark:bg-[#11161d] rounded-2xl border border-[#405862]/10 shadow-sm p-5 md:p-6"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-4">
-                    <span className="text-sm font-extrabold text-[#4ecdc4] uppercase tracking-wide flex-shrink-0 sm:w-28">
+                    <span className="text-sm font-extrabold text-teal-deep uppercase tracking-wide flex-shrink-0 sm:w-28">
                       {item.time}
                     </span>
                     <div className="flex-1">
@@ -371,7 +371,7 @@ export default function MedXConferenceClient() {
       <section className="py-10 bg-white dark:bg-[#080b0e] border-t border-b border-[#4ecdc4]/20">
         <div className="container max-w-5xl mx-auto px-4 text-center space-y-8">
           <div>
-            <Badge variant="secondary" className="bg-[#f5f1eb] dark:bg-[#161c24] text-[#405862] dark:text-[#4ecdc4] font-bold mb-2">
+            <Badge variant="secondary" className="bg-[#f5f1eb] dark:bg-[#161c24] text-[#405862] dark:text-teal-deep font-bold mb-2">
               Thank You
             </Badge>
             <h3 className="text-2xl font-extrabold text-[#405862] dark:text-white">
@@ -419,7 +419,7 @@ export default function MedXConferenceClient() {
           </div>
 
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto flex items-center justify-center gap-2">
-            <Heart className="h-4 w-4 text-[#4ecdc4] flex-shrink-0" />
+            <Heart className="h-4 w-4 text-teal-deep flex-shrink-0" />
             And to every speaker, volunteer, and student who showed up on August 16th &mdash; thank you.
           </p>
         </div>
@@ -435,10 +435,10 @@ export default function MedXConferenceClient() {
             className="flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-[#11161d] rounded-2xl border border-[#405862]/10 shadow-md p-6 md:p-8 hover:shadow-lg hover:border-[#4ecdc4]/40 transition-all group"
           >
             <div className="w-14 h-14 rounded-xl bg-[#4ecdc4]/15 flex items-center justify-center flex-shrink-0">
-              <Newspaper className="h-7 w-7 text-[#405862] dark:text-[#4ecdc4]" />
+              <Newspaper className="h-7 w-7 text-[#405862] dark:text-teal-deep" />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <p className="text-xs font-bold uppercase tracking-wide text-[#4ecdc4] mb-1">As Featured In insauga</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-teal-deep mb-1">As Featured In insauga</p>
               <p className="font-bold text-[#405862] dark:text-white text-base md:text-lg leading-snug">
                 &ldquo;Mississauga teen starts global organization helping students explore healthcare careers&rdquo;
               </p>
@@ -453,7 +453,7 @@ export default function MedXConferenceClient() {
       <section className="py-12 md:py-16 bg-gradient-to-r from-[#405862] via-[#334852] to-[#405862] text-white">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="text-center space-y-3 mb-8">
-            <Award className="h-8 w-8 text-[#4ecdc4] mx-auto" />
+            <Award className="h-8 w-8 text-teal-deep mx-auto" />
             <h3 className="text-2xl md:text-3xl font-black">Don&apos;t Miss What&apos;s Next</h3>
             <p className="text-white/80 max-w-xl mx-auto text-sm md:text-base">
               Registration for MedExplore 2026 is closed, but that&apos;s not the end. Follow along and be the

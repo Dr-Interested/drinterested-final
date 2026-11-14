@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: "Dr. Interested Privacy Policy",
       },
     ],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     description:
       "Read Dr. Interested's Privacy Policy to understand how we collect, use, and protect your personal information.",
     images: {
-      url: "/websitebanner.jpg",
+      url: "/og-2026.jpg",
       alt: "Dr. Interested Privacy Policy",
     },
   },

@@ -38,7 +38,7 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
           <motion.h1 {...rise(0.05)} className="text-[2.1rem] leading-[1.08] font-semibold text-ink sm:text-5xl lg:text-[3.4rem]">
             Where young people find their place in <span className="scribble">wellness</span>.
           </motion.h1>
-          <motion.p {...rise(0.12)} className="mt-4 max-w-xl text-base leading-relaxed text-ink/75 sm:text-lg">
+          <motion.p {...rise(0.12)} className="mt-4 max-w-xl text-base leading-relaxed text-ink/85 sm:text-lg">
             We&apos;re a youth led global organization. We help young people explore wellness careers, from health and
             medicine to law and finance, get a voice in the rooms where policy is made, and find a community that
             feels like theirs. Free, always.
@@ -62,7 +62,7 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
             </a>
             <Link
               href="/impact-report"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/80 underline decoration-teal decoration-2 underline-offset-4 hover:text-ink"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/85 underline decoration-teal decoration-2 underline-offset-4 hover:text-ink"
             >
               <FileText className="h-4 w-4" />
               {IMPACT_REPORT_2026.shortTitle}
@@ -77,7 +77,7 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
               <div key={l}>
                 <dt className="sr-only">{l}</dt>
                 <dd className="font-display text-xl font-semibold text-ink sm:text-2xl">{n}</dd>
-                <dd className="text-xs leading-snug text-ink/60">{l}</dd>
+                <dd className="text-xs leading-snug text-ink/85">{l}</dd>
               </div>
             ))}
           </motion.dl>
@@ -103,7 +103,7 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
           </div>
           <div className="absolute -right-2 bottom-4 rounded-2xl bg-white px-4 py-3 shadow-lg ring-1 ring-black/5 sm:-right-4 md:-bottom-4">
             <p className="font-display text-lg font-semibold leading-none text-ink">{ALL_TIME.volunteerHours}</p>
-            <p className="mt-1 text-[11px] text-ink/60">volunteer hours given</p>
+            <p className="mt-1 text-[11px] text-ink/85">volunteer hours given</p>
           </div>
         </motion.div>
       </div>

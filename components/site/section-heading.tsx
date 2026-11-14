@@ -23,7 +23,7 @@ export function SectionHeading({
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-teal-deep">{eyebrow}</p>
       )}
       <Tag className="text-2xl md:text-3xl font-semibold text-ink leading-tight">{title}</Tag>
-      {children && <div className="mt-2 text-ink/70 text-[15px] leading-relaxed max-w-2xl">{children}</div>}
+      {children && <div className="mt-2 text-ink/85 text-[15px] leading-relaxed max-w-2xl">{children}</div>}
     </div>
   )
 }

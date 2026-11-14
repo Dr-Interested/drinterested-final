@@ -18,10 +18,10 @@ export function PhotoStrip({
   className?: string
 }) {
   return (
-    <Marquee reverse={reverse} duration={duration} className={className}>
+    <Marquee reverse={reverse} duration={duration} className={className} controls label="event photos">
       {photos.map((ph, i) => (
-        <figure key={`${ph.src}-${i}`} className={cn("relative mx-1.5 aspect-[4/3] shrink-0 overflow-hidden rounded-xl bg-cream", height)}>
-          <Image src={ph.src} alt={ph.alt} fill sizes="320px" className="object-cover" />
+        <figure key={`${ph.src}-${i}`} className={cn("group/photo relative mx-1.5 aspect-[4/3] shrink-0 overflow-hidden rounded-xl bg-cream", height)}>
+          <Image src={ph.src} alt={ph.alt} fill sizes="320px" className="object-cover transition-transform duration-700 group-hover/photo:scale-105" />
           {ph.caption && (
             <figcaption className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-medium text-ink shadow-sm">
               {ph.caption}

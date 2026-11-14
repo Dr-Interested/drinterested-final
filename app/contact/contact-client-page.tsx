@@ -1,6 +1,8 @@
 "use client"
 
 import type React from "react"
+import { PhotoTrio } from "@/components/site/photo-trio"
+import { PHOTOS } from "@/lib/media"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -197,10 +199,11 @@ export default function ContactClientPage() {
         <div className="container">
           <motion.div className="text-center" initial="hidden" animate="visible" variants={fadeIn}>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#405862]">Contact Us</h1>
-            <p className="text-lg text-[#405862]/80 mt-3 max-w-2xl mx-auto">
+            <p className="text-lg text-[#405862]/90 mt-3 max-w-2xl mx-auto">
               Questions, partnerships, or media inquiries? We&apos;d love to hear from you.
             </p>
           </motion.div>
+          <PhotoTrio className="mt-8" photos={[PHOTOS.community[2], PHOTOS.community[1], PHOTOS.community[0]]} priority />
         </div>
       </section>
 
@@ -217,31 +220,31 @@ export default function ContactClientPage() {
                 Get in Touch
                 <div className="w-10 h-1 bg-[#4ecdc4] ml-3"></div>
               </h2>
-              <p className="text-[#405862]/80 text-sm mb-6">
+              <p className="text-[#405862]/90 text-sm mb-6">
                 Whether you have questions about our events, want to collaborate, or are interested in joining our team,
                 we're here to help.
               </p>
 
               <div className="space-y-5">
                 <div className="flex items-start gap-3 p-3 rounded-lg border border-[#405862]/10 hover:border-[#4ecdc4]/30 hover:bg-[#f5f1eb]/30 transition-all duration-300">
-                  <Mail className="h-5 w-5 text-[#4ecdc4] mt-0.5" />
+                  <Mail className="h-5 w-5 text-teal-deep mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-[#405862] text-sm">Email</h3>
-                    <p className="text-[#405862]/80 text-sm">admin@drinterested.org</p>
-                    <p className="text-xs text-[#405862]/60 mt-1">We'll respond within 48 hours</p>
+                    <p className="text-[#405862]/90 text-sm">admin@drinterested.org</p>
+                    <p className="text-xs text-[#405862]/85 mt-1">We'll respond within 48 hours</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 rounded-lg border border-[#405862]/10 hover:border-[#4ecdc4]/30 hover:bg-[#f5f1eb]/30 transition-all duration-300">
-                  <MapPin className="h-5 w-5 text-[#4ecdc4] mt-0.5" />
+                  <MapPin className="h-5 w-5 text-teal-deep mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-[#405862] text-sm">Find us on our Discord space!</h3>
-                    <p className="text-[#405862]/80 text-sm">Connect with our community</p>
+                    <p className="text-[#405862]/90 text-sm">Connect with our community</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 rounded-lg border border-[#405862]/10 hover:border-[#4ecdc4]/30 hover:bg-[#f5f1eb]/30 transition-all duration-300">
-                  <Phone className="h-5 w-5 text-[#4ecdc4] mt-0.5" />
+                  <Phone className="h-5 w-5 text-teal-deep mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-[#405862] text-sm">Follow Us</h3>
                     <div className="flex space-x-3 mt-2">
@@ -249,7 +252,8 @@ export default function ContactClientPage() {
                         href="https://www.instagram.com/dr.interested/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on Instagram"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Instagram className="h-5 w-5" />
                       </a>
@@ -257,7 +261,8 @@ export default function ContactClientPage() {
                         href="https://www.linkedin.com/company/dr-interested/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on LinkedIn"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Linkedin className="h-5 w-5" />
                       </a>
@@ -265,7 +270,8 @@ export default function ContactClientPage() {
                         href="https://www.facebook.com/profile.php?id=61572438387454"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on Facebook"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Facebook className="h-5 w-5" />
                       </a>
@@ -273,7 +279,8 @@ export default function ContactClientPage() {
                         href="https://www.youtube.com/@Dr.Interested"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on YouTube"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Youtube className="h-5 w-5" />
                       </a>
@@ -281,7 +288,8 @@ export default function ContactClientPage() {
                         href="https://open.spotify.com/show/6SLlRUL6co6fPxckAdrigf"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on Spotify"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Music2 className="h-5 w-5" />
                       </a>
@@ -289,7 +297,8 @@ export default function ContactClientPage() {
                         href="https://www.tiktok.com/@dr.interested"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on TikTok"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Video className="h-5 w-5" />
                       </a>
@@ -297,7 +306,8 @@ export default function ContactClientPage() {
                         href="https://discord.gg/pzbGRgsGXY"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on Discord"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <MessageSquare className="h-5 w-5" />
                       </a>
@@ -305,7 +315,8 @@ export default function ContactClientPage() {
                         href="https://www.threads.com/@dr.interested"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on Threads"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Threads className="h-5 w-5" />
                       </a>
@@ -313,7 +324,8 @@ export default function ContactClientPage() {
                         href="https://bsky.app/profile/drinterested.org"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on Bluesky"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Layers className="h-5 w-5" />
                       </a>
@@ -321,7 +333,8 @@ export default function ContactClientPage() {
                         href="https://mastodon.social/@drinterested"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on Mastodon"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Cloud className="h-5 w-5" />
                       </a>
@@ -329,7 +342,8 @@ export default function ContactClientPage() {
                         href="https://x.com/Dr_Interested_"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/80 hover:text-[#4ecdc4] transition-colors hover:scale-110 duration-200"
+                        aria-label="Dr. Interested on X"
+                        className="text-[#405862]/90 hover:text-teal-deep transition-colors hover:scale-110 duration-200"
                       >
                         <Twitter className="h-5 w-5" />
                       </a>
@@ -448,10 +462,10 @@ export default function ContactClientPage() {
           <div className="rounded-2xl border border-[#405862]/10 bg-[#f5f1eb]/40 p-6 md:p-8 grid md:grid-cols-[1fr_1fr] gap-8">
             <div>
               <h2 className="text-xl font-bold text-[#405862] flex items-center gap-2 mb-3">
-                <Newspaper className="h-5 w-5 text-[#4ecdc4]" />
+                <Newspaper className="h-5 w-5 text-teal-deep" />
                 Media Inquiries
               </h2>
-              <p className="text-sm text-[#405862]/80 mb-4">
+              <p className="text-sm text-[#405862]/90 mb-4">
                 Journalists, podcasters, and event organizers: email us with &ldquo;Media Inquiry&rdquo; in the subject
                 line and we will connect you with the right person, usually within 48 hours.
               </p>
@@ -462,7 +476,7 @@ export default function ContactClientPage() {
                 <Mail className="h-4 w-4" />
                 admin@drinterested.org
               </a>
-              <div className="mt-5 text-sm text-[#405862]/80 space-y-1">
+              <div className="mt-5 text-sm text-[#405862]/90 space-y-1">
                 <p className="font-semibold text-[#405862]">Who speaks for us</p>
                 <p>Adil Mukhi, Executive Director and Founder</p>
                 <p>Lakshya Jain and Ryan Rawal, Organization Spokespeople</p>
@@ -472,37 +486,37 @@ export default function ContactClientPage() {
               <p className="font-semibold text-[#405862] text-sm mb-3">Press resources</p>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href={IMPACT_REPORT_2026.path} target="_blank" rel="noopener" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
-                    <FileText className="h-4 w-4 text-[#4ecdc4]" />
+                  <a href={IMPACT_REPORT_2026.path} target="_blank" rel="noopener" className="inline-flex items-center gap-2 text-[#405862] hover:text-teal-deep">
+                    <FileText className="h-4 w-4 text-teal-deep" />
                     {IMPACT_REPORT_2026.title} (PDF)
                   </a>
                 </li>
                 <li>
-                  <Link href="/impact-report" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
-                    <FileText className="h-4 w-4 text-[#4ecdc4]" />
+                  <Link href="/impact-report" className="inline-flex items-center gap-2 text-[#405862] hover:text-teal-deep">
+                    <FileText className="h-4 w-4 text-teal-deep" />
                     Key numbers and fact sheet
                   </Link>
                 </li>
                 <li>
-                  <Link href="/our-work/in-the-media" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
-                    <Newspaper className="h-4 w-4 text-[#4ecdc4]" />
+                  <Link href="/our-work/in-the-media" className="inline-flex items-center gap-2 text-[#405862] hover:text-teal-deep">
+                    <Newspaper className="h-4 w-4 text-teal-deep" />
                     Past coverage: In the Media
                   </Link>
                 </li>
                 <li>
-                  <a href="/logo.png" target="_blank" rel="noopener" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
-                    <Globe className="h-4 w-4 text-[#4ecdc4]" />
+                  <a href="/logo.png" target="_blank" rel="noopener" className="inline-flex items-center gap-2 text-[#405862] hover:text-teal-deep">
+                    <Globe className="h-4 w-4 text-teal-deep" />
                     Logo (PNG)
                   </a>
                 </li>
                 <li>
-                  <Link href="/sponsorships#legal-status" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
-                    <FileText className="h-4 w-4 text-[#4ecdc4]" />
+                  <Link href="/sponsorships#legal-status" className="inline-flex items-center gap-2 text-[#405862] hover:text-teal-deep">
+                    <FileText className="h-4 w-4 text-teal-deep" />
                     Legal status
                   </Link>
                 </li>
               </ul>
-              <p className="text-xs text-[#405862]/60 mt-4">
+              <p className="text-xs text-[#405862]/85 mt-4">
                 Photos and video of participants under 18 are only shared with signed parent or guardian consent. See
                 our{" "}
                 <Link href="/media-consent" className="underline">
@@ -519,10 +533,10 @@ export default function ContactClientPage() {
       <section id="profiles-hub" className="py-10 bg-white scroll-mt-20">
         <div className="container max-w-5xl">
           <h2 className="text-xl font-bold text-[#405862] flex items-center gap-2 mb-2">
-            <Globe className="h-5 w-5 text-[#4ecdc4]" />
+            <Globe className="h-5 w-5 text-teal-deep" />
             Profiles Hub
           </h2>
-          <p className="text-sm text-[#405862]/80 mb-6">
+          <p className="text-sm text-[#405862]/90 mb-6">
             Every official Dr. Interested profile, membership, and listing in one place. If an account is not here, it
             is not us.
           </p>
@@ -535,7 +549,7 @@ export default function ContactClientPage() {
             ] as const
           ).map(([group, label]) => (
             <div key={group} className="mb-6">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-[#405862]/60 mb-2">{label}</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-[#405862]/85 mb-2">{label}</h3>
               <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {PROFILES.filter((p) => p.group === group).map((p) => (
                   <li key={p.url}>
@@ -582,7 +596,7 @@ export default function ContactClientPage() {
               <Card className="border-[#405862]/10 hover:border-[#4ecdc4]/30 hover:shadow-md transition-all duration-300">
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-2 text-[#405862] text-sm">How can I join Dr. Interested?</h3>
-                  <p className="text-[#405862]/80 text-xs">
+                  <p className="text-[#405862]/90 text-xs">
                     Join our Discord to become a member. To join the team as a general executive, general volunteer,
                     ambassador, or podcast member, apply through our one application link on the Join page. Applications
                     are open year round.
@@ -595,7 +609,7 @@ export default function ContactClientPage() {
               <Card className="border-[#405862]/10 hover:border-[#4ecdc4]/30 hover:shadow-md transition-all duration-300">
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-2 text-[#405862] text-sm">Do I need a healthcare background to join?</h3>
-                  <p className="text-[#405862]/80 text-xs">
+                  <p className="text-[#405862]/90 text-xs">
                     Not at all! We are a wellness organization: we cover health, law, finance, and any career that
                     improves wellbeing, and we recruit across finance, tech, design, outreach, events, and education.
                   </p>
@@ -607,7 +621,7 @@ export default function ContactClientPage() {
               <Card className="border-[#405862]/10 hover:border-[#4ecdc4]/30 hover:shadow-md transition-all duration-300">
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-2 text-[#405862] text-sm">Are your events only for members?</h3>
-                  <p className="text-[#405862]/80 text-xs">
+                  <p className="text-[#405862]/90 text-xs">
                     Most of our webinars and educational events are open to all interested students. Some special events
                     may be member-exclusive (meaning they would only be offered to the people on our Discord).
                   </p>
@@ -621,7 +635,7 @@ export default function ContactClientPage() {
                   <h3 className="font-semibold mb-2 text-[#405862] text-sm">
                     How many schools collaborate with Dr. Interested?
                   </h3>
-                  <p className="text-[#405862]/80 text-xs">
+                  <p className="text-[#405862]/90 text-xs">
                     We're always open to school partnerships and currently work with several high schools. Contact our
                     Outreach Department for potential collaborations.
                   </p>

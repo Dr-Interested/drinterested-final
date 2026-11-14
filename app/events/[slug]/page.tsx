@@ -72,7 +72,7 @@ export default async function RecapPage({ params }: { params: Promise<{ slug: st
       <header className="bg-gradient-to-b from-cream to-white">
         <div className="container grid items-center gap-8 py-8 md:grid-cols-[1.1fr_1fr] md:py-12">
           <div>
-            <Link href="/events" className="mb-4 inline-flex items-center gap-1 text-sm text-ink/60 hover:text-ink">
+            <Link href="/events" className="mb-4 inline-flex items-center gap-1 text-sm text-ink/85 hover:text-ink">
               <ArrowLeft className="h-4 w-4" />
               All events
             </Link>
@@ -85,8 +85,8 @@ export default async function RecapPage({ params }: { params: Promise<{ slug: st
               ))}
             </div>
             <h1 className="text-3xl font-semibold leading-tight text-ink md:text-[2.6rem]">{r.title}</h1>
-            <p className="mt-3 text-base leading-relaxed text-ink/75 md:text-lg">{r.summary}</p>
-            <ul className="mt-5 space-y-1.5 text-sm text-ink/75">
+            <p className="mt-3 text-base leading-relaxed text-ink/85 md:text-lg">{r.summary}</p>
+            <ul className="mt-5 space-y-1.5 text-sm text-ink/85">
               <li className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-teal-deep" />
                 {r.date}
@@ -116,7 +116,7 @@ export default async function RecapPage({ params }: { params: Promise<{ slug: st
             <div key={l}>
               <dt className="sr-only">{l}</dt>
               <dd className="font-display text-2xl font-semibold md:text-3xl">{n}</dd>
-              <dd className="text-xs text-white/70">{l}</dd>
+              <dd className="text-xs text-white/80">{l}</dd>
             </div>
           ))}
         </dl>
@@ -196,7 +196,7 @@ export default async function RecapPage({ params }: { params: Promise<{ slug: st
             <blockquote className="font-display text-xl font-medium leading-snug text-ink md:text-2xl">
               &ldquo;{r.quote.quote}&rdquo;
             </blockquote>
-            <figcaption className="mt-3 text-sm text-ink/60">{r.quote.who}</figcaption>
+            <figcaption className="mt-3 text-sm text-ink/85">{r.quote.who}</figcaption>
           </Reveal>
         </section>
       )}
@@ -218,7 +218,7 @@ export default async function RecapPage({ params }: { params: Promise<{ slug: st
                   <Image src={o.cover.src} alt={o.cover.alt} fill sizes="25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
                 </div>
                 <div className="p-3">
-                  <p className="text-[11px] text-ink/60">{o.date}</p>
+                  <p className="text-[11px] text-ink/85">{o.date}</p>
                   <p className="text-sm font-semibold leading-snug text-ink">{o.short}</p>
                 </div>
               </Link>

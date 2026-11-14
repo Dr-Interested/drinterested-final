@@ -19,7 +19,7 @@ export default function LatestEventSection({ latestEvent }: { latestEvent: any }
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-teal-deep">Coming up</p>
                 <h2 className="text-2xl md:text-3xl font-semibold text-ink">Our next event</h2>
               </div>
-              <Link href="/events" className="text-[#405862] hover:text-[#4ecdc4] text-sm flex items-center group">
+              <Link href="/events" className="text-[#405862] hover:text-teal-deep text-sm flex items-center group">
                 <span>View all events</span>
                 <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
@@ -59,26 +59,26 @@ export default function LatestEventSection({ latestEvent }: { latestEvent: any }
                               ? "Registration Closed"
                               : "Completed"}
                       </div>
-                      <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+                      <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors">
                         {latestEvent.title}
                       </h3>
                       <div className="space-y-1.5 mb-3">
-                        <div className="flex items-center text-sm text-[#405862]/80">
-                          <Calendar className="h-4 w-4 mr-2 text-[#4ecdc4]" />
+                        <div className="flex items-center text-sm text-[#405862]/90">
+                          <Calendar className="h-4 w-4 mr-2 text-teal-deep" />
                           {latestEvent.date}
                         </div>
                         {latestEvent.time && (
-                          <div className="flex items-center text-sm text-[#405862]/80">
-                            <Clock className="h-4 w-4 mr-2 text-[#4ecdc4]" />
+                          <div className="flex items-center text-sm text-[#405862]/90">
+                            <Clock className="h-4 w-4 mr-2 text-teal-deep" />
                             {latestEvent.time}
                           </div>
                         )}
-                        <div className="flex items-center text-sm text-[#405862]/80">
-                          <MapPin className="h-4 w-4 mr-2 text-[#4ecdc4]" />
+                        <div className="flex items-center text-sm text-[#405862]/90">
+                          <MapPin className="h-4 w-4 mr-2 text-teal-deep" />
                           {latestEvent.location}
                         </div>
                       </div>
-                      <p className="text-[#405862]/80 text-sm mb-5 line-clamp-2">{latestEvent.description}</p>
+                      <p className="text-[#405862]/90 text-sm mb-5 line-clamp-2">{latestEvent.description}</p>
                     </div>
                     <div className="mt-auto">
                       {latestEvent.status === "open" ? (
@@ -103,7 +103,7 @@ export default function LatestEventSection({ latestEvent }: { latestEvent: any }
                         </Button>
                       ) : (
                         <Button
-                          className="w-full bg-[#405862]/20 text-[#405862]/50 cursor-not-allowed"
+                          className="w-full bg-[#405862]/20 text-[#405862]/85 cursor-not-allowed"
                           disabled
                         >
                           <AlertCircle className="mr-2 h-4 w-4" />

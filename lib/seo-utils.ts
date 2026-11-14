@@ -25,7 +25,7 @@ export function generateSeoMetadata(config: SEOConfig): Metadata {
     title,
     description,
     keywords = [],
-    image = "/websitebanner.jpg",
+    image = "/og-2026.jpg",
     url,
     type = "website",
     publishedTime,
@@ -101,7 +101,7 @@ export function generateOrganizationSchema() {
     description: `${ORG_ONE_LINER} Across 2025 and 2026 we have impacted ${ALL_TIME.youthImpacted} youth in ${ALL_TIME.countries} countries and territories, with ${ALL_TIME.members} members and ${ALL_TIME.executives} executives. ${LEGAL_STATUS.short}`,
     url: "https://www.drinterested.org",
     logo: "https://www.drinterested.org/android-chrome-512x512.png",
-    image: "https://www.drinterested.org/websitebanner.jpg",
+    image: "https://www.drinterested.org/og-2026.jpg",
     foundingDate: "2024",
     founder: {
       "@type": "Person",

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
         alt: "Adil Mukhi - Executive Director, Dr. Interested",
       },
       {
-        url: "https://www.drinterested.org/websitebanner.jpg",
+        url: "https://www.drinterested.org/og-2026.jpg",
         width: 1920,
         height: 1080,
         alt: "Dr. Interested Team",

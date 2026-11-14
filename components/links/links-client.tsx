@@ -161,17 +161,17 @@ export default function LinksPageClient() {
             />
           </div>
           <h1 className="text-2xl font-bold text-[#405862] text-center">
-            Dr. <span className="text-[#4ecdc4]">Interested</span>
+            Dr. <span className="text-teal-deep">Interested</span>
           </h1>
-          <p className="text-[#405862]/80 text-center mt-2 text-sm max-w-xs">
+          <p className="text-[#405862]/90 text-center mt-2 text-sm max-w-xs">
             A youth led global wellness organization
           </p>
 
           <div className="flex items-center mt-3 text-sm bg-[#f0ebe3] rounded-full px-3 py-1.5">
-            <span className="text-[#405862]/70 mr-2">www.drinterested.org/links</span>
+            <span className="text-[#405862]/85 mr-2">www.drinterested.org/links</span>
             <button
               onClick={copyToClipboard}
-              className="text-[#4ecdc4] hover:text-[#3dbdb5] transition-colors"
+              className="text-teal-deep hover:text-[#3dbdb5] transition-colors"
               aria-label="Copy link to clipboard"
             >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -204,20 +204,20 @@ export default function LinksPageClient() {
         </motion.div>
 
         <motion.div
-          className="mt-10 text-center text-sm text-[#405862]/60"
+          className="mt-10 text-center text-sm text-[#405862]/85"
           initial={{ opacity: 0 }}
           animate={isLoaded ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 1, duration: 0.6 }}
         >
           <p>© {new Date().getFullYear()} Dr. Interested</p>
           <div className="flex justify-center space-x-3 mt-2">
-            <Link href="/privacy-policy" className="hover:text-[#4ecdc4] transition-colors">
+            <Link href="/privacy-policy" className="hover:text-teal-deep transition-colors">
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-[#4ecdc4] transition-colors">
+            <Link href="/terms" className="hover:text-teal-deep transition-colors">
               Terms
             </Link>
-            <Link href="/contact" className="hover:text-[#4ecdc4] transition-colors">
+            <Link href="/contact" className="hover:text-teal-deep transition-colors">
               Contact
             </Link>
           </div>

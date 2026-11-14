@@ -26,7 +26,7 @@ const config = {
       colors: {
         // Brand palette, shared with the impact report and Instagram.
         ink: { DEFAULT: "#405862", deep: "#2b3f47", soft: "#5d7680" },
-        teal: { DEFAULT: "#4ecdc4", deep: "#2d8a83", wash: "#e3f6f4" },
+        teal: { DEFAULT: "#4ecdc4", deep: "#23736d", wash: "#e3f6f4" },
         cream: { DEFAULT: "#f5f1eb", deep: "#ebe4d8" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

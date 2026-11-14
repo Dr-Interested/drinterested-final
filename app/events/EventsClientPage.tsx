@@ -21,7 +21,7 @@ function RegisterButton({ event }: { event: any }) {
     )
   const label = event.status === "full" ? "Registration full" : event.status === "closed" ? "Registration closed" : "Details coming soon"
   return (
-    <span className={`${base} bg-ink/10 text-ink/60`}>
+    <span className={`${base} bg-ink/10 text-ink/85`}>
       <AlertCircle className="h-3.5 w-3.5" />
       {label}
     </span>
@@ -38,7 +38,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
       <section className="overflow-hidden bg-gradient-to-b from-cream to-white pt-8 md:pt-12">
         <div className="container">
           <h1 className="text-3xl font-semibold text-ink md:text-5xl">Events</h1>
-          <p className="mt-3 max-w-2xl text-base text-ink/75 md:text-lg">
+          <p className="mt-3 max-w-2xl text-base text-ink/85 md:text-lg">
             Free events across our three pillars: wellness career education, access to policy spaces, and community
             spaces. We ran {YEAR_2026.events} of them in 2026 alone.
           </p>
@@ -53,7 +53,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
         <div className="container">
           <SectionHeading eyebrow="Upcoming" title="What's next" />
           {upcomingEvents.length === 0 ? (
-            <p className="rounded-2xl bg-cream/70 p-5 text-sm text-ink/75">
+            <p className="rounded-2xl bg-cream/70 p-5 text-sm text-ink/85">
               Nothing announced right now. New events land in our newsletter and Discord first.
             </p>
           ) : (
@@ -65,7 +65,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
                   </div>
                   <div className="flex flex-1 flex-col p-4">
                     <h3 className="font-semibold leading-snug text-ink">{event.title}</h3>
-                    <ul className="mt-2 space-y-1 text-xs text-ink/70">
+                    <ul className="mt-2 space-y-1 text-xs text-ink/85">
                       <li className="flex items-center gap-1.5">
                         <CalendarDays className="h-3.5 w-3.5 text-teal-deep" />
                         {event.date}
@@ -81,7 +81,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
                         {event.location}
                       </li>
                     </ul>
-                    <p className="mt-2 line-clamp-3 flex-1 text-xs text-ink/70">{event.description}</p>
+                    <p className="mt-2 line-clamp-3 flex-1 text-xs text-ink/85">{event.description}</p>
                     <div className="mt-4">
                       <RegisterButton event={event} />
                     </div>
@@ -116,7 +116,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
                     <Image src={r.cover.src} alt={r.cover.alt} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
                   </div>
                   <div className="p-3">
-                    <p className="text-[11px] text-ink/60">{r.date}</p>
+                    <p className="text-[11px] text-ink/85">{r.date}</p>
                     <p className="text-sm font-semibold leading-snug text-ink">{r.short}</p>
                   </div>
                 </Link>
@@ -142,7 +142,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-ink md:text-base">{event.title}</p>
-                      <p className="text-xs text-ink/60">{event.date}</p>
+                      <p className="text-xs text-ink/85">{event.date}</p>
                     </div>
                     {href && (
                       <Link
@@ -168,7 +168,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
           <div className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-ink p-6 text-white md:flex-row md:items-center">
             <div>
               <h2 className="text-xl font-semibold md:text-2xl">Hear about the next one first</h2>
-              <p className="mt-1 text-sm text-white/75">New events land on Discord and in our newsletter before anywhere else.</p>
+              <p className="mt-1 text-sm text-white/80">New events land on Discord and in our newsletter before anywhere else.</p>
             </div>
             <a
               href="https://discord.gg/pzbGRgsGXY"
@@ -183,7 +183,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
         </div>
       </section>
 
-      <p className="media-consent-note px-4 py-4 text-center text-xs text-ink/50">
+      <p className="media-consent-note px-4 py-4 text-center text-xs text-ink/85">
         Attendees under 18 need a parent or guardian&apos;s consent for photos and video at our events. See our{" "}
         <Link href="/media-consent" className="underline hover:text-ink">
           Media Consent and Release
