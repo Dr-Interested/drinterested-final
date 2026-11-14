@@ -128,6 +128,22 @@ const nextConfig = {
         destination: "/members/apply",
         permanent: true,
       },
+      // The 2026 Impact Report links here.
+      {
+        source: "/members/join",
+        destination: "/members/apply",
+        permanent: true,
+      },
+      {
+        source: "/impact-report/2026",
+        destination: "/impact-report",
+        permanent: false,
+      },
+      {
+        source: "/in-the-media",
+        destination: "/our-work/in-the-media",
+        permanent: true,
+      },
       {
         source: "/medexplore-2026",
         destination: "/medx-2026",

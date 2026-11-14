@@ -59,7 +59,7 @@ export default function MemberCard({ member }: MemberCardProps) {
   // Derive tags/departments
   const departmentTags = member.department
     ? member.department.replace(/Department|Board/gi, "").trim()
-    : "Healthcare | Education | Leadership"
+    : "Wellness | Policy | Community"
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-6 md:py-12 px-4">
@@ -154,7 +154,7 @@ export default function MemberCard({ member }: MemberCardProps) {
 
                 {/* Tagline */}
                 <p className="text-xs md:text-sm text-[#405862]/70 italic pt-1">
-                  Inspiring and supporting students on their path to healthcare careers.
+                  Helping youth explore wellness careers, reach policy spaces, and find community.
                 </p>
 
                 {/* Department / Skill Tags */}

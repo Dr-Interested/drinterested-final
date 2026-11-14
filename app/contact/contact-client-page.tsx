@@ -22,9 +22,16 @@ import {
   AtSign as Threads,
   Cloud, // Mastodon
   Layers, // Bluesky
-  Twitter
+  Twitter,
+  Newspaper,
+  Globe,
+  FileText,
+  ExternalLink,
 } from "lucide-react"
 import SeoSchema from "@/components/seo-schema"
+import Link from "next/link"
+import { PROFILES } from "@/data/media-features"
+import { IMPACT_REPORT_2026 } from "@/lib/impact-stats"
 import { motion } from "framer-motion"
 
 export default function ContactClientPage() {
@@ -110,14 +117,18 @@ export default function ContactClientPage() {
     "@type": "ContactPage",
     name: "Contact Dr. Interested",
     description:
-      "Get in touch with Dr. Interested for questions about our events, collaborations, or joining our team.",
+      "Contact Dr. Interested about our programs, partnerships, media inquiries, or joining our team, and find every official profile in our Profiles Hub.",
     url: "https://www.drinterested.org/contact",
     mainEntity: {
       "@type": "Organization",
       name: "Dr. Interested",
       email: "admin@drinterested.org",
       url: "https://www.drinterested.org",
-      sameAs: ["https://www.instagram.com/dr.interested/", "https://www.linkedin.com/company/dr-interested"],
+      sameAs: PROFILES.map((p) => p.url),
+      contactPoint: [
+        { "@type": "ContactPoint", contactType: "General Inquiry", email: "admin@drinterested.org" },
+        { "@type": "ContactPoint", contactType: "Media Inquiries", email: "admin@drinterested.org" },
+      ],
     },
   }
 
@@ -132,15 +143,15 @@ export default function ContactClientPage() {
         name: "How can I join Dr. Interested?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Join our Discord to become a regular member, follow us on Instagram, and stay active on Discord to be the first to know when executive applications open!",
+          text: "Join our Discord to become a member. To join the team as a general executive, general volunteer, ambassador, or podcast member, apply through our one application link on the Join page. Applications are open year round.",
         },
       },
       {
         "@type": "Question",
-        name: "Do I need to be pre-med to join?",
+        name: "Do I need a healthcare background to join?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Not at all! We welcome all high school students interested in healthcare, regardless of their future career plans.",
+          text: "Not at all! We are a wellness organization: we cover health, law, finance, and any career that improves wellbeing, and we recruit across finance, tech, design, outreach, events, and education.",
         },
       },
       {
@@ -187,7 +198,7 @@ export default function ContactClientPage() {
           <motion.div className="text-center" initial="hidden" animate="visible" variants={fadeIn}>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#405862]">Contact Us</h1>
             <p className="text-lg text-[#405862]/80 mt-3 max-w-2xl mx-auto">
-              Have questions or want to get involved? We'd love to hear from you!
+              Questions, partnerships, or media inquiries? We&apos;d love to hear from you.
             </p>
           </motion.div>
         </div>
@@ -431,6 +442,120 @@ export default function ContactClientPage() {
         </div>
       </section>
 
+      {/* Media inquiries */}
+      <section id="media-inquiries" className="py-10 bg-white scroll-mt-20">
+        <div className="container max-w-5xl">
+          <div className="rounded-2xl border border-[#405862]/10 bg-[#f5f1eb]/40 p-6 md:p-8 grid md:grid-cols-[1fr_1fr] gap-8">
+            <div>
+              <h2 className="text-xl font-bold text-[#405862] flex items-center gap-2 mb-3">
+                <Newspaper className="h-5 w-5 text-[#4ecdc4]" />
+                Media Inquiries
+              </h2>
+              <p className="text-sm text-[#405862]/80 mb-4">
+                Journalists, podcasters, and event organizers: email us with &ldquo;Media Inquiry&rdquo; in the subject
+                line and we will connect you with the right person, usually within 48 hours.
+              </p>
+              <a
+                href="mailto:admin@drinterested.org?subject=Media%20Inquiry"
+                className="inline-flex items-center gap-2 bg-[#405862] text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-[#334852]"
+              >
+                <Mail className="h-4 w-4" />
+                admin@drinterested.org
+              </a>
+              <div className="mt-5 text-sm text-[#405862]/80 space-y-1">
+                <p className="font-semibold text-[#405862]">Who speaks for us</p>
+                <p>Adil Mukhi, Executive Director and Founder</p>
+                <p>Lakshya Jain and Ryan Rawal, Organization Spokespeople</p>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-[#405862] text-sm mb-3">Press resources</p>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href={IMPACT_REPORT_2026.path} target="_blank" rel="noopener" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
+                    <FileText className="h-4 w-4 text-[#4ecdc4]" />
+                    {IMPACT_REPORT_2026.title} (PDF)
+                  </a>
+                </li>
+                <li>
+                  <Link href="/impact-report" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
+                    <FileText className="h-4 w-4 text-[#4ecdc4]" />
+                    Key numbers and fact sheet
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/our-work/in-the-media" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
+                    <Newspaper className="h-4 w-4 text-[#4ecdc4]" />
+                    Past coverage: In the Media
+                  </Link>
+                </li>
+                <li>
+                  <a href="/logo.png" target="_blank" rel="noopener" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
+                    <Globe className="h-4 w-4 text-[#4ecdc4]" />
+                    Logo (PNG)
+                  </a>
+                </li>
+                <li>
+                  <Link href="/sponsorships#legal-status" className="inline-flex items-center gap-2 text-[#405862] hover:text-[#2d8659]">
+                    <FileText className="h-4 w-4 text-[#4ecdc4]" />
+                    Legal status
+                  </Link>
+                </li>
+              </ul>
+              <p className="text-xs text-[#405862]/60 mt-4">
+                Photos and video of participants under 18 are only shared with signed parent or guardian consent. See
+                our{" "}
+                <Link href="/media-consent" className="underline">
+                  Media Consent
+                </Link>{" "}
+                policy.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Profiles hub */}
+      <section id="profiles-hub" className="py-10 bg-white scroll-mt-20">
+        <div className="container max-w-5xl">
+          <h2 className="text-xl font-bold text-[#405862] flex items-center gap-2 mb-2">
+            <Globe className="h-5 w-5 text-[#4ecdc4]" />
+            Profiles Hub
+          </h2>
+          <p className="text-sm text-[#405862]/80 mb-6">
+            Every official Dr. Interested profile, membership, and listing in one place. If an account is not here, it
+            is not us.
+          </p>
+          {(
+            [
+              ["Social", "Social and community"],
+              ["Membership", "Memberships and networks"],
+              ["Directory", "Directories and listings"],
+              ["Research", "Research and publishing"],
+            ] as const
+          ).map(([group, label]) => (
+            <div key={group} className="mb-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-[#405862]/60 mb-2">{label}</h3>
+              <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {PROFILES.filter((p) => p.group === group).map((p) => (
+                  <li key={p.url}>
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-2 rounded-lg border border-[#405862]/10 px-3 py-2 text-sm text-[#405862] hover:border-[#4ecdc4]/50 hover:bg-[#f5f1eb]/50"
+                    >
+                      <span className="truncate" title={p.name}>{p.name}</span>
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-[#405862]/40" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="py-10 bg-[#f5f1eb]/50">
         <div className="container max-w-5xl">
           <motion.div
@@ -458,8 +583,9 @@ export default function ContactClientPage() {
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-2 text-[#405862] text-sm">How can I join Dr. Interested?</h3>
                   <p className="text-[#405862]/80 text-xs">
-                    Join our Discord to become a regular member, follow us on Instagram, and stay active on Discord to
-                    be the first to know when executive applications open!
+                    Join our Discord to become a member. To join the team as a general executive, general volunteer,
+                    ambassador, or podcast member, apply through our one application link on the Join page. Applications
+                    are open year round.
                   </p>
                 </CardContent>
               </Card>
@@ -468,10 +594,10 @@ export default function ContactClientPage() {
             <motion.div variants={fadeIn}>
               <Card className="border-[#405862]/10 hover:border-[#4ecdc4]/30 hover:shadow-md transition-all duration-300">
                 <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2 text-[#405862] text-sm">Do I need to be pre-med to join?</h3>
+                  <h3 className="font-semibold mb-2 text-[#405862] text-sm">Do I need a healthcare background to join?</h3>
                   <p className="text-[#405862]/80 text-xs">
-                    Not at all! We welcome all high school students interested in healthcare, regardless of their future
-                    career plans.
+                    Not at all! We are a wellness organization: we cover health, law, finance, and any career that
+                    improves wellbeing, and we recruit across finance, tech, design, outreach, events, and education.
                   </p>
                 </CardContent>
               </Card>

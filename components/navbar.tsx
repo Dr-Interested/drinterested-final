@@ -10,14 +10,32 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { Menu, Instagram, Linkedin } from "lucide-react"
 import DiscordIcon from "@/components/icons/discord-icon"
 
-const routes = [
+type Route = { href: string; label: string; children?: { href: string; label: string }[] }
+
+const routes: Route[] = [
   { href: "/", label: "Home" },
-  { href: "/our-work", label: "Our Work" },
+  {
+    href: "/our-work",
+    label: "Our Work",
+    children: [
+      { href: "/our-work", label: "Our Programs" },
+      { href: "/impact-report", label: "2026 Impact Report" },
+      { href: "/our-work/in-the-media", label: "In the Media" },
+    ],
+  },
   { href: "/events", label: "Events" },
   { href: "/publications", label: "Publications" },
   { href: "/members", label: "Members" },
   { href: "/sponsorships", label: "Sponsorships" },
-  { href: "/contact", label: "Contact" },
+  {
+    href: "/contact",
+    label: "Contact",
+    children: [
+      { href: "/contact", label: "Contact Us" },
+      { href: "/contact#media-inquiries", label: "Media Inquiries" },
+      { href: "/contact#profiles-hub", label: "Profiles Hub" },
+    ],
+  },
 ]
 
 export default function Navbar() {
@@ -121,11 +139,26 @@ export default function Navbar() {
                       {isActive(route.href) && <div className="w-1 h-4 bg-[#4ecdc4] mr-2 rounded-full"></div>}
                       {route.label}
                     </Link>
-                  ))}
+                  )).flatMap((link, i) => {
+                    const children = routes[i].children?.slice(1) ?? []
+                    return [
+                      link,
+                      ...children.map((c) => (
+                        <Link
+                          key={c.href}
+                          href={c.href}
+                          onClick={() => setIsOpen(false)}
+                          className="ml-6 px-3 py-2 text-sm text-muted-foreground hover:text-[#405862] hover:bg-[#f5f1eb]/50 rounded-md"
+                        >
+                          {c.label}
+                        </Link>
+                      )),
+                    ]
+                  })}
                 </nav>
                 <div className="p-4 border-t mt-auto flex flex-col gap-2">
                   <Link
-                    href="/members/join"
+                    href="/members/apply"
                     className="flex w-full justify-center border border-[#405862] text-[#405862] hover:bg-[#405862]/10 px-4 py-3 rounded-md text-sm font-medium transition-all"
                     onClick={() => setIsOpen(false)}
                   >
@@ -190,24 +223,41 @@ export default function Navbar() {
         </div>
         <nav className="hidden md:flex items-center gap-4">
           {routes.map((route) => (
-            <Link
-              key={route.href}
-              href={route.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-[#405862] relative py-1 px-2 rounded-md",
-                isActive(route.href) ? "text-[#405862] font-bold" : "text-muted-foreground hover:bg-[#f5f1eb]/50",
+            <div key={route.href} className="relative group">
+              <Link
+                href={route.href}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-[#405862] relative py-1 px-2 rounded-md",
+                  isActive(route.href) ? "text-[#405862] font-bold" : "text-muted-foreground hover:bg-[#f5f1eb]/50",
+                )}
+              >
+                {route.label}
+                {isActive(route.href) && (
+                  <span className="absolute -bottom-[5px] left-0 w-full h-0.5 bg-[#4ecdc4] rounded-full"></span>
+                )}
+              </Link>
+              {route.children && (
+                // Opens on hover and on keyboard focus (focus-within), no JavaScript needed.
+                <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-opacity absolute left-0 top-full pt-2 z-50">
+                  <div className="min-w-[190px] rounded-lg border bg-white shadow-lg py-1">
+                    {route.children.map((c) => (
+                      <Link
+                        key={c.href}
+                        href={c.href}
+                        className="block px-4 py-2 text-sm text-[#405862]/80 hover:bg-[#f5f1eb] hover:text-[#405862]"
+                      >
+                        {c.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               )}
-            >
-              {route.label}
-              {isActive(route.href) && (
-                <span className="absolute -bottom-[5px] left-0 w-full h-0.5 bg-[#4ecdc4] rounded-full"></span>
-              )}
-            </Link>
+            </div>
           ))}
         </nav>
         <div className="flex items-center gap-3">
           <Link
-            href="/members/join"
+            href="/members/apply"
             className="hidden md:inline-flex border border-[#405862] text-[#405862] hover:bg-[#405862]/10 px-3 py-1.5 rounded-md text-sm font-medium transition-all hover:shadow-md hover:scale-105 duration-300"
           >
             Join Us

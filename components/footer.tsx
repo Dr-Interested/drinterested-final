@@ -38,8 +38,8 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm mb-4 text-white/80">
-              Inspiring the next generation of healthcare professionals through education, collaboration, and meaningful
-              experiences.
+              A youth led global wellness organization: wellness career education, access to policy spaces, and
+              community spaces for young people everywhere.
             </p>
             <div className="flex space-x-3">
               <Link
@@ -110,13 +110,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="https://impact.drinterested.org/2025/annual"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/80 hover:text-[#4ecdc4] transition-colors"
-                >
-                  2025 Annual Impact Report
+                <Link href="/impact-report" className="text-white/80 hover:text-[#4ecdc4] transition-colors">
+                  2026 Annual Impact Report
+                </Link>
+              </li>
+              <li>
+                <Link href="/our-work/in-the-media" className="text-white/80 hover:text-[#4ecdc4] transition-colors">
+                  In the Media
                 </Link>
               </li>
               <li>
@@ -201,7 +201,8 @@ export default function Footer() {
 
         <div className="mt-8 pt-5 border-t border-[#4f6b75] flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-xs text-white/70 text-center md:text-left order-2 md:order-1">
-            © {new Date().getFullYear()} Dr. Interested. All rights reserved.
+            © {new Date().getFullYear()} Dr. Interested. All rights reserved. A Canadian youth led project; our
+            nonprofit work runs through Future Interested, a fiscally sponsored 501(c)(3).
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs order-1 md:order-2">
@@ -222,6 +223,9 @@ export default function Footer() {
             </Link>
             <Link href="/safeguarding-policy" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
               Safeguarding Policy
+            </Link>
+            <Link href="/sponsorships#legal-status" className="text-white/70 hover:text-[#4ecdc4] transition-colors">
+              Legal Status
             </Link>
             <button
               onClick={scrollToTop}

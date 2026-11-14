@@ -9,7 +9,7 @@ export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 export const metadata: Metadata = generateSeoMetadata({
   title: "Publications",
   description:
-    "Explore Dr. Interested's blog posts, op-eds, and policy work on healthcare education and medical advocacy.",
+    "Explore Dr. Interested's youth written blog posts, op-eds, and policy work on wellness careers, health, and youth voice in policy.",
   url: "https://www.drinterested.org/publications",
   keywords: [
     "healthcare publications",

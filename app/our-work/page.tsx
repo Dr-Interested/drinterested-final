@@ -1,27 +1,27 @@
 import type { Metadata } from "next"
 import OurWorkClient from "@/components/our-work/OurWorkClient"
+import { ALL_TIME } from "@/lib/impact-stats"
 
-const OUR_WORK_DESCRIPTION =
-  "Dr. Interested has impacted 160,000+ youth in 106 countries through healthcare education, mentorship and research competitions. See our impact and programs."
+const OUR_WORK_DESCRIPTION = `${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through wellness career education, access to policy spaces, and community spaces. See our 2026 programs.`
 
 export const metadata: Metadata = {
   title: "Our Work",
   description: OUR_WORK_DESCRIPTION,
   keywords: [
     "Dr. Interested impact",
-    "160000 youth impacted",
-    "3.7 million reached",
-    "youth healthcare programs",
-    "medical education initiatives",
-    "healthcare mentorship",
-    "research competitions",
-    "Resilient Minds Project",
-    "Cards for Nurses",
-    "pre-med community",
-    "healthcare advocacy",
-    "youth leadership",
-    "medical research",
-    "healthcare events",
+    "Dr. Interested 2026",
+    "389000 youth impacted",
+    "youth wellness programs",
+    "wellness career education",
+    "youth in policy",
+    "youth community spaces",
+    "Research Proposal Competition",
+    "Office Hours Initiative",
+    "MedExplore 2026",
+    "Explore 3 Case Competition",
+    "Code Blue Planet",
+    "Simmon Chang Chess Club",
+    "youth mentorship",
   ],
   openGraph: {
     title: "Our Work | Dr. Interested",

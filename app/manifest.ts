@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Dr. Interested - Healthcare Education for High School Students",
+    name: "Dr. Interested: Youth Led Global Wellness Organization",
     short_name: "Dr. Interested",
     description:
-      "Empowering high school students to explore careers in healthcare through education, research, and mentorship. Join our community for volunteer hours and leadership opportunities!",
+      "A youth led global wellness organization: wellness career education, access to policy spaces, and a safe community for young people. Earn verified volunteer hours.",
     start_url: "/",
     display: "standalone",
     background_color: "#f5f1eb",

@@ -24,11 +24,21 @@ export default function TermsClient() {
         <section>
           <h2 className="text-xl font-semibold mb-3 text-[#405862]">1. Legal Status of Dr. Interested</h2>
           <p className="text-slate-600">
-            Dr. Interested is a youth-led educational project intended to provide informational content and
-            programming to students interested in healthcare-related careers. It is not a registered business,
-            corporation, nonprofit, charity, or other legal entity in any jurisdiction. It is an informal,
-            volunteer-run initiative. All activities, content, events, and communications are provided on a
-            voluntary, non-commercial basis by its organizers and volunteers.
+            Dr. Interested is a Canadian youth-led project that provides wellness career education, access to
+            policy spaces, and community spaces for young people. It is listed as a civil society organization with
+            the United Nations Department of Economic and Social Affairs (ECOSOC). Dr. Interested itself is not a
+            registered business, corporation, nonprofit, charity, or other legal entity in any jurisdiction. All
+            activities, content, events, and communications are provided on a voluntary, non-commercial basis by
+            its organizers and volunteers.
+          </p>
+          <p className="text-slate-600 mt-3">
+            Our nonprofit work, including donations and grants, officially runs through our sister organization,
+            Future Interested, a fiscally sponsored US 501(c)(3) public charity. Future Interested is fiscally
+            sponsored by The Hack Foundation (d.b.a. Hack Club), a 501(c)(3) public charity, EIN 81-2908499. See{" "}
+            <a href="/sponsorships#legal-status" className="text-[#405862] font-medium underline">
+              our legal status
+            </a>{" "}
+            for how donations and tax receipts work.
           </p>
           <p className="text-slate-600 mt-3">
             Because Dr. Interested has no separate legal existence, references in these Terms to "Dr. Interested,"

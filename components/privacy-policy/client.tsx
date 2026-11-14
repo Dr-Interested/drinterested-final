@@ -17,7 +17,7 @@ export default function PrivacyPolicyClientPage() {
       <ScrollToTop />
       <div className="bg-[#405862] text-white p-6 rounded-lg mb-8 shadow-md">
         <h1 className="text-3xl font-bold mb-2 text-center">Privacy Policy</h1>
-        <p className="text-center mb-0">Last updated: November 8, 2026</p>
+        <p className="text-center mb-0">Last updated: November 14, 2026</p>
       </div>
 
       <div className="space-y-8 bg-white p-8 rounded-lg shadow-md">
@@ -30,8 +30,9 @@ export default function PrivacyPolicyClientPage() {
             Privacy Policy, please do not access the site.
           </p>
           <p className="text-slate-600 mt-3">
-            Dr. Interested is not a registered business, corporation, nonprofit, charity, or other legal entity —
-            see our{" "}
+            Dr. Interested is a Canadian youth-led project; it is not itself a registered business, corporation,
+            nonprofit, charity, or other legal entity. Our nonprofit work runs through Future Interested, a fiscally
+            sponsored US 501(c)(3) public charity. See our{" "}
             <Link href="/terms" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
               Terms and Conditions
             </Link>{" "}

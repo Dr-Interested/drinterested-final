@@ -11,7 +11,7 @@ export const revalidate = 300
 export const metadata: Metadata = generateSeoMetadata({
   title: "Op-Eds",
   description:
-    "Every op-ed from Dr. Interested — opinion pieces and thought leadership on healthcare policy and youth engagement.",
+    "Every op-ed from Dr. Interested: youth opinion pieces on health policy, youth voice in decision making, and youth engagement.",
   url: "https://www.drinterested.org/publications/op-eds",
   keywords: [
     "Dr. Interested op-eds",
@@ -28,7 +28,7 @@ export default async function OpEdsListingPage() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Dr. Interested Op-Eds",
-    description: "Every op-ed from Dr. Interested on healthcare policy and youth engagement.",
+    description: "Every op-ed from Dr. Interested on health policy and youth voice.",
     url: "https://www.drinterested.org/publications/op-eds",
     isPartOf: { "@type": "WebSite", name: "Dr. Interested", url: "https://www.drinterested.org" },
     mainEntity: {
@@ -57,7 +57,7 @@ export default async function OpEdsListingPage() {
           />
           <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mb-4">Op-Eds</h1>
           <p className="text-[#405862]/80 text-base md:text-lg max-w-2xl">
-            Opinion pieces and thought leadership from Dr. Interested on healthcare policy and youth engagement —
+            Opinion pieces from Dr. Interested on health policy, youth voice, and youth engagement —
             {" "}{opEds.length} pieces and counting.
           </p>
         </div>

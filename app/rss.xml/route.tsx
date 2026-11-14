@@ -23,18 +23,18 @@ export async function GET() {
   const imageDescriptions: Record<string, string> = {
     // Logo and branding
     "/logo.png":
-      "Dr. Interested official logo - A professional medical education organization empowering youth to explore healthcare careers through research, mentorship, and community engagement",
+      "Dr. Interested official logo - A youth led global wellness organization helping young people explore wellness careers, policy, and community",
     "/circle-logo.png":
-      "Dr. Interested circular logo variant - Round emblem representing the organization's commitment to youth medical education and healthcare advocacy",
+      "Dr. Interested circular logo variant",
     "/websitebanner.jpg":
-      "Dr. Interested website banner - Hero image showcasing the organization's mission to inspire the next generation of healthcare professionals",
+      "Dr. Interested website banner",
 
     // Favicons and app icons
     "/favicon-16x16.png":
-      "Dr. Interested favicon 16x16 - Small icon for browser tabs representing the medical education platform",
+      "Dr. Interested favicon 16x16 - Small icon for browser tabs",
     "/favicon-32x32.png": "Dr. Interested favicon 32x32 - Medium icon for browser tabs and bookmarks",
     "/apple-touch-icon.png":
-      "Dr. Interested Apple touch icon - iOS home screen icon for the medical education platform",
+      "Dr. Interested Apple touch icon - iOS home screen icon",
     "/android-chrome-192x192.png":
       "Dr. Interested Android icon 192x192 - Android home screen icon for mobile app experience",
     "/android-chrome-512x512.png":
@@ -487,9 +487,9 @@ export async function GET() {
      xmlns:media="http://search.yahoo.com/mrss/"
      xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Dr. Interested - Empowering Youth in Healthcare</title>
+    <title>Dr. Interested: Youth Led Global Wellness Organization</title>
     <link>${escapeXml(baseUrl)}</link>
-    <description>Dr. Interested is a youth-led organization dedicated to inspiring the next generation of healthcare professionals through research, education, and mentorship. Explore medical topics, career guidance, and opportunities in healthcare.</description>
+    <description>Dr. Interested is a youth led global wellness organization. We help young people explore wellness careers, from health and medicine to law and finance, take part in policy decisions, and find a safe community. Articles, op eds, podcasts, webinars and events.</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${escapeXml(baseUrl)}/rss.xml" rel="self" type="application/rss+xml" />
