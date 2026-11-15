@@ -53,9 +53,9 @@ function eventSchema(e: any) {
   }
 }
 
-/** Programs that never end, like Office Hours: always shown as open, never moved to past. */
+/** Office Hours never ends: always shown as open, never moved to past. */
 function isOngoing(e: any) {
-  return /office hours/i.test(e.title || "") || /forever|ongoing|year.?round/i.test(e.date || "")
+  return /office hours/i.test(e.title || "")
 }
 
 export const revalidate = 60; // Revalidate events every 60 seconds (ISR)
