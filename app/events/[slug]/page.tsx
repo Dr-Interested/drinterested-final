@@ -104,7 +104,7 @@ export default async function RecapPage({ params }: { params: Promise<{ slug: st
             </ul>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-xl ring-1 ring-black/5">
-            <Image src={r.cover.src} alt={r.cover.alt} fill priority sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+            <Image src={r.cover.src} alt={r.cover.alt} fill loading="eager" sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
           </div>
         </div>
       </header>

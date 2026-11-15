@@ -111,7 +111,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://open.spotify.com/show/6SLlRUL6co6fPxckAdrigf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#11793a] hover:text-[#0d5f2d] text-sm flex items-center group"
+                  className="text-[#11793a] hover:text-[#0d5f2d] dark:text-[#1ed760] dark:hover:text-[#1ed760] text-sm flex items-center group"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +129,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://www.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#c4000f] hover:text-[#9e000c] text-sm flex items-center group"
+                  className="text-[#c4000f] hover:text-[#9e000c] dark:text-[#ff5a5a] dark:hover:text-[#ff5a5a] text-sm flex items-center group"
                 >
                   <Youtube className="h-4 w-4 mr-1" />
                   <span>YouTube</span>
@@ -138,7 +138,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#2b63d6] hover:text-[#1f4fb0] text-sm flex items-center group"
+                  className="text-[#2b63d6] hover:text-[#1f4fb0] dark:text-[#7fa8ff] dark:hover:text-[#7fa8ff] text-sm flex items-center group"
                 >
                   <Music className="h-4 w-4 mr-1" />
                   <span>YouTube Music</span>
@@ -163,7 +163,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                     href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#2b63d6] hover:text-[#1f4fb0] text-xs flex items-center"
+                    className="text-[#2b63d6] hover:text-[#1f4fb0] dark:text-[#7fa8ff] dark:hover:text-[#7fa8ff] text-xs flex items-center"
                   >
                     <Music className="h-3 w-3 mr-1" />
                     <span>YouTube Music</span>
@@ -187,7 +187,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://open.spotify.com/show/6SLlRUL6co6fPxckAdrigf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#11793a] hover:text-[#0d5f2d] text-sm font-medium"
+                  className="inline-flex items-center text-[#11793a] hover:text-[#0d5f2d] dark:text-[#1ed760] dark:hover:text-[#1ed760] text-sm font-medium"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -205,7 +205,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://www.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#c4000f] hover:text-[#9e000c] text-sm font-medium"
+                  className="inline-flex items-center text-[#c4000f] hover:text-[#9e000c] dark:text-[#ff5a5a] dark:hover:text-[#ff5a5a] text-sm font-medium"
                 >
                   <Play className="h-4 w-4 mr-1 fill-current" />
                   <span>Watch on YouTube</span>
@@ -214,7 +214,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#2b63d6] hover:text-[#1f4fb0] text-sm font-medium"
+                  className="inline-flex items-center text-[#2b63d6] hover:text-[#1f4fb0] dark:text-[#7fa8ff] dark:hover:text-[#7fa8ff] text-sm font-medium"
                 >
                   <Music className="h-4 w-4 mr-1" />
                   <span>Listen on YouTube Music</span>

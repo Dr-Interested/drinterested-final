@@ -15,12 +15,12 @@ const supabaseOrigin = (() => {
 const isDev = process.env.NODE_ENV !== "production"
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://connect.facebook.net https://f.convertkit.com https://va.vercel-scripts.com`,
-  "style-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://connect.facebook.net https://f.convertkit.com https://va.vercel-scripts.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com`,
+  "style-src 'self' 'unsafe-inline' https://www.gstatic.com https://translate.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  `connect-src 'self' ${supabaseOrigin} ${supabaseOrigin.replace(/^https:/, "wss:")} https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://connect.facebook.net https://app.convertkit.com https://app.kit.com https://f.convertkit.com https://formspree.io https://vitals.vercel-insights.com`,
-  "frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://open.spotify.com https://www.facebook.com",
+  `connect-src 'self' ${supabaseOrigin} ${supabaseOrigin.replace(/^https:/, "wss:")} https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://connect.facebook.net https://app.convertkit.com https://app.kit.com https://f.convertkit.com https://formspree.io https://vitals.vercel-insights.com https://translate.googleapis.com https://translate-pa.googleapis.com https://translate.google.com`,
+  "frame-src 'self' https://translate.google.com https://translate.googleapis.com https://www.youtube-nocookie.com https://www.youtube.com https://open.spotify.com https://www.facebook.com",
   "media-src 'self' blob: https:",
   "worker-src 'self' blob:",
   "manifest-src 'self'",

@@ -12,7 +12,7 @@ export function PhotoTrio({ photos, className, priority = false }: { photos: [Ph
           key={ph.src}
           className={cn("relative aspect-[4/3] overflow-hidden rounded-xl border-[3px] border-white shadow-md sm:rounded-2xl sm:border-4", tilt[i])}
         >
-          <Image src={ph.src} alt={ph.alt} fill sizes="(max-width: 640px) 33vw, 260px" className="object-cover" priority={priority} />
+          <Image src={ph.src} alt={ph.alt} fill sizes="(max-width: 640px) 33vw, 260px" className="object-cover" loading={priority ? "eager" : undefined} />
         </figure>
       ))}
     </div>

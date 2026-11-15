@@ -140,8 +140,7 @@ export default function ImpactReportPage() {
               alt="Cover of the Dr. Interested 2026 Annual Impact Report"
               width={900}
               height={1165}
-              sizes="280px"
-              priority
+              sizes="280px" loading="eager"
             />
           </a>
         </div>

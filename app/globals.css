@@ -24,6 +24,11 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 200 28% 31%;
     --radius: 0.5rem;
+    /* Brand tokens (see tailwind.config.ts) */
+    --c-ink: 64 88 98;
+    --c-teal-deep: 35 115 109;
+    --c-cream: 245 241 235;
+    --c-cream-deep: 235 228 216;
   }
 
   .dark {
@@ -46,6 +51,10 @@
     --border: 0 0% 15%;
     --input: 0 0% 15%;
     --ring: 200 28% 31%;
+    --c-ink: 233 229 223;
+    --c-teal-deep: 142 230 223;
+    --c-cream: 20 23 30;
+    --c-cream-deep: 28 32 41;
   }
 }
 
@@ -994,4 +1003,39 @@ img.loading {
   background-size: 100% 0.45em;
   background-position: 0 100%;
   padding-bottom: 0.12em;
+}
+
+
+/* ---- Dark mode for the 2026 redesign ---- */
+/* Solid ink panels and buttons stay dark (ink text flips light, these must not). */
+.dark .bg-ink,
+.dark .hover\:bg-ink-deep:hover {
+  background-color: #1f2c32;
+}
+/* Gradients that fade to white fade to the page colour instead. */
+.dark .to-white {
+  --tw-gradient-to: #0b0d12 var(--tw-gradient-to-position);
+}
+.dark .via-white {
+  --tw-gradient-stops: var(--tw-gradient-from), #0b0d12 var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+/* The dark-slate logo becomes white on dark backgrounds. */
+.dark .logo-adapt {
+  filter: brightness(0) invert(0.94);
+}
+
+/* Google Translate: keep its toolbar and tooltips out of the layout; the navbar picker replaces them. */
+iframe.skiptranslate,
+body > .skiptranslate,
+.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
+font[style] > font {
+  background: none !important;
+  box-shadow: none !important;
 }

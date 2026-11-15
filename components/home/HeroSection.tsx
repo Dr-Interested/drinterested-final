@@ -5,9 +5,9 @@ import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, FileText } from "lucide-react"
 import DiscordIcon from "@/components/icons/discord-icon"
-import { BgVideo } from "@/components/site/bg-video"
+import { HeroReel } from "@/components/site/hero-reel"
 import { ALL_TIME, IMPACT_REPORT_2026 } from "@/lib/impact-stats"
-import { PHOTOS, VIDEOS } from "@/lib/media"
+import { HERO_REEL, PHOTOS } from "@/lib/media"
 
 export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
   const reduce = useReducedMotion()
@@ -30,9 +30,8 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
               src="/brand/logo-stacked.png"
               alt="Dr. Interested"
               width={180}
-              height={146}
-              priority
-              className="mb-5 h-auto w-[112px] md:w-[132px]"
+              height={146} loading="eager"
+              className="logo-adapt mb-5 h-auto w-[112px] md:w-[132px]"
             />
           </motion.div>
           <motion.h1 {...rise(0.05)} className="text-[2.1rem] leading-[1.08] font-semibold text-ink sm:text-5xl lg:text-[3.4rem]">
@@ -91,14 +90,11 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
           className="relative mx-auto w-full max-w-xl pb-10 md:pb-0"
         >
           <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] shadow-xl ring-1 ring-black/5">
-            <BgVideo {...VIDEOS.hero} label="Students at the Explore 3 Case Competition" />
-            <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-ink shadow-sm">
-              Explore 3 Case Competition
-            </span>
+            <HeroReel clips={HERO_REEL} />
           </div>
           <div className="absolute -bottom-2 -left-3 w-[44%] rotate-[-3deg] overflow-hidden rounded-2xl border-4 border-white shadow-lg sm:-left-6 md:-bottom-8">
             <div className="relative aspect-[4/3]">
-              <Image src={PHOTOS.medexplore[0].src} alt={PHOTOS.medexplore[0].alt} fill sizes="240px" className="object-cover" priority />
+              <Image src={PHOTOS.medexplore[0].src} alt={PHOTOS.medexplore[0].alt} fill sizes="240px" className="object-cover" loading="eager" />
             </div>
           </div>
           <div className="absolute -right-2 bottom-4 rounded-2xl bg-white px-4 py-3 shadow-lg ring-1 ring-black/5 sm:-right-4 md:-bottom-4">

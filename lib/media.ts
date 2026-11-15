@@ -96,7 +96,6 @@ export const HIGHLIGHT_REEL: Photo[] = [
 ]
 
 export const VIDEOS = {
-  hero: { src: "/media/video/hero-explore3-2025.mp4", poster: "/media/video/hero-explore3-2025.jpg" },
   explore3Room: { src: "/media/video/explore3-2025-room.mp4", poster: "/media/video/explore3-2025-room.jpg" },
   explore3Crowd: { src: "/media/video/explore3-2025-crowd.mp4", poster: "/media/video/explore3-2025-crowd.jpg" },
   explore3Pitch: { src: "/media/video/explore3-2025-pitch.mp4", poster: "/media/video/explore3-2025-pitch.jpg" },
@@ -106,6 +105,15 @@ export const VIDEOS = {
   psych: { src: "/media/video/psych-keynote.mp4", poster: "/media/video/psych-keynote.jpg" },
   communityFair: { src: "/media/video/community-fair.mp4", poster: "/media/video/community-fair.jpg" },
 }
+
+/** The homepage hero: one wide room shot per event, played in turn. */
+export const HERO_REEL = [
+  { src: "/media/video/hero-explore3.mp4", poster: "/media/video/hero-explore3.jpg", label: "Explore 3 Case Competition 2025" },
+  { src: "/media/video/hero-medexplore.mp4", poster: "/media/video/hero-medexplore.jpg", label: "MedExplore 2026" },
+  { src: "/media/video/hero-codeblue.mp4", poster: "/media/video/hero-codeblue.jpg", label: "Code Blue Planet" },
+  { src: "/media/video/hero-psych.mp4", poster: "/media/video/hero-psych.jpg", label: "Culture and Psychology Conference" },
+  { src: "/media/video/hero-explore3-2026.mp4", poster: "/media/video/hero-explore3-2026.jpg", label: "Explore 3 Case Competition 2026" },
+]
 
 export type Quote = { quote: string; who: string; topic?: string }
 

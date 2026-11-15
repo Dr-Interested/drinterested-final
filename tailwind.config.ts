@@ -25,9 +25,11 @@ const config = {
       },
       colors: {
         // Brand palette, shared with the impact report and Instagram.
-        ink: { DEFAULT: "#405862", deep: "#2b3f47", soft: "#5d7680" },
-        teal: { DEFAULT: "#4ecdc4", deep: "#23736d", wash: "#e3f6f4" },
-        cream: { DEFAULT: "#f5f1eb", deep: "#ebe4d8" },
+        // ink, teal-deep and cream are CSS variables (globals.css) so they flip in dark mode:
+        // ink text turns light, cream surfaces turn dark, teal-deep turns a readable light teal.
+        ink: { DEFAULT: "rgb(var(--c-ink) / <alpha-value>)", deep: "#2b3f47", soft: "#5d7680" },
+        teal: { DEFAULT: "#4ecdc4", deep: "rgb(var(--c-teal-deep) / <alpha-value>)", wash: "#e3f6f4" },
+        cream: { DEFAULT: "rgb(var(--c-cream) / <alpha-value>)", deep: "rgb(var(--c-cream-deep) / <alpha-value>)" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

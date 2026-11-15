@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Instagram, Linkedin } from "lucide-react"
 import DiscordIcon from "@/components/icons/discord-icon"
+import { LanguagePicker } from "@/components/site/language-picker"
+import { ThemeToggle } from "@/components/site/theme-toggle"
 
 type Route = { href: string; label: string; children?: { href: string; label: string }[] }
 
@@ -110,7 +112,7 @@ export default function Navbar() {
               <div className="flex flex-col h-full">
                 <div className="p-4 border-b flex items-center">
                   <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-                    <Image src="/brand/icon.png" alt="" width={36} height={36} priority />
+                    <Image src="/brand/icon.png" alt="" width={36} height={36} priority className="logo-adapt" />
                     <span className="font-display font-semibold text-lg text-ink">
                       Dr. <span className="text-teal-deep">Interested</span>
                     </span>
@@ -204,10 +206,12 @@ export default function Navbar() {
           </Sheet>
           <Link href="/" className="flex items-center gap-2 group">
             <div className="relative w-8 h-8 md:w-9 md:h-9 transition-transform duration-300 group-hover:-rotate-6">
-              <Image src="/brand/icon.png" alt="" fill sizes="36px" priority />
+              <Image src="/brand/icon.png" alt="" fill sizes="36px" priority className="logo-adapt" />
             </div>
             <div className="font-display font-semibold text-base md:text-lg text-ink">
-              Dr. <span className="text-teal-deep">Interested</span>
+              <span translate="no" className="notranslate">
+                Dr. <span className="text-teal-deep">Interested</span>
+              </span>
               <span className="sr-only"> home</span>
             </div>
           </Link>
@@ -246,7 +250,11 @@ export default function Navbar() {
             </div>
           ))}
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3">
+          <div className="flex items-center">
+            <LanguagePicker />
+            <ThemeToggle />
+          </div>
           <Link
             href="/members/join"
             className="hidden md:inline-flex border border-[#405862] text-[#405862] hover:bg-[#405862]/10 px-3 py-1.5 rounded-md text-sm font-medium transition-all hover:shadow-md hover:scale-105 duration-300"
