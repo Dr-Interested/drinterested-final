@@ -3,6 +3,7 @@ import EventsClientPage from "./EventsClientPage"
 import { supabase } from "@/lib/supabase-client"
 import { recapHrefFor } from "@/data/recaps"
 import { todayET } from "@/lib/dates"
+import { isDateRange, parseEventDate } from "@/lib/event-date"
 import SeoSchema from "@/components/seo-schema"
 
 const baseUrl = "https://www.drinterested.org"
@@ -97,23 +98,32 @@ export default async function EventsPage() {
     .select("*")
     .order("created_at", { ascending: false })
 
+  // Dated events in date order (newest first for past, soonest first for upcoming); events
+  // with no readable date go last, newest added first.
   const sortEvents = (eventsList: any[], ascending = true) => {
     return [...eventsList].sort((a, b) => {
-      const dateA = new Date(a.date).getTime() || 0
-      const dateB = new Date(b.date).getTime() || 0
+      const dateA = parseEventDate(a.date)
+      const dateB = parseEventDate(b.date)
+      if (dateA === null && dateB === null) {
+        return String(b.created_at ?? "").localeCompare(String(a.created_at ?? ""))
+      }
+      if (dateA === null) return 1
+      if (dateB === null) return -1
       return ascending ? dateA - dateB : dateB - dateA
     })
   }
 
   // An event counts as past once its date is behind us (ET), even if nobody has flipped
-  // is_past in the portal yet; that is how the 2026 Explore 3 showed as upcoming. Dates that
-  // can't be parsed ("Details coming soon") fall back to the is_past flag.
+  // is_past in the portal yet; that is how the 2026 Explore 3 showed as upcoming. Ranges
+  // ("October to November 2026") and unreadable dates rely on the is_past flag, so a program
+  // that is still running is never moved early.
   const today = todayET()
   const isPast = (e: any) => {
     if (e.is_past) return true
-    const d = new Date(e.date)
-    if (Number.isNaN(d.getTime())) return false
-    return d.toISOString().slice(0, 10) < today
+    if (isDateRange(e.date)) return false
+    const t = parseEventDate(e.date)
+    if (t === null) return false
+    return new Date(t).toISOString().slice(0, 10) < today
   }
   const withRecap = (e: any) => ({ ...e, recapHref: recapHrefFor(e.title || "", e.date) })
   const rawUpcoming = (allEventsData?.filter((e) => !isPast(e)) || []).map(withRecap)
