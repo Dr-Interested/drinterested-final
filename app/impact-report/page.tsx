@@ -10,6 +10,7 @@ import {
   ALL_TIME,
   IMPACT_REPORT_2025,
   IMPACT_REPORT_2026,
+  HEALTHCARE_DEFINITION,
   LEGAL_STATUS,
   PILLARS,
   YEAR_2026,
@@ -27,7 +28,7 @@ export const metadata: Metadata = generateSeoMetadata({
     "Dr. Interested impact report",
     "Dr. Interested 2026 annual impact report",
     "impact report 2026",
-    "youth wellness organization impact",
+    "youth healthcare organization impact",
     "youth led nonprofit impact report",
     "Future Interested",
   ],
@@ -194,7 +195,10 @@ export default function ImpactReportPage() {
       {/* Pillars */}
       <section className="py-12 bg-white">
         <div className="container max-w-5xl">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#405862] mb-6">Our three pillars</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#405862] mb-2">Our three pillars</h2>
+          <p className="text-sm text-[#405862]/85 mb-6 max-w-3xl">
+            The report uses the word wellness. {HEALTHCARE_DEFINITION}
+          </p>
           <div className="grid md:grid-cols-3 gap-4">
             {PILLARS.map((p) => (
               <div key={p.id} className="rounded-xl border border-[#405862]/10 p-5">

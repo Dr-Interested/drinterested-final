@@ -24,7 +24,7 @@ export default function TermsClient() {
         <section>
           <h2 className="text-xl font-semibold mb-3 text-[#405862]">1. Legal Status of Dr. Interested</h2>
           <p className="text-slate-600">
-            Dr. Interested is a Canadian youth-led project that provides wellness career education, access to
+            Dr. Interested is a Canadian youth-led project that provides healthcare career education, access to
             policy spaces, and community spaces for young people. It is listed as a civil society organization with
             the United Nations Department of Economic and Social Affairs (ECOSOC). Dr. Interested itself is not a
             registered business, corporation, nonprofit, charity, or other legal entity in any jurisdiction. All

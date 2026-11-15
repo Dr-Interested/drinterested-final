@@ -80,7 +80,7 @@ export default function NewsletterForm({
               Stay Updated
             </h2>
             <p className={descriptionClass}>
-              Stay updated on Dr. Interested and new opportunities in wellness careers, policy, and community!
+              Stay updated on Dr. Interested and new opportunities in healthcare careers, policy, and community!
             </p>
           </>
         )}

@@ -18,7 +18,7 @@ export default function StayUpdatedSection() {
         <div>
           <h2 className="text-2xl font-semibold md:text-3xl">A short email, every other Saturday</h2>
           <p className="mt-2 max-w-md text-sm text-white/75">
-            8,000+ people already get our newsletter: new events, articles, and opportunities in wellness careers,
+            8,000+ people already get our newsletter: new events, articles, and opportunities in healthcare careers,
             policy, and community.
           </p>
         </div>

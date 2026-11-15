@@ -6,7 +6,7 @@ import { PHOTOS } from "@/lib/media"
 import { Mail, Sparkles, Users, Megaphone, Award, Heart, Info, Building2, Share2, UserPlus, Receipt } from "lucide-react"
 import { ALL_TIME, IMPACT_REPORT_2026, LEGAL_STATUS, YEAR_2026 } from "@/lib/impact-stats"
 
-const DESCRIPTION = `Sponsor, partner with, or donate to Dr. Interested, a youth led wellness organization that has impacted ${ALL_TIME.youthImpacted} youth. US donors can receive tax receipts.`
+const DESCRIPTION = `Sponsor, partner with, or donate to Dr. Interested, a youth led healthcare organization that has impacted ${ALL_TIME.youthImpacted} youth. US donors can receive tax receipts.`
 
 export const metadata: Metadata = {
   title: "Sponsorships & Donations",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   keywords: [
     "sponsor Dr. Interested",
     "partner with Dr. Interested",
-    "donate to youth wellness",
+    "donate to youth healthcare education",
     "Future Interested",
     "fiscally sponsored 501(c)(3)",
     "Hack Club fiscal sponsorship",
@@ -67,7 +67,7 @@ export default function SponsorshipsPage() {
             Sponsorships & Donations
           </h1>
           <p className="text-lg text-[#405862]/90 max-w-2xl mx-auto text-pretty">
-            Help keep wellness career education, policy access, and community spaces free for every young person. Our
+            Help keep healthcare career education, policy access, and community spaces free for every young person. Our
             community has impacted {ALL_TIME.youthImpacted} youth across {ALL_TIME.countries} countries and territories,
             with {ALL_TIME.impressions} impressions across our platforms.
           </p>
@@ -86,7 +86,7 @@ export default function SponsorshipsPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-4">Support Us Through Donations</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
               Every contribution helps us continue our educational mission to support the next generation of youth
-              leaders in wellness, policy, and community.
+              leaders in healthcare, policy, and community.
             </p>
           </div>
 
@@ -94,7 +94,7 @@ export default function SponsorshipsPage() {
           <div className="bg-white rounded-2xl border-2 border-[#4ecdc4]/20 p-8 md:p-12 mb-8 shadow-sm">
             <h3 className="text-2xl font-bold text-[#405862] mb-6">Why Your Donation Matters</h3>
             <p className="text-[#405862]/90 mb-6 leading-relaxed">
-              Dr. Interested is a youth-run project dedicated to providing accessible wellness career education, policy
+              Dr. Interested is a youth-run project dedicated to providing accessible healthcare career education, policy
               access, and community spaces to youth worldwide. Your donations directly support:
             </p>
             <ul className="grid md:grid-cols-2 gap-4 mb-8">
@@ -102,7 +102,7 @@ export default function SponsorshipsPage() {
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-[#4ecdc4]"></div>
                 </div>
-                <span className="text-[#405862]/90">Youth wellness career education and mentorship programs</span>
+                <span className="text-[#405862]/90">Youth healthcare career education and mentorship programs</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mt-0.5">
@@ -364,7 +364,7 @@ export default function SponsorshipsPage() {
             </div>
           </div>
           <p className="mt-10 text-center text-lg text-[#405862] font-medium text-pretty">
-            Thank you for helping youth explore wellness careers and change policy.
+            Thank you for helping youth explore healthcare careers and change policy.
           </p>
         </div>
       </section>

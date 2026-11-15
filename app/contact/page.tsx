@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Dr. Interested media inquiries",
     "Dr. Interested press contact",
     "Dr. Interested profiles",
-    "youth wellness organization contact",
+    "youth healthcare organization contact",
     "partner with Dr. Interested",
   ],
   openGraph: {

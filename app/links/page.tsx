@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "LinkedIn",
     "YouTube",
     "Spotify",
-    "youth wellness community",
+    "youth health community",
   ],
   openGraph: {
     title: "Links | Dr. Interested",

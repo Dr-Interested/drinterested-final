@@ -25,9 +25,9 @@ const poppins = Poppins({
   display: "swap",
 })
 
-const SITE_TITLE = "Dr. Interested | Youth Led Global Wellness Organization"
-const SITE_DESCRIPTION = `Youth led global wellness organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free wellness career education, policy access, and community spaces.`
-const BANNER_ALT = "Dr. Interested: a youth led global wellness organization"
+const SITE_TITLE = "Dr. Interested | Youth Led Global Healthcare Organization"
+const SITE_DESCRIPTION = `Youth led global healthcare organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free healthcare career education, policy access, and community spaces.`
+const BANNER_ALT = "Dr. Interested: a youth led global healthcare organization"
 
 export const metadata: Metadata = {
   title: {
@@ -41,9 +41,9 @@ export const metadata: Metadata = {
     "doctor interested",
     "Adil Mukhi",
     "Future Interested",
-    "youth wellness organization",
+    "youth healthcare organization",
     "youth led organization",
-    "wellness careers",
+    "healthcare careers",
     "career education for youth",
     "youth in policy",
     "youth voice in policy",

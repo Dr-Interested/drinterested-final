@@ -111,7 +111,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://open.spotify.com/show/6SLlRUL6co6fPxckAdrigf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#1DB954] hover:text-[#1ed760] text-sm flex items-center group"
+                  className="text-[#11793a] hover:text-[#0d5f2d] text-sm flex items-center group"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +129,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://www.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#FF0000] hover:text-[#ff3333] text-sm flex items-center group"
+                  className="text-[#c4000f] hover:text-[#9e000c] text-sm flex items-center group"
                 >
                   <Youtube className="h-4 w-4 mr-1" />
                   <span>YouTube</span>
@@ -138,7 +138,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#4285F4] hover:text-[#5a95f5] text-sm flex items-center group"
+                  className="text-[#2b63d6] hover:text-[#1f4fb0] text-sm flex items-center group"
                 >
                   <Music className="h-4 w-4 mr-1" />
                   <span>YouTube Music</span>
@@ -163,7 +163,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                     href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#4285F4] hover:text-[#5a95f5] text-xs flex items-center"
+                    className="text-[#2b63d6] hover:text-[#1f4fb0] text-xs flex items-center"
                   >
                     <Music className="h-3 w-3 mr-1" />
                     <span>YouTube Music</span>
@@ -180,14 +180,14 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
             <div className="mt-4 text-center">
               <p className="text-sm text-[#405862]/90 mb-3">
                 Our podcast features youth leaders, changemakers, and professionals talking about health, leadership,
-                wellness careers, and the future.
+                healthcare careers, and the future.
               </p>
               <div className="flex justify-center items-center gap-4 flex-wrap">
                 <Link
                   href="https://open.spotify.com/show/6SLlRUL6co6fPxckAdrigf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#1DB954] hover:text-[#1ed760] text-sm font-medium"
+                  className="inline-flex items-center text-[#11793a] hover:text-[#0d5f2d] text-sm font-medium"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -205,7 +205,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://www.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#FF0000] hover:text-[#ff3333] text-sm font-medium"
+                  className="inline-flex items-center text-[#c4000f] hover:text-[#9e000c] text-sm font-medium"
                 >
                   <Play className="h-4 w-4 mr-1 fill-current" />
                   <span>Watch on YouTube</span>
@@ -214,7 +214,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#4285F4] hover:text-[#5a95f5] text-sm font-medium"
+                  className="inline-flex items-center text-[#2b63d6] hover:text-[#1f4fb0] text-sm font-medium"
                 >
                   <Music className="h-4 w-4 mr-1" />
                   <span>Listen on YouTube Music</span>

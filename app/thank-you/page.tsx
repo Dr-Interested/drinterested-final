@@ -65,7 +65,7 @@ export default function ThankYouPage() {
 
           <p className="text-[#405862] mb-6">
             Your subscription to the Dr. Interested newsletter has been confirmed. We're excited to share the latest
-            opportunities in wellness careers, policy, and community with you!
+            opportunities in healthcare careers, policy, and community with you!
           </p>
 
           <div className="space-y-4">

@@ -120,7 +120,7 @@ export default async function PolicySubmissionPage({ params }: { params: Promise
             <span className="bg-[#405862]/10 px-3 py-1 rounded-full text-sm font-medium text-[#405862]">
               Policy Work
             </span>
-            <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#1976d2]">
+            <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#0d5aa7]">
               {submission.resolution}
             </span>
           </div>
@@ -207,7 +207,7 @@ export default async function PolicySubmissionPage({ params }: { params: Promise
               href={submission.ohchrPdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] font-bold px-5 py-2.5 rounded-xl text-sm transition-colors"
+              className="inline-flex items-center gap-2 bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#2b3f47] font-bold px-5 py-2.5 rounded-xl text-sm transition-colors"
             >
               View on ohchr.org <ExternalLink className="h-3.5 w-3.5" />
             </a>

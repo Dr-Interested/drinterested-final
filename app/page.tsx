@@ -8,8 +8,8 @@ export const revalidate = 300; // Revalidate homepage every 5 minutes (ISR)
 
 export const metadata: Metadata = {
   // An absolute title: the root template would otherwise append "| Dr. Interested" twice.
-  title: { absolute: "Dr. Interested | Youth Led Global Wellness Organization" },
-  description: `Youth led global wellness organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free wellness career education, policy access, and community spaces.`,
+  title: { absolute: "Dr. Interested | Helping Youth Find Their Spark in Healthcare" },
+  description: `Youth led global healthcare organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free healthcare career education, policy access, and community spaces.`,
   alternates: {
     canonical: "https://www.drinterested.org",
     languages: {
@@ -148,7 +148,7 @@ export default async function Page() {
           datePublished: IMPACT_REPORT_2026.published,
           inLanguage: "en",
           author: { "@type": "Organization", name: "Dr. Interested", url: "https://www.drinterested.org" },
-          description: `Dr. Interested's 2026 Annual Impact Report: ${YEAR_2026.youthImpacted} youth impacted in 2026 and ${ALL_TIME.youthImpacted} across 2025 and 2026, through wellness career education, access to policy spaces, and community spaces.`,
+          description: `Dr. Interested's 2026 Annual Impact Report: ${YEAR_2026.youthImpacted} youth impacted in 2026 and ${ALL_TIME.youthImpacted} across 2025 and 2026, through healthcare career education, access to policy spaces, and community spaces.`,
         }}
       />
       <ClientPage recentPost={recentPost} featuredEvent={featuredEvent} featuredPosts={featuredPosts} />

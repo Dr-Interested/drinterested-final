@@ -103,7 +103,7 @@ export function DomainAnnouncementPopup({ onClose, isMainPage = false }: DomainA
 
                 <p className="text-sm text-[#405862]/90 leading-relaxed max-w-md mx-auto">
                   This year, {YEAR_2026.executives} executives and {YEAR_2026.volunteers} volunteers helped us reach{" "}
-                  {YEAR_2026.youthImpacted} young people through wellness career education, access to policy spaces, and
+                  {YEAR_2026.youthImpacted} young people through healthcare career education, access to policy spaces, and
                   community spaces.
                 </p>
 

@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react"
 import { Marquee } from "@/components/site/marquee"
 import { Reveal } from "@/components/site/reveal"
 import { SectionHeading } from "@/components/site/section-heading"
-import { PILLARS } from "@/lib/impact-stats"
+import { HEALTHCARE_DEFINITION, PILLARS } from "@/lib/impact-stats"
 import { AS_SEEN_IN, PHOTOS } from "@/lib/media"
 
 const PILLAR_MEDIA = {
@@ -31,7 +31,7 @@ export default function PillarsSection() {
       <section className="py-12 md:py-16">
         <div className="container">
           <SectionHeading eyebrow="What we do" title="Three pillars, one community">
-            Every program we run fits at least one of them. The best ones fit all three.
+            {HEALTHCARE_DEFINITION} Every program we run fits at least one pillar; the best fit all three.
           </SectionHeading>
           <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0">
             {PILLARS.map((p, i) => {

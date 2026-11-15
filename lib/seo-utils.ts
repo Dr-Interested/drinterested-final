@@ -222,8 +222,9 @@ export function generateOrganizationSchema() {
       { "@type": "Organization", name: "National Canadian Youth Council (NCYC)" },
     ],
     knowsAbout: [
-      "Youth Wellness",
-      "Wellness Career Education",
+      "Youth Health",
+      "Public Health Education",
+      "Healthcare Career Education",
       "Healthcare Careers",
       "Law Careers",
       "Finance Careers",

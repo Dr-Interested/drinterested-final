@@ -74,7 +74,7 @@ export default function DocumentStrip({ documents }: { documents: SupportDocumen
                     href={active.pdf}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#405862] dark:text-teal-deep hover:underline flex-shrink-0"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#405862] dark:text-[#4ecdc4] hover:underline flex-shrink-0"
                   >
                     <Download className="h-3.5 w-3.5" />
                     Open original PDF

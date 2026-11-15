@@ -67,7 +67,7 @@ export const RECAPS: Recap[] = [
     short: "Explore 3 Case Competition 2025",
     date: "November 22, 2025",
     isoDate: "2025-11-22",
-    location: "Toronto, Ontario",
+    location: "University of Toronto Mississauga",
     partner: "With Hope In Every Hand and Youth Law Advocacy",
     pillars: ["Career Education", "Youth in Policy"],
     summary:

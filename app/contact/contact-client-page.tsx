@@ -153,7 +153,7 @@ export default function ContactClientPage() {
         name: "Do I need a healthcare background to join?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Not at all! We are a wellness organization: we cover health, law, finance, and any career that improves wellbeing, and we recruit across finance, tech, design, outreach, events, and education.",
+          text: "Not at all! We use healthcare in its widest sense: medicine and mental health, but also public and community health, health law, policy and finance. Our team recruits across finance, tech, design, outreach, events, and education.",
         },
       },
       {
@@ -610,8 +610,9 @@ export default function ContactClientPage() {
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-2 text-[#405862] text-sm">Do I need a healthcare background to join?</h3>
                   <p className="text-[#405862]/90 text-xs">
-                    Not at all! We are a wellness organization: we cover health, law, finance, and any career that
-                    improves wellbeing, and we recruit across finance, tech, design, outreach, events, and education.
+                    Not at all! We use healthcare in its widest sense: medicine and mental health, but also public and
+                    community health, health law, policy and finance. Our team recruits across finance, tech, design,
+                    outreach, events, and education.
                   </p>
                 </CardContent>
               </Card>

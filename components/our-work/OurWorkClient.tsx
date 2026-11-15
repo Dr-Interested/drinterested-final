@@ -19,7 +19,7 @@ import {
   CalendarDays,
   Eye,
 } from "lucide-react"
-import { ALL_TIME, IMPACT_REPORT_2026, PILLARS, YEAR_2026 } from "@/lib/impact-stats"
+import { ALL_TIME, HEALTHCARE_DEFINITION, IMPACT_REPORT_2026, PILLARS, YEAR_2026 } from "@/lib/impact-stats"
 import { HIGHLIGHT_REEL, PHOTOS, QUOTES, VIDEOS } from "@/lib/media"
 import { PhotoStrip } from "@/components/site/photo-strip"
 import { QuoteCarousel } from "@/components/site/quote-carousel"
@@ -219,10 +219,10 @@ export default function OurWorkPage() {
               <span>Read our {IMPACT_REPORT_2026.shortTitle}</span>
             </Link>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#405862] mb-4">
-              Youth Led Change in Wellness, Policy, and Community
+              Youth Led Change in Healthcare, Policy, and Community
             </h1>
             <p className="text-[#405862]/90 text-lg mb-6 leading-relaxed max-w-3xl mx-auto">
-              Everything we run fits at least one of our three pillars: wellness career education, access to policy
+              Everything we run fits at least one of our three pillars: healthcare career education, access to policy
               spaces, and community spaces. The best programs fit all three.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
@@ -302,7 +302,7 @@ export default function OurWorkPage() {
           <motion.div className="text-center mb-10" {...inView} variants={fadeIn}>
             <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-3">Our Three Pillars</h2>
             <p className="text-[#405862]/85 max-w-2xl mx-auto">
-              Guided by the UN Convention on the Rights of the Child (Articles 6 and 12) and SDGs 3, 4, and 10.
+              {HEALTHCARE_DEFINITION} Guided by the UN Convention on the Rights of the Child (Articles 6 and 12) and SDGs 3, 4, and 10.
             </p>
           </motion.div>
           <motion.div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:overflow-visible md:px-0 md:pb-0 md:grid md:grid-cols-3 md:gap-5" {...inView} variants={staggerContainer}>
@@ -489,7 +489,7 @@ export default function OurWorkPage() {
             className="rounded-2xl bg-[#405862] text-white p-6 md:p-10 grid md:grid-cols-[1fr_auto] gap-6 items-center"
           >
             <div>
-              <div className="flex items-center gap-2 text-teal-deep text-sm font-semibold mb-2">
+              <div className="flex items-center gap-2 text-[#8ee6df] text-sm font-semibold mb-2">
                 <Newspaper className="w-4 h-4" />
                 In the Media
               </div>
@@ -516,7 +516,7 @@ export default function OurWorkPage() {
           <motion.div {...inView} variants={fadeIn}>
             <h2 className="text-3xl md:text-4xl font-bold mb-3">Ready to Make an Impact?</h2>
             <p className="text-white/90 mb-6 text-base leading-relaxed max-w-2xl mx-auto">
-              Join {ALL_TIME.members} youth from {ALL_TIME.countries} countries and territories exploring wellness
+              Join {ALL_TIME.members} youth from {ALL_TIME.countries} countries and territories exploring healthcare
               careers, speaking up in policy spaces, and building community.
             </p>
             <div className="flex flex-wrap justify-center gap-3">

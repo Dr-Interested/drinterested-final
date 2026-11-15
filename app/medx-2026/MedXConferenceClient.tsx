@@ -116,7 +116,7 @@ export default function MedXConferenceClient() {
         <div className="container max-w-6xl mx-auto flex items-center justify-between text-xs md:text-sm">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 font-medium hover:text-teal-deep transition-colors group"
+            className="inline-flex items-center gap-2 font-medium hover:text-[#8ee6df] transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
             <span>Return to Main Website</span>
@@ -131,7 +131,7 @@ export default function MedXConferenceClient() {
             >
               {copied ? (
                 <>
-                  <Check className="h-3.5 w-3.5 mr-1 text-teal-deep" /> Link Copied!
+                  <Check className="h-3.5 w-3.5 mr-1 text-[#8ee6df]" /> Link Copied!
                 </>
               ) : (
                 <>
@@ -164,7 +164,7 @@ export default function MedXConferenceClient() {
             {/* Left Content Column */}
             <div className="lg:col-span-7 text-left space-y-6">
               <div className="flex flex-wrap items-center gap-2.5">
-                <Badge className="bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] font-semibold px-3 py-1 text-xs md:text-sm rounded-full shadow-sm">
+                <Badge className="bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#2b3f47] font-semibold px-3 py-1 text-xs md:text-sm rounded-full shadow-sm">
                   Event Recap
                 </Badge>
                 <Badge variant="outline" className="border-[#405862]/30 text-[#405862] dark:text-[#f1ece7] px-3 py-1 text-xs rounded-full">
@@ -280,7 +280,7 @@ export default function MedXConferenceClient() {
       <section className="py-10 md:py-16 bg-[#f5f1eb]/60 dark:bg-[#0c1015]">
         <div className="container max-w-5xl mx-auto px-4">
           <div className="text-center space-y-4 mb-10">
-            <Badge className="bg-[#405862] text-[#4ecdc4] font-bold px-4 py-1 text-sm rounded-full">
+            <Badge className="bg-[#405862] text-[#8ee6df] font-bold px-4 py-1 text-sm rounded-full">
               How the Day Went
             </Badge>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#405862] dark:text-white">
@@ -333,7 +333,7 @@ export default function MedXConferenceClient() {
       <section className="py-10 md:py-16 bg-white dark:bg-[#080b0e]">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center space-y-3 mb-8">
-            <Badge className="bg-[#405862] text-[#4ecdc4] font-bold px-4 py-1 text-sm rounded-full">
+            <Badge className="bg-[#405862] text-[#8ee6df] font-bold px-4 py-1 text-sm rounded-full">
               Letters of Support
             </Badge>
             <h2 className="text-3xl md:text-4xl font-black text-[#405862] dark:text-white">
@@ -352,7 +352,7 @@ export default function MedXConferenceClient() {
       <section className="py-10 md:py-16 bg-[#f5f1eb]/60 dark:bg-[#0c1015]">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center space-y-3 mb-8">
-            <Badge className="bg-[#405862] text-[#4ecdc4] font-bold px-4 py-1 text-sm rounded-full">
+            <Badge className="bg-[#405862] text-[#8ee6df] font-bold px-4 py-1 text-sm rounded-full">
               Certificates of Recognition
             </Badge>
             <h2 className="text-3xl md:text-4xl font-black text-[#405862] dark:text-white">
@@ -371,7 +371,7 @@ export default function MedXConferenceClient() {
       <section className="py-10 bg-white dark:bg-[#080b0e] border-t border-b border-[#4ecdc4]/20">
         <div className="container max-w-5xl mx-auto px-4 text-center space-y-8">
           <div>
-            <Badge variant="secondary" className="bg-[#f5f1eb] dark:bg-[#161c24] text-[#405862] dark:text-teal-deep font-bold mb-2">
+            <Badge variant="secondary" className="bg-[#f5f1eb] dark:bg-[#161c24] text-[#405862] dark:text-[#4ecdc4] font-bold mb-2">
               Thank You
             </Badge>
             <h3 className="text-2xl font-extrabold text-[#405862] dark:text-white">
@@ -435,7 +435,7 @@ export default function MedXConferenceClient() {
             className="flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-[#11161d] rounded-2xl border border-[#405862]/10 shadow-md p-6 md:p-8 hover:shadow-lg hover:border-[#4ecdc4]/40 transition-all group"
           >
             <div className="w-14 h-14 rounded-xl bg-[#4ecdc4]/15 flex items-center justify-center flex-shrink-0">
-              <Newspaper className="h-7 w-7 text-[#405862] dark:text-teal-deep" />
+              <Newspaper className="h-7 w-7 text-[#405862] dark:text-[#4ecdc4]" />
             </div>
             <div className="flex-1 text-center md:text-left">
               <p className="text-xs font-bold uppercase tracking-wide text-teal-deep mb-1">As Featured In insauga</p>
@@ -453,7 +453,7 @@ export default function MedXConferenceClient() {
       <section className="py-12 md:py-16 bg-gradient-to-r from-[#405862] via-[#334852] to-[#405862] text-white">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="text-center space-y-3 mb-8">
-            <Award className="h-8 w-8 text-teal-deep mx-auto" />
+            <Award className="h-8 w-8 text-[#8ee6df] mx-auto" />
             <h3 className="text-2xl md:text-3xl font-black">Don&apos;t Miss What&apos;s Next</h3>
             <p className="text-white/80 max-w-xl mx-auto text-sm md:text-base">
               Registration for MedExplore 2026 is closed, but that&apos;s not the end. Follow along and be the
@@ -465,7 +465,7 @@ export default function MedXConferenceClient() {
             <Link href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
               <Button
                 size="lg"
-                className="bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] font-extrabold px-8 py-6 rounded-xl text-base shadow-lg flex items-center gap-2"
+                className="bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#2b3f47] font-extrabold px-8 py-6 rounded-xl text-base shadow-lg flex items-center gap-2"
               >
                 <Instagram className="h-5 w-5" />
                 Follow @dr.interested

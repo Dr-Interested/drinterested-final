@@ -11,12 +11,12 @@ export const revalidate = 300
 export const metadata: Metadata = generateSeoMetadata({
   title: "Blog",
   description:
-    "Every blog post from Dr. Interested: youth written insights, research, and guides on wellness careers, health, medicine, and skill building.",
+    "Every blog post from Dr. Interested: youth written insights, research, and guides on healthcare careers, health, medicine, and skill building.",
   url: "https://www.drinterested.org/publications/blog",
   keywords: [
     "Dr. Interested blog",
     "healthcare careers blog",
-    "wellness careers blog",
+    "healthcare careers blog",
     "medical education articles",
     "youth healthcare advocacy",
   ],
@@ -29,7 +29,7 @@ export default async function BlogListingPage() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Dr. Interested Blog",
-    description: "Every blog post from Dr. Interested on wellness careers, health, and skill building.",
+    description: "Every blog post from Dr. Interested on healthcare careers, health, and skill building.",
     url: "https://www.drinterested.org/publications/blog",
     isPartOf: { "@type": "WebSite", name: "Dr. Interested", url: "https://www.drinterested.org" },
     mainEntity: {
@@ -58,7 +58,7 @@ export default async function BlogListingPage() {
           />
           <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mb-4">Blog</h1>
           <p className="text-[#405862]/90 text-base md:text-lg max-w-2xl">
-            Youth written insights, research, and guides on wellness careers, health, medicine, and skill building — {blogs.length} posts and counting.
+            Youth written insights, research, and guides on healthcare careers, health, medicine, and skill building — {blogs.length} posts and counting.
           </p>
         </div>
       </section>

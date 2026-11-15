@@ -28,7 +28,7 @@ export default function Footer() {
               <Image src="/brand/logo-stacked.png" alt="Dr. Interested" width={120} height={98} className="h-auto w-[104px]" />
             </div>
             <p className="text-sm mb-4 text-white/80">
-              A youth led global wellness organization: wellness career education, access to policy spaces, and
+              A youth led global healthcare organization: healthcare career education, access to policy spaces, and
               community spaces for young people everywhere.
             </p>
             <div className="flex space-x-3">

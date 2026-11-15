@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     contentTypeLabel,
     publication.policy_type ? publication.policy_type.replace(/-/g, " ") : undefined,
     "Dr. Interested",
-    "youth wellness",
-    "wellness careers",
+    "youth health",
+    "healthcare careers",
     ...String(publication.title || "")
       .split(/\s+/)
       .filter((w: string) => w.length > 3),
@@ -182,7 +182,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
               {contentTypeLabel}
             </span>
             {publication.policy_type && (
-              <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#1976d2]">
+              <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#0d5aa7]">
                 {publication.policy_type.replace("-", " ")}
               </span>
             )}

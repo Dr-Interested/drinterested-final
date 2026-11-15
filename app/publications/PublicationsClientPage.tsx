@@ -71,7 +71,7 @@ export default function PublicationsClientPage({
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Dr. Interested Publications",
-    description: "Explore youth written blog posts, op-eds, and policy work on wellness careers, health, and policy.",
+    description: "Explore youth written blog posts, op-eds, and policy work on healthcare careers, health, and policy.",
     url: "https://www.drinterested.org/publications",
     isPartOf: {
       "@type": "WebSite",
@@ -101,7 +101,7 @@ export default function PublicationsClientPage({
             Publications
           </h1>
           <p className="text-center text-lg text-[#405862]/90 max-w-2xl mx-auto mb-3">
-            Youth written blog posts, op-eds, and policy work on wellness careers, health, policy, and systemic change.
+            Youth written blog posts, op-eds, and policy work on healthcare careers, health, policy, and systemic change.
           </p>
           <p className="text-center text-xs text-[#405862]/85 max-w-2xl mx-auto mb-8">
             Content on this page is for informational and entertainment purposes only and is not medical or career
@@ -164,7 +164,7 @@ export default function PublicationsClientPage({
           <div className="container">
             <CategorySectionHeader
               title="Blog"
-              description="Insights, research, and guides on wellness careers, health, medicine, and skill building."
+              description="Insights, research, and guides on healthcare careers, health, medicine, and skill building."
               href="/publications/blog"
               totalCount={blogs.length}
               itemLabel="Posts"

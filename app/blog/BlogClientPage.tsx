@@ -67,7 +67,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
     "@type": "CollectionPage",
     name: "Dr. Interested Blog",
     description:
-      "Youth written insights, research, and guides on wellness careers, health, medicine, and skill building.",
+      "Youth written insights, research, and guides on healthcare careers, health, medicine, and skill building.",
     url: "https://www.drinterested.org/blog",
     isPartOf: {
       "@type": "WebSite",
@@ -97,7 +97,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
             Dr. Interested Blog
           </h1>
           <p className="text-center text-lg text-[#405862]/90 max-w-2xl mx-auto mb-8">
-            Youth written insights, research, and guides on wellness careers, health, medicine, and skill building.
+            Youth written insights, research, and guides on healthcare careers, health, medicine, and skill building.
           </p>
 
           <div className="max-w-xl mx-auto relative">

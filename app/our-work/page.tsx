@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import OurWorkClient from "@/components/our-work/OurWorkClient"
 import { ALL_TIME } from "@/lib/impact-stats"
 
-const OUR_WORK_DESCRIPTION = `${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through wellness career education, access to policy spaces, and community spaces. See our 2026 programs.`
+const OUR_WORK_DESCRIPTION = `${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through healthcare career education, access to policy spaces, and community spaces. See our 2026 programs.`
 
 export const metadata: Metadata = {
   title: "Our Work",
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     "Dr. Interested impact",
     "Dr. Interested 2026",
     "389000 youth impacted",
-    "youth wellness programs",
-    "wellness career education",
+    "youth healthcare programs",
+    "healthcare career education",
     "youth in policy",
     "youth community spaces",
     "Research Proposal Competition",

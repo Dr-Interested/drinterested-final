@@ -1006,7 +1006,7 @@ export default function MembersClient() {
                   Join Our Executive Team
                 </h3>
                 <p>
-                  Dr. Interested is a youth led global wellness organization with members in{" "}
+                  Dr. Interested is a youth led global healthcare organization with members in{" "}
                   <strong>{ALL_TIME.countries} countries and territories</strong> and{" "}
                   <strong>{ALL_TIME.youthImpacted} youth impacted</strong> since 2025. We operate mostly online through
                   Discord, with in person opportunities depending on your city.
@@ -1180,7 +1180,7 @@ export default function MembersClient() {
                           Podcast Team
                         </h5>
                         <p className="text-xs text-[#405862]/85 leading-relaxed mt-2">
-                          Create engaging podcast content and amplify youth voices on health, leadership, and wellness careers from around the world.
+                          Create engaging podcast content and amplify youth voices on health, leadership, and healthcare careers from around the world.
                         </p>
                       </div>
                       <Link

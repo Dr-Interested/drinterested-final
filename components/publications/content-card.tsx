@@ -43,7 +43,7 @@ export default function ContentCard({ post, index }: { post: Publication; index:
           <div className="text-sm text-[#405862]/85 mb-2 flex items-center flex-wrap gap-2">
             <span className="bg-[#f5f1eb] px-2 py-1 rounded-full text-xs font-medium">{post.topic}</span>
             {post.policyType && (
-              <span className="bg-[#e3f2fd] px-2 py-1 rounded-full text-xs font-medium text-[#1976d2]">
+              <span className="bg-[#e3f2fd] px-2 py-1 rounded-full text-xs font-medium text-[#0d5aa7]">
                 {post.policyType.replace("-", " ")}
               </span>
             )}

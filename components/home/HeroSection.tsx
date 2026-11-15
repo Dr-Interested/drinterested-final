@@ -36,12 +36,12 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
             />
           </motion.div>
           <motion.h1 {...rise(0.05)} className="text-[2.1rem] leading-[1.08] font-semibold text-ink sm:text-5xl lg:text-[3.4rem]">
-            Where young people find their place in <span className="scribble">wellness</span>.
+            Helping every young person find their <span className="scribble">spark</span> in healthcare.
           </motion.h1>
           <motion.p {...rise(0.12)} className="mt-4 max-w-xl text-base leading-relaxed text-ink/85 sm:text-lg">
-            We&apos;re a youth led global organization. We help young people explore wellness careers, from health and
-            medicine to law and finance, get a voice in the rooms where policy is made, and find a community that
-            feels like theirs. Free, always.
+            We&apos;re a youth led global organization. We help young people explore healthcare careers, from
+            medicine and research to public health, law and policy, get a voice in the rooms where health decisions
+            are made, and find a community that feels like theirs. Free, always.
           </motion.p>
           <motion.div {...rise(0.18)} className="mt-6 flex flex-wrap items-center gap-3">
             <Link
