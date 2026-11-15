@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { PhotoTrio } from "@/components/site/photo-trio"
 import { PHOTOS } from "@/lib/media"
-import Image from "next/image"
+import Image from "@/components/site/img"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"

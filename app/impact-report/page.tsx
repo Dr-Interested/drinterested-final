@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import Image from "next/image"
+import Image from "@/components/site/img"
 import Link from "next/link"
 import { Download, FileText, ExternalLink } from "lucide-react"
 import SeoSchema from "@/components/seo-schema"

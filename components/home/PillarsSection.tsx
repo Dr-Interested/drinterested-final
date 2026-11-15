@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "@/components/site/img"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { Marquee } from "@/components/site/marquee"

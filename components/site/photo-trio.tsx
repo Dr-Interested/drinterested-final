@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "@/components/site/img"
 import type { Photo } from "@/lib/media"
 import { cn } from "@/lib/utils"
 

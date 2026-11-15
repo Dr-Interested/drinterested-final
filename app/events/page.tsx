@@ -53,6 +53,11 @@ function eventSchema(e: any) {
   }
 }
 
+/** Programs that never end, like Office Hours: always shown as open, never moved to past. */
+function isOngoing(e: any) {
+  return /office hours/i.test(e.title || "") || /forever|ongoing|year.?round/i.test(e.date || "")
+}
+
 export const revalidate = 60; // Revalidate events every 60 seconds (ISR)
 
 export const metadata: Metadata = {
@@ -119,6 +124,7 @@ export default async function EventsPage() {
   // that is still running is never moved early.
   const today = todayET()
   const isPast = (e: any) => {
+    if (isOngoing(e)) return false
     if (e.is_past) return true
     if (isDateRange(e.date)) return false
     const t = parseEventDate(e.date)
@@ -126,22 +132,33 @@ export default async function EventsPage() {
     return new Date(t).toISOString().slice(0, 10) < today
   }
   const withRecap = (e: any) => ({ ...e, recapHref: recapHrefFor(e.title || "", e.date) })
-  const rawUpcoming = (allEventsData?.filter((e) => !isPast(e)) || []).map(withRecap)
+  // Ongoing programs (Office Hours) stay open, whatever the portal says.
+  const asOngoing = (e: any) => ({
+    ...e,
+    ongoing: true,
+    date: "Ongoing, all year",
+    status: "open",
+    link: e.link || "https://discord.gg/pzbGRgsGXY",
+    image: "/media/programs/office-hours.webp",
+  })
+  const ongoingEvents = (allEventsData?.filter(isOngoing) || []).map(asOngoing)
+  const rawUpcoming = (allEventsData?.filter((e) => !isPast(e) && !isOngoing(e)) || []).map(withRecap)
   const rawPast = (allEventsData?.filter(isPast) || []).map(withRecap)
 
-  const upcomingEvents = sortEvents(rawUpcoming, true)
+  const datedUpcoming = sortEvents(rawUpcoming, true)
+  const upcomingEvents = [...datedUpcoming, ...ongoingEvents]
   const pastEvents = sortEvents(rawPast, false)
 
   // Only upcoming events get Event structured data — schema.org has no real "completed" status,
   // and Google's Event rich results are meant for things people can still attend/register for.
   const eventsListSchema = {
     "@context": "https://schema.org",
-    "@graph": upcomingEvents.map(eventSchema),
+    "@graph": datedUpcoming.map(eventSchema),
   }
 
   return (
     <>
-      {upcomingEvents.length > 0 && <SeoSchema id="events-schema" schema={eventsListSchema} />}
+      {datedUpcoming.length > 0 && <SeoSchema id="events-schema" schema={eventsListSchema} />}
       <EventsClientPage upcomingEvents={upcomingEvents} pastEvents={pastEvents} />
     </>
   )
