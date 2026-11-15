@@ -26,7 +26,7 @@ const poppins = Poppins({
 })
 
 const SITE_TITLE = "Dr. Interested | Youth Led Global Healthcare Organization"
-const SITE_DESCRIPTION = `Youth led global healthcare organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free healthcare career education, policy access, and community spaces.`
+const SITE_DESCRIPTION = `Youth led global healthcare organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through accessible healthcare career education, policy access, and community spaces.`
 const BANNER_ALT = "Dr. Interested: a youth led global healthcare organization"
 
 export const metadata: Metadata = {
@@ -171,7 +171,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <div className="flex min-h-screen flex-col">
               <Navbar />
-              <div className="h-16 md:hidden" aria-hidden="true" />
+              <div className="h-16 lg:hidden" aria-hidden="true" />
               <main className="flex-1">{children}</main>
               <Footer />
               <Toaster />

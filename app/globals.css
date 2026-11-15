@@ -33,25 +33,25 @@
 
   .dark {
     --background: 0 0% 0%;
-    --foreground: 30 26% 93%;
+    --foreground: 38 32% 88%;
     --card: 0 0% 6%;
-    --card-foreground: 30 26% 93%;
+    --card-foreground: 38 32% 88%;
     --popover: 0 0% 6%;
-    --popover-foreground: 30 26% 93%;
+    --popover-foreground: 38 32% 88%;
     --primary: 200 28% 31%;
-    --primary-foreground: 30 26% 93%;
+    --primary-foreground: 38 32% 88%;
     --secondary: 0 0% 8%;
-    --secondary-foreground: 30 26% 93%;
+    --secondary-foreground: 38 32% 88%;
     --muted: 0 0% 12%;
-    --muted-foreground: 30 26% 93%;
+    --muted-foreground: 38 32% 88%;
     --accent: 0 0% 10%;
-    --accent-foreground: 30 26% 93%;
+    --accent-foreground: 38 32% 88%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 30 26% 93%;
+    --destructive-foreground: 38 32% 88%;
     --border: 0 0% 15%;
     --input: 0 0% 15%;
     --ring: 200 28% 31%;
-    --c-ink: 233 229 223;
+    --c-ink: 235 228 216;
     --c-teal-deep: 142 230 223;
     --c-cream: 20 23 30;
     --c-cream-deep: 28 32 41;
@@ -499,13 +499,13 @@ img.loading {
 
 .dark body {
   background-color: #0b0d12;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark .main-bg,
 .dark .secondary-bg {
   background-color: #0b0d12;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark .third-bg {
@@ -515,7 +515,7 @@ img.loading {
 
 .dark [class*="bg-white"] {
   background-color: #15181f;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 /* Portal / dashboard use a gray scale the rest of the site doesn't — map it here so dark
@@ -556,7 +556,7 @@ img.loading {
 .dark [class*="text-gray-800"],
 .dark [class*="text-gray-900"],
 .dark [class*="text-[#1a1a1a]"],
-.dark [class*="text-[#0b0b0b]"] { color: #e9e5df; }
+.dark [class*="text-[#0b0b0b]"] { color: #ebe4d8; }
 .dark [class*="bg-blue-50"] { background-color: rgba(59, 130, 246, 0.14); }
 .dark [class*="bg-amber-50"], .dark [class*="bg-[#fff3cd]"] { background-color: rgba(245, 158, 11, 0.14); }
 .dark [class*="bg-green-50"], .dark [class*="bg-[#d4edda]"] { background-color: rgba(34, 197, 94, 0.14); }
@@ -599,7 +599,7 @@ img.loading {
 
 .dark [class*="bg-[#f5f1eb]"] {
   background-color: #0f1218;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark [class*="bg-[#f5f1eb]/50"] {
@@ -616,7 +616,7 @@ img.loading {
 
 .dark [class*="bg-[#f1ece7]"] {
   background-color: #0f1218;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark [class*="text-[#405862]"] {
@@ -723,7 +723,7 @@ img.loading {
 .dark [class*="bg-[#4ecdc4]/20"],
 .dark [class*="bg-[#4ecdc4]/30"] {
   background-color: rgba(78, 205, 196, 0.14);
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 /* ...but a mint chip with dark brand text needs its text lightened to stay readable. */
 .dark [class*="bg-[#4ecdc4]/10"][class*="text-[#405862]"],
@@ -1021,7 +1021,13 @@ img.loading {
 }
 /* The dark-slate logo becomes white on dark backgrounds. */
 .dark .logo-adapt {
-  filter: brightness(0) invert(0.94);
+  /* Black logo to the brand off-white (#ebe4d8). */
+  filter: brightness(0) invert(91%) sepia(9%) saturate(390%) hue-rotate(354deg) brightness(99%);
+}
+/* Dark mode uses the brand off-white for "white" text so it never glares. */
+.dark .text-white,
+.dark .dark\:text-white {
+  color: #ebe4d8;
 }
 
 /* Google Translate: keep its toolbar and tooltips out of the layout; the navbar picker replaces them. */

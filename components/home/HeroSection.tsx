@@ -71,7 +71,7 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
             {[
               [ALL_TIME.youthImpacted, "youth impacted"],
               [ALL_TIME.countries, "countries and territories"],
-              [ALL_TIME.executives, "youth executives"],
+              ["$60K+", "in funding raised"],
             ].map(([n, l]) => (
               <div key={l}>
                 <dt className="sr-only">{l}</dt>

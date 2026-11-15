@@ -62,7 +62,7 @@ const MORE = [
 
 const COOKIE = "googtrans"
 
-function readLang(): string {
+export function readLang(): string {
   const m = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/)
   const code = m ? decodeURIComponent(m[1]).split("/").pop() : ""
   return code || "en"
@@ -76,6 +76,13 @@ function writeLang(code: string) {
     if (code === "en") document.cookie = `${COOKIE}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/${d}`
     else document.cookie = `${COOKIE}=/en/${code}; path=/; max-age=31536000; SameSite=Lax${d}`
   }
+}
+
+/** The language the visitor picked ("en" until the page has mounted). */
+export function useSiteLang(): string {
+  const [lang, setLang] = useState("en")
+  useEffect(() => setLang(readLang()), [])
+  return lang
 }
 
 declare global {
@@ -117,7 +124,7 @@ export function LanguagePicker({ className }: { className?: string }) {
         <DropdownMenuTrigger
           aria-label={`Language: ${current?.name ?? "English"}. Change language`}
           className={cn(
-            "notranslate inline-flex h-8 items-center gap-1 rounded-full px-2 text-xs font-semibold uppercase text-ink transition hover:bg-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-deep",
+            "notranslate inline-flex h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 text-xs font-semibold uppercase text-ink transition hover:bg-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-deep",
             className,
           )}
           translate="no"

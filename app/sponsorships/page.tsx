@@ -67,7 +67,7 @@ export default function SponsorshipsPage() {
             Sponsorships & Donations
           </h1>
           <p className="text-lg text-[#405862]/90 max-w-2xl mx-auto text-pretty">
-            Help keep healthcare career education, policy access, and community spaces free for every young person. Our
+            Help keep healthcare career education, policy access, and community spaces accessible to every young person. Our
             community has impacted {ALL_TIME.youthImpacted} youth across {ALL_TIME.countries} countries and territories,
             with {ALL_TIME.impressions} impressions across our platforms.
           </p>
@@ -232,7 +232,7 @@ export default function SponsorshipsPage() {
           <Card>
             <LevelHeading level={3} icon={Heart} title="Donate as an individual or family" />
             <p className="text-[#405862]/90 mb-4 leading-relaxed">
-              Donations fund our programs, events, and the tools that keep our programs free. Send an e-transfer to{" "}
+              Donations fund our programs, events, and the tools that keep our programs low barrier. Send an e-transfer to{" "}
               <a href="mailto:finance@drinterested.org" className="font-semibold text-[#405862] underline underline-offset-2">
                 finance@drinterested.org
               </a>{" "}

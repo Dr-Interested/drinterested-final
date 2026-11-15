@@ -19,7 +19,7 @@ function toIsoDate(dateStr: string, timeStr?: string): string {
 function eventSchema(e: any) {
   const isVirtual = /virtual|online|zoom|webinar/i.test(e.location || "")
   const registrationUrl = e.link && e.link.startsWith("http") ? e.link : `${baseUrl}/events`
-  // Dr. Interested events are free to attend; availability tracks the registration status.
+  // Availability tracks the registration status.
   const availability =
     e.status === "full" || e.status === "closed"
       ? "https://schema.org/SoldOut"
@@ -58,10 +58,10 @@ export const revalidate = 60; // Revalidate events every 60 seconds (ISR)
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "Free events for youth from Dr. Interested: healthcare career webinars, conferences, case and research competitions, and policy sessions. Find your next event.",
+    "Accessible, low barrier events for youth from Dr. Interested: healthcare career webinars, conferences, case and research competitions, and policy sessions. Find your next event.",
   keywords: [
     "Dr. Interested events",
-    "free youth events",
+    "youth healthcare events",
     "healthcare career webinars",
     "healthcare career events",
     "youth policy events",
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Events | Dr. Interested",
     description:
-      "Free Dr. Interested events for youth: healthcare career talks, conferences, case competitions, policy sessions and community events.",
+      "Accessible Dr. Interested events for youth: healthcare career talks, conferences, case competitions, policy sessions and community events.",
     url: "https://www.drinterested.org/events",
     siteName: "Dr. Interested",
     type: "website",

@@ -9,7 +9,7 @@ export const revalidate = 300; // Revalidate homepage every 5 minutes (ISR)
 export const metadata: Metadata = {
   // An absolute title: the root template would otherwise append "| Dr. Interested" twice.
   title: { absolute: "Dr. Interested | Helping Youth Find Their Spark in Healthcare" },
-  description: `Youth led global healthcare organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free healthcare career education, policy access, and community spaces.`,
+  description: `Youth led global healthcare organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through accessible healthcare career education, policy access, and community spaces.`,
   alternates: {
     canonical: "https://www.drinterested.org",
     languages: {

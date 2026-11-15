@@ -39,7 +39,7 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
         <div className="container">
           <h1 className="text-3xl font-semibold text-ink md:text-5xl">Events</h1>
           <p className="mt-3 max-w-2xl text-base text-ink/85 md:text-lg">
-            Free events across our three pillars: healthcare career education, access to policy spaces, and community
+            Low barrier events across our three pillars: healthcare career education, access to policy spaces, and community
             spaces. We ran {YEAR_2026.events} of them in 2026 alone.
           </p>
         </div>

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Instagram, Linkedin } from "lucide-react"
 import DiscordIcon from "@/components/icons/discord-icon"
-import { LanguagePicker } from "@/components/site/language-picker"
+import { LanguagePicker, useSiteLang } from "@/components/site/language-picker"
 import { ThemeToggle } from "@/components/site/theme-toggle"
 
 type Route = { href: string; label: string; children?: { href: string; label: string }[] }
@@ -40,7 +40,36 @@ const routes: Route[] = [
   },
 ]
 
+// Hand-written French navigation; Google Translate gets these wrong ("Home" becomes "Maison").
+const FR: Record<string, string> = {
+  Home: "Accueil",
+  "Our Work": "Notre travail",
+  "Our Programs": "Nos programmes",
+  "2026 Impact Report": "Rapport d'impact 2026",
+  "In the Media": "Dans les médias",
+  Events: "Événements",
+  Publications: "Publications",
+  Members: "Équipe",
+  Sponsorships: "Commandites",
+  Contact: "Contact",
+  "Contact Us": "Nous joindre",
+  "Media Inquiries": "Demandes des médias",
+  "Profiles Hub": "Nos profils",
+  "Join Us": "Nous rejoindre",
+  "Interested?": "Intéressé?",
+}
+
 export default function Navbar() {
+  const lang = useSiteLang()
+  // In French, our labels replace Google's and are marked so Google leaves them alone.
+  const t = (label: string) =>
+    lang === "fr" && FR[label] ? (
+      <span translate="no" className="notranslate">
+        {FR[label]}
+      </span>
+    ) : (
+      label
+    )
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -94,7 +123,7 @@ export default function Navbar() {
         // Fixed vertical padding and a fixed-width (always-present, just transparent when idle)
         // border at all times — only background/shadow/border-color toggle on scroll, so the
         // header's box height never changes and never shifts page content below it (avoids CLS).
-        "fixed top-0 md:sticky z-50 w-full py-2 border-b backdrop-blur-md supports-[backdrop-filter]:bg-background/60 transition-colors duration-300",
+        "fixed top-0 lg:sticky z-50 w-full py-2 border-b backdrop-blur-md supports-[backdrop-filter]:bg-background/60 transition-colors duration-300",
         scrolled ? "bg-white/95 shadow-md border-border" : "bg-transparent border-transparent",
       )}
     >
@@ -102,7 +131,7 @@ export default function Navbar() {
         <div className="flex items-center gap-1">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
@@ -132,7 +161,7 @@ export default function Navbar() {
                       )}
                     >
                       {isActive(route.href) && <div className="w-1 h-4 bg-[#4ecdc4] mr-2 rounded-full"></div>}
-                      {route.label}
+                      {t(route.label)}
                     </Link>
                   )).flatMap((link, i) => {
                     const children = routes[i].children?.slice(1) ?? []
@@ -145,7 +174,7 @@ export default function Navbar() {
                           onClick={() => setIsOpen(false)}
                           className="ml-6 px-3 py-2 text-sm text-muted-foreground hover:text-[#405862] hover:bg-[#f5f1eb]/50 rounded-md"
                         >
-                          {c.label}
+                          {t(c.label)}
                         </Link>
                       )),
                     ]
@@ -157,7 +186,7 @@ export default function Navbar() {
                     className="flex w-full justify-center border border-[#405862] text-[#405862] hover:bg-[#405862]/10 px-4 py-3 rounded-md text-sm font-medium transition-all"
                     onClick={() => setIsOpen(false)}
                   >
-                    Join Us
+                    {t("Join Us")}
                   </Link>
                   <Link
                     href="https://forms.gle/UMyitptfyXvdSCtz7"
@@ -166,7 +195,7 @@ export default function Navbar() {
                     className="flex w-full justify-center bg-[#405862] text-white hover:bg-[#334852] px-4 py-3 rounded-md text-sm font-medium transition-all hover:shadow-md"
                     onClick={() => setIsOpen(false)}
                   >
-                    Interested?
+                    {t("Interested?")}
                   </Link>
                   <div className="flex items-center justify-center gap-4 mt-4">
                     <Link
@@ -208,7 +237,7 @@ export default function Navbar() {
             <div className="relative w-8 h-8 md:w-9 md:h-9 transition-transform duration-300 group-hover:-rotate-6">
               <Image src="/brand/icon.png" alt="" fill sizes="36px" priority className="logo-adapt" />
             </div>
-            <div className="font-display font-semibold text-base md:text-lg text-ink">
+            <div className="whitespace-nowrap font-display font-semibold text-base md:text-lg text-ink">
               <span translate="no" className="notranslate">
                 Dr. <span className="text-teal-deep">Interested</span>
               </span>
@@ -216,17 +245,17 @@ export default function Navbar() {
             </div>
           </Link>
         </div>
-        <nav className="hidden md:flex items-center gap-4">
+        <nav className="hidden lg:flex items-center gap-0.5 lg:ml-3 xl:gap-2">
           {routes.map((route) => (
             <div key={route.href} className="relative group">
               <Link
                 href={route.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-[#405862] relative py-1 px-2 rounded-md",
+                  "whitespace-nowrap text-sm font-medium transition-colors hover:text-[#405862] relative py-1 px-2 rounded-md",
                   isActive(route.href) ? "text-[#405862] font-bold" : "text-muted-foreground hover:bg-[#f5f1eb]/50",
                 )}
               >
-                {route.label}
+                {t(route.label)}
                 {isActive(route.href) && (
                   <span className="absolute -bottom-[5px] left-0 w-full h-0.5 bg-[#4ecdc4] rounded-full"></span>
                 )}
@@ -239,9 +268,9 @@ export default function Navbar() {
                       <Link
                         key={c.href}
                         href={c.href}
-                        className="block px-4 py-2 text-sm text-[#405862]/90 hover:bg-[#f5f1eb] hover:text-[#405862]"
+                        className="block whitespace-nowrap px-4 py-2 text-sm text-[#405862]/90 hover:bg-[#f5f1eb] hover:text-[#405862]"
                       >
-                        {c.label}
+                        {t(c.label)}
                       </Link>
                     ))}
                   </div>
@@ -250,26 +279,26 @@ export default function Navbar() {
             </div>
           ))}
         </nav>
-        <div className="flex items-center gap-1.5 md:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 xl:gap-3">
           <div className="flex items-center">
             <LanguagePicker />
             <ThemeToggle />
           </div>
           <Link
             href="/members/join"
-            className="hidden md:inline-flex border border-[#405862] text-[#405862] hover:bg-[#405862]/10 px-3 py-1.5 rounded-md text-sm font-medium transition-all hover:shadow-md hover:scale-105 duration-300"
+            className="hidden lg:inline-flex whitespace-nowrap border border-[#405862] text-[#405862] hover:bg-[#405862]/10 px-3 py-1.5 rounded-md text-sm font-medium transition-all hover:shadow-md hover:scale-105 duration-300"
           >
-            Join Us
+            {t("Join Us")}
           </Link>
           <Link
             href="https://discord.gg/pzbGRgsGXY"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:inline-flex bg-[#405862] text-white hover:bg-[#334852] px-3 py-1.5 rounded-md text-sm font-medium transition-all hover:shadow-md hover:scale-105 duration-300"
+            className="hidden xl:inline-flex whitespace-nowrap bg-[#405862] text-white hover:bg-[#334852] px-3 py-1.5 rounded-md text-sm font-medium transition-all hover:shadow-md hover:scale-105 duration-300"
           >
-            Interested?
+            {t("Interested?")}
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 lg:hidden xl:flex">
             <Link
               href="https://discord.gg/pzbGRgsGXY"
               target="_blank"

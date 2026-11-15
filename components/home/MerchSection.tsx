@@ -29,7 +29,7 @@ export default function MerchSection() {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-ink md:text-xl">Wear the mission</h2>
-              <p className="text-sm text-ink/85">T-shirts, hoodies, stickers and mugs. Every order supports our free programs.</p>
+              <p className="text-sm text-ink/85">T-shirts, hoodies, stickers and mugs. Every order helps keep our programs accessible.</p>
             </div>
           </div>
           <a
