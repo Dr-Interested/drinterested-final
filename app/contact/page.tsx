@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Dr. Interested media inquiries",
     "Dr. Interested press contact",
     "Dr. Interested profiles",
-    "youth wellness organization contact",
+    "youth healthcare organization contact",
     "partner with Dr. Interested",
   ],
   openGraph: {
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: "Contact Dr. Interested",
       },
     ],

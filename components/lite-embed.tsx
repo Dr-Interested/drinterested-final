@@ -16,7 +16,7 @@ function OpenFullPageLink({ href }: { href: string }) {
   return (
     <Link
       href={href}
-      className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#405862] hover:text-[#4ecdc4] transition-colors"
+      className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#405862] hover:text-teal-deep transition-colors"
     >
       Open full page
       <ArrowUpRight className="h-3 w-3" />

@@ -15,7 +15,7 @@
     --secondary: 0 0% 100%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 39 30% 95%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215 19% 35%;
     --accent: 39 30% 95%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
@@ -24,28 +24,37 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 200 28% 31%;
     --radius: 0.5rem;
+    /* Brand tokens (see tailwind.config.ts) */
+    --c-ink: 64 88 98;
+    --c-teal-deep: 35 115 109;
+    --c-cream: 245 241 235;
+    --c-cream-deep: 235 228 216;
   }
 
   .dark {
     --background: 0 0% 0%;
-    --foreground: 30 26% 93%;
+    --foreground: 38 32% 88%;
     --card: 0 0% 6%;
-    --card-foreground: 30 26% 93%;
+    --card-foreground: 38 32% 88%;
     --popover: 0 0% 6%;
-    --popover-foreground: 30 26% 93%;
+    --popover-foreground: 38 32% 88%;
     --primary: 200 28% 31%;
-    --primary-foreground: 30 26% 93%;
+    --primary-foreground: 38 32% 88%;
     --secondary: 0 0% 8%;
-    --secondary-foreground: 30 26% 93%;
+    --secondary-foreground: 38 32% 88%;
     --muted: 0 0% 12%;
-    --muted-foreground: 30 26% 93%;
+    --muted-foreground: 38 32% 88%;
     --accent: 0 0% 10%;
-    --accent-foreground: 30 26% 93%;
+    --accent-foreground: 38 32% 88%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 30 26% 93%;
+    --destructive-foreground: 38 32% 88%;
     --border: 0 0% 15%;
     --input: 0 0% 15%;
     --ring: 200 28% 31%;
+    --c-ink: 235 228 216;
+    --c-teal-deep: 142 230 223;
+    --c-cream: 20 23 30;
+    --c-cream-deep: 28 32 41;
   }
 }
 
@@ -55,6 +64,17 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Headings use Poppins (the impact report and Instagram heading face); body text stays Inter. */
+  h1,
+  h2,
+  h3,
+  .font-bricolage {
+    font-family: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
+    letter-spacing: -0.015em;
+  }
+  h1 {
+    letter-spacing: -0.025em;
   }
   /* iOS Safari zooms the whole page when a field with text under 16px is focused, and many
      forms here use 14px (text-sm). Keep form text at 16px on phones so tapping a field never
@@ -479,13 +499,13 @@ img.loading {
 
 .dark body {
   background-color: #0b0d12;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark .main-bg,
 .dark .secondary-bg {
   background-color: #0b0d12;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark .third-bg {
@@ -495,7 +515,7 @@ img.loading {
 
 .dark [class*="bg-white"] {
   background-color: #15181f;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 /* Portal / dashboard use a gray scale the rest of the site doesn't — map it here so dark
@@ -536,7 +556,7 @@ img.loading {
 .dark [class*="text-gray-800"],
 .dark [class*="text-gray-900"],
 .dark [class*="text-[#1a1a1a]"],
-.dark [class*="text-[#0b0b0b]"] { color: #e9e5df; }
+.dark [class*="text-[#0b0b0b]"] { color: #ebe4d8; }
 .dark [class*="bg-blue-50"] { background-color: rgba(59, 130, 246, 0.14); }
 .dark [class*="bg-amber-50"], .dark [class*="bg-[#fff3cd]"] { background-color: rgba(245, 158, 11, 0.14); }
 .dark [class*="bg-green-50"], .dark [class*="bg-[#d4edda]"] { background-color: rgba(34, 197, 94, 0.14); }
@@ -579,7 +599,7 @@ img.loading {
 
 .dark [class*="bg-[#f5f1eb]"] {
   background-color: #0f1218;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark [class*="bg-[#f5f1eb]/50"] {
@@ -596,7 +616,7 @@ img.loading {
 
 .dark [class*="bg-[#f1ece7]"] {
   background-color: #0f1218;
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 
 .dark [class*="text-[#405862]"] {
@@ -703,7 +723,7 @@ img.loading {
 .dark [class*="bg-[#4ecdc4]/20"],
 .dark [class*="bg-[#4ecdc4]/30"] {
   background-color: rgba(78, 205, 196, 0.14);
-  color: #e9e5df;
+  color: #ebe4d8;
 }
 /* ...but a mint chip with dark brand text needs its text lightened to stay readable. */
 .dark [class*="bg-[#4ecdc4]/10"][class*="text-[#405862]"],
@@ -955,4 +975,73 @@ img.loading {
 .dark .blog-prose blockquote {
   background: #161c24;
   color: #f1ece7;
+}
+
+
+/* ---- 2026 redesign helpers ---- */
+/* Marquees pause on hover and stop entirely for people who prefer reduced motion. */
+.marquee-track:hover,
+.marquee-track:focus-within {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
+  }
+}
+/* Soft fade at the edges of horizontal scrollers. */
+.edge-fade-x {
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.edge-fade-y {
+  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+}
+/* A small hand-drawn underline used under key words in headings. */
+.scribble {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8.5C40 3 90 2.5 198 6.5' stroke='%234ecdc4' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 0.45em;
+  background-position: 0 100%;
+  padding-bottom: 0.12em;
+}
+
+
+/* ---- Dark mode for the 2026 redesign ---- */
+/* Solid ink panels and buttons stay dark (ink text flips light, these must not). */
+.dark .bg-ink,
+.dark .hover\:bg-ink-deep:hover {
+  background-color: #1f2c32;
+}
+/* Gradients that fade to white fade to the page colour instead. */
+.dark .to-white {
+  --tw-gradient-to: #0b0d12 var(--tw-gradient-to-position);
+}
+.dark .via-white {
+  --tw-gradient-stops: var(--tw-gradient-from), #0b0d12 var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+/* The dark-slate logo becomes white on dark backgrounds. */
+.dark .logo-adapt {
+  /* Black logo to the brand off-white (#ebe4d8). */
+  filter: brightness(0) invert(91%) sepia(9%) saturate(390%) hue-rotate(354deg) brightness(99%);
+}
+/* Dark mode uses the brand off-white for "white" text so it never glares. */
+.dark .text-white,
+.dark .dark\:text-white {
+  color: #ebe4d8;
+}
+
+/* Google Translate: keep its toolbar and tooltips out of the layout; the navbar picker replaces them. */
+iframe.skiptranslate,
+body > .skiptranslate,
+.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
+font[style] > font {
+  background: none !important;
+  box-shadow: none !important;
 }

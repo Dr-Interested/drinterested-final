@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     url: "https://www.drinterested.org/safeguarding-policy",
     siteName: "Dr. Interested",
     type: "website",
-    images: [{ url: "/websitebanner.jpg", width: 1920, height: 1080, alt: "Dr. Interested Safeguarding Policy" }],
+    images: [{ url: "/og-2026.jpg", width: 1200, height: 630, alt: "Dr. Interested Safeguarding Policy" }],
   },
   alternates: {
     canonical: "https://www.drinterested.org/safeguarding-policy",

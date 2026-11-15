@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: "Medical-Technological Internship Recap",
       },
     ],
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     description:
       "Explore amazing projects from our Medical-Technological Internship featuring cutting-edge healthcare technologies.",
     images: {
-      url: "/websitebanner.jpg",
+      url: "/og-2026.jpg",
       alt: "Medical-Technological Internship Recap",
     },
   },

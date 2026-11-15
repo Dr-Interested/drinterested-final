@@ -1,0 +1,4 @@
+# Raw uploads stay in the repo as source material but are never deployed: they are large and
+# some carry phone location data or personal details. The site uses the processed copies in
+# public/media and public/brand.
+public/2026-update-images-vids

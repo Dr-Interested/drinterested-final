@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Every episode of the Dr. Interested Podcast — written and hosted by our members, covering health topics from neuroscience to nutrition to mental health.",
   keywords: [
     "Dr. Interested Podcast",
-    "youth wellness podcast",
+    "youth health podcast",
     "healthcare careers podcast",
     "youth health podcast",
   ],
@@ -62,7 +62,7 @@ export default async function PodcastsPage() {
             ]}
           />
           <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mb-4">Dr. Interested Podcast</h1>
-          <p className="text-[#405862]/80 text-base md:text-lg max-w-2xl">
+          <p className="text-[#405862]/90 text-base md:text-lg max-w-2xl">
             Every episode, written and hosted by our members — {sorted.length} episodes and counting.
           </p>
         </div>

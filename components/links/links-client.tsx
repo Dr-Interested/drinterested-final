@@ -39,7 +39,7 @@ export default function LinksPageClient() {
       title: "Join Our Discord Community",
       url: "https://discord.gg/pzbGRgsGXY",
       icon: <DiscordIcon className="h-5 w-5" />,
-      color: "bg-[#5865F2] hover:bg-[#4752C4]",
+      color: "bg-[#4752C4] hover:bg-[#3a43a3]",
     },
     {
       title: "Follow Us on Instagram",
@@ -58,13 +58,13 @@ export default function LinksPageClient() {
       title: "Subscribe on YouTube",
       url: "https://www.youtube.com/@Dr.Interested",
       icon: <Youtube className="h-5 w-5" />,
-      color: "bg-[#FF0000] hover:bg-[#CC0000]",
+      color: "bg-[#c4000f] hover:bg-[#9e000c]",
     },
     {
       title: "Listen on YouTube Music",
       url: "https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4",
       icon: <Music className="h-5 w-5" />,
-      color: "bg-[#4285F4] hover:bg-[#3367D6]",
+      color: "bg-[#2b63d6] hover:bg-[#1f4fb0]",
     },
     {
       title: "Listen on Spotify",
@@ -81,7 +81,7 @@ export default function LinksPageClient() {
           <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
         </svg>
       ),
-      color: "bg-[#1DB954] hover:bg-[#1AA34A]",
+      color: "bg-[#11793a] hover:bg-[#0d5f2d]",
     },
     {
       title: "Shop Our Merch",
@@ -105,7 +105,7 @@ export default function LinksPageClient() {
       title: "Upcoming Events",
       url: "/events",
       icon: <Calendar className="h-5 w-5" />,
-      color: "bg-[#4ecdc4] hover:bg-[#3dbdb5]",
+      color: "bg-[#23736d] hover:bg-[#1c5c57]",
     },
     {
       title: "Read Our Blog",
@@ -117,13 +117,13 @@ export default function LinksPageClient() {
       title: "Meet Our Team",
       url: "/members",
       icon: <Users className="h-5 w-5" />,
-      color: "bg-[#8B5CF6] hover:bg-[#7C3AED]",
+      color: "bg-[#6d3fd9] hover:bg-[#5b2fc2]",
     },
     {
       title: "Contact Us",
       url: "/contact",
       icon: <Mail className="h-5 w-5" />,
-      color: "bg-[#EC4899] hover:bg-[#DB2777]",
+      color: "bg-[#c2185b] hover:bg-[#9d1249]",
     },
   ]
 
@@ -161,17 +161,17 @@ export default function LinksPageClient() {
             />
           </div>
           <h1 className="text-2xl font-bold text-[#405862] text-center">
-            Dr. <span className="text-[#4ecdc4]">Interested</span>
+            Dr. <span className="text-teal-deep">Interested</span>
           </h1>
-          <p className="text-[#405862]/80 text-center mt-2 text-sm max-w-xs">
-            A youth led global wellness organization
+          <p className="text-[#405862]/90 text-center mt-2 text-sm max-w-xs">
+            A youth led global healthcare organization
           </p>
 
           <div className="flex items-center mt-3 text-sm bg-[#f0ebe3] rounded-full px-3 py-1.5">
-            <span className="text-[#405862]/70 mr-2">www.drinterested.org/links</span>
+            <span className="text-[#405862]/85 mr-2">www.drinterested.org/links</span>
             <button
               onClick={copyToClipboard}
-              className="text-[#4ecdc4] hover:text-[#3dbdb5] transition-colors"
+              className="text-teal-deep hover:text-[#3dbdb5] transition-colors"
               aria-label="Copy link to clipboard"
             >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -204,20 +204,20 @@ export default function LinksPageClient() {
         </motion.div>
 
         <motion.div
-          className="mt-10 text-center text-sm text-[#405862]/60"
+          className="mt-10 text-center text-sm text-[#405862]/85"
           initial={{ opacity: 0 }}
           animate={isLoaded ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 1, duration: 0.6 }}
         >
           <p>© {new Date().getFullYear()} Dr. Interested</p>
           <div className="flex justify-center space-x-3 mt-2">
-            <Link href="/privacy-policy" className="hover:text-[#4ecdc4] transition-colors">
+            <Link href="/privacy-policy" className="hover:text-teal-deep transition-colors">
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-[#4ecdc4] transition-colors">
+            <Link href="/terms" className="hover:text-teal-deep transition-colors">
               Terms
             </Link>
-            <Link href="/contact" className="hover:text-[#4ecdc4] transition-colors">
+            <Link href="/contact" className="hover:text-teal-deep transition-colors">
               Contact
             </Link>
           </div>

@@ -13,23 +13,15 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
   return (
     <>
       {/* Latest Content Section */}
-      <section className="py-10 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container">
-          <motion.div
-            className="text-center mb-6"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeIn}
-          >
-            <h2 className="text-2xl font-bold text-[#405862] inline-flex flex-col items-center">
-              Latest Content
-              <div className="w-16 h-1 bg-[#4ecdc4] mt-2"></div>
-            </h2>
-            <p className="text-[#405862]/70 max-w-2xl mx-auto mt-2 text-sm">
-              Explore our latest blog posts and podcast episodes
+          <div className="mb-6">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-teal-deep">Youth educating youth</p>
+            <h2 className="text-2xl md:text-3xl font-semibold text-ink">Fresh from our writers and podcast</h2>
+            <p className="mt-2 max-w-2xl text-[15px] text-ink/85">
+              55 articles across 18 topics and 39 podcast episodes in 2026, written and hosted by our members.
             </p>
-          </motion.div>
+          </div>
 
           {/* Blog Section */}
           {recentPost && (
@@ -38,17 +30,17 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
-              className="mb-10"
+              className="mb-8"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-[#405862]">Latest from Our Publications</h3>
-                <Link href="/publications" className="text-[#405862] hover:text-[#4ecdc4] text-sm flex items-center group">
+                <Link href="/publications" className="text-[#405862] hover:text-teal-deep text-sm flex items-center group">
                   <span>View all posts</span>
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
 
-              <Card className="overflow-hidden border-[#405862]/10 shadow-md hover:shadow-lg transition-all duration-300 group">
+              <Card className="overflow-hidden rounded-2xl border-ink/10 shadow-sm hover:shadow-md transition-all duration-300 group">
                 <div className="grid md:grid-cols-2">
                   <div className="relative h-48 md:h-auto overflow-hidden">
                     <Image
@@ -62,7 +54,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   </div>
                   <CardContent className="p-5 flex flex-col">
                     <div>
-                      <div className="flex items-center text-xs text-[#405862]/70 mb-2 flex-wrap gap-2">
+                      <div className="flex items-center text-xs text-[#405862]/85 mb-2 flex-wrap gap-2">
                         <span className="bg-[#405862]/10 px-2.5 py-0.5 rounded-full">{recentPost.topic}</span>
                         <span className="flex items-center">
                           <Clock className="h-3 w-3 mr-1" />
@@ -74,11 +66,11 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                         </span>
                       </div>
                       <Link href={`/publications/${recentPost.slug}`}>
-                        <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+                        <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors">
                           {recentPost.title}
                         </h3>
                       </Link>
-                      <p className="text-[#405862]/80 mb-4 text-sm line-clamp-2">{recentPost.excerpt}</p>
+                      <p className="text-[#405862]/90 mb-4 text-sm line-clamp-2">{recentPost.excerpt}</p>
                     </div>
                     <div className="mt-auto">
                       <div className="flex items-center mb-3">
@@ -119,7 +111,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://open.spotify.com/show/6SLlRUL6co6fPxckAdrigf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#1DB954] hover:text-[#1ed760] text-sm flex items-center group"
+                  className="text-[#11793a] hover:text-[#0d5f2d] dark:text-[#1ed760] dark:hover:text-[#1ed760] text-sm flex items-center group"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +129,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://www.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#FF0000] hover:text-[#ff3333] text-sm flex items-center group"
+                  className="text-[#c4000f] hover:text-[#9e000c] dark:text-[#ff5a5a] dark:hover:text-[#ff5a5a] text-sm flex items-center group"
                 >
                   <Youtube className="h-4 w-4 mr-1" />
                   <span>YouTube</span>
@@ -146,7 +138,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#4285F4] hover:text-[#5a95f5] text-sm flex items-center group"
+                  className="text-[#2b63d6] hover:text-[#1f4fb0] dark:text-[#7fa8ff] dark:hover:text-[#7fa8ff] text-sm flex items-center group"
                 >
                   <Music className="h-4 w-4 mr-1" />
                   <span>YouTube Music</span>
@@ -171,7 +163,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                     href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#4285F4] hover:text-[#5a95f5] text-xs flex items-center"
+                    className="text-[#2b63d6] hover:text-[#1f4fb0] dark:text-[#7fa8ff] dark:hover:text-[#7fa8ff] text-xs flex items-center"
                   >
                     <Music className="h-3 w-3 mr-1" />
                     <span>YouTube Music</span>
@@ -186,16 +178,16 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
             </div>
 
             <div className="mt-4 text-center">
-              <p className="text-sm text-[#405862]/80 mb-3">
+              <p className="text-sm text-[#405862]/90 mb-3">
                 Our podcast features youth leaders, changemakers, and professionals talking about health, leadership,
-                wellness careers, and the future.
+                healthcare careers, and the future.
               </p>
               <div className="flex justify-center items-center gap-4 flex-wrap">
                 <Link
                   href="https://open.spotify.com/show/6SLlRUL6co6fPxckAdrigf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#1DB954] hover:text-[#1ed760] text-sm font-medium"
+                  className="inline-flex items-center text-[#11793a] hover:text-[#0d5f2d] dark:text-[#1ed760] dark:hover:text-[#1ed760] text-sm font-medium"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -213,7 +205,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://www.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#FF0000] hover:text-[#ff3333] text-sm font-medium"
+                  className="inline-flex items-center text-[#c4000f] hover:text-[#9e000c] dark:text-[#ff5a5a] dark:hover:text-[#ff5a5a] text-sm font-medium"
                 >
                   <Play className="h-4 w-4 mr-1 fill-current" />
                   <span>Watch on YouTube</span>
@@ -222,7 +214,7 @@ export default function LatestContentSection({ featuredPosts, recentPost }: { fe
                   href="https://music.youtube.com/playlist?list=PLhgtIQtU24W2axj8qIfCS-j1idk6LbCF4"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-[#4285F4] hover:text-[#5a95f5] text-sm font-medium"
+                  className="inline-flex items-center text-[#2b63d6] hover:text-[#1f4fb0] dark:text-[#7fa8ff] dark:hover:text-[#7fa8ff] text-sm font-medium"
                 >
                   <Music className="h-4 w-4 mr-1" />
                   <span>Listen on YouTube Music</span>

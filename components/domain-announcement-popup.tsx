@@ -98,27 +98,27 @@ export function DomainAnnouncementPopup({ onClose, isMainPage = false }: DomainA
                 {/* Title */}
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-[#405862] leading-tight">Our 2026 Annual Impact Report Is Here</h2>
-                  <p className="text-sm font-medium text-[#405862]/70">A year of youth led change and impact</p>
+                  <p className="text-sm font-medium text-[#405862]/85">A year of youth led change and impact</p>
                 </div>
 
-                <p className="text-sm text-[#405862]/80 leading-relaxed max-w-md mx-auto">
+                <p className="text-sm text-[#405862]/90 leading-relaxed max-w-md mx-auto">
                   This year, {YEAR_2026.executives} executives and {YEAR_2026.volunteers} volunteers helped us reach{" "}
-                  {YEAR_2026.youthImpacted} young people through wellness career education, access to policy spaces, and
+                  {YEAR_2026.youthImpacted} young people through healthcare career education, access to policy spaces, and
                   community spaces.
                 </p>
 
                 <div className="grid grid-cols-3 gap-2 bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-[#4ecdc4]/30">
                   <div>
                     <p className="text-lg font-bold text-[#405862]">{ALL_TIME.youthImpacted}</p>
-                    <p className="text-[11px] text-[#405862]/70">youth impacted since 2025</p>
+                    <p className="text-[11px] text-[#405862]/85">youth impacted since 2025</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-[#405862]">{ALL_TIME.members}</p>
-                    <p className="text-[11px] text-[#405862]/70">members</p>
+                    <p className="text-[11px] text-[#405862]/85">members</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-[#405862]">{ALL_TIME.countries}</p>
-                    <p className="text-[11px] text-[#405862]/70">countries and territories</p>
+                    <p className="text-[11px] text-[#405862]/85">countries and territories</p>
                   </div>
                 </div>
 

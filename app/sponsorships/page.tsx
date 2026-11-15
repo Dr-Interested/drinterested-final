@@ -1,10 +1,12 @@
 import type React from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { PhotoTrio } from "@/components/site/photo-trio"
+import { PHOTOS } from "@/lib/media"
 import { Mail, Sparkles, Users, Megaphone, Award, Heart, Info, Building2, Share2, UserPlus, Receipt } from "lucide-react"
 import { ALL_TIME, IMPACT_REPORT_2026, LEGAL_STATUS, YEAR_2026 } from "@/lib/impact-stats"
 
-const DESCRIPTION = `Sponsor, partner with, or donate to Dr. Interested, a youth led wellness organization that has impacted ${ALL_TIME.youthImpacted} youth. US donors can receive tax receipts.`
+const DESCRIPTION = `Sponsor, partner with, or donate to Dr. Interested, a youth led healthcare organization that has impacted ${ALL_TIME.youthImpacted} youth. US donors can receive tax receipts.`
 
 export const metadata: Metadata = {
   title: "Sponsorships & Donations",
@@ -12,7 +14,7 @@ export const metadata: Metadata = {
   keywords: [
     "sponsor Dr. Interested",
     "partner with Dr. Interested",
-    "donate to youth wellness",
+    "donate to youth healthcare education",
     "Future Interested",
     "fiscally sponsored 501(c)(3)",
     "Hack Club fiscal sponsorship",
@@ -25,13 +27,13 @@ export const metadata: Metadata = {
     url: "https://www.drinterested.org/sponsorships",
     siteName: "Dr. Interested",
     type: "website",
-    images: [{ url: "/websitebanner.jpg", width: 1920, height: 1080, alt: "Dr. Interested Sponsorships" }],
+    images: [{ url: "/og-2026.jpg", width: 1200, height: 630, alt: "Dr. Interested Sponsorships" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Sponsorships & Donations | Dr. Interested",
     description: DESCRIPTION,
-    images: { url: "/websitebanner.jpg", alt: "Dr. Interested Sponsorships" },
+    images: { url: "/og-2026.jpg", alt: "Dr. Interested Sponsorships" },
   },
   alternates: { canonical: "https://www.drinterested.org/sponsorships" },
   robots: { index: true, follow: true },
@@ -45,7 +47,7 @@ function LevelHeading({ level, icon: Icon, title }: { level: number; icon: typeo
   return (
     <div className="flex items-center gap-3 mb-4">
       <span className="bg-[#405862] text-white text-xs font-bold px-3 py-1 rounded-full">Level {level}</span>
-      <Icon className="h-5 w-5 text-[#4ecdc4]" />
+      <Icon className="h-5 w-5 text-teal-deep" />
       <h3 className="text-xl md:text-2xl font-bold text-[#405862]">{title}</h3>
     </div>
   )
@@ -64,11 +66,12 @@ export default function SponsorshipsPage() {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#405862] mb-6 text-balance">
             Sponsorships & Donations
           </h1>
-          <p className="text-lg text-[#405862]/80 max-w-2xl mx-auto text-pretty">
-            Help keep wellness career education, policy access, and community spaces free for every young person. Our
+          <p className="text-lg text-[#405862]/90 max-w-2xl mx-auto text-pretty">
+            Help keep healthcare career education, policy access, and community spaces accessible to every young person. Our
             community has impacted {ALL_TIME.youthImpacted} youth across {ALL_TIME.countries} countries and territories,
             with {ALL_TIME.impressions} impressions across our platforms.
           </p>
+          <PhotoTrio className="mt-8" photos={[PHOTOS.medexplore[2], PHOTOS.codeblue[0], PHOTOS.explore3[1]]} priority />
         </div>
       </section>
 
@@ -83,15 +86,15 @@ export default function SponsorshipsPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-[#405862] mb-4">Support Us Through Donations</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
               Every contribution helps us continue our educational mission to support the next generation of youth
-              leaders in wellness, policy, and community.
+              leaders in healthcare, policy, and community.
             </p>
           </div>
 
           {/* Donation Information */}
           <div className="bg-white rounded-2xl border-2 border-[#4ecdc4]/20 p-8 md:p-12 mb-8 shadow-sm">
             <h3 className="text-2xl font-bold text-[#405862] mb-6">Why Your Donation Matters</h3>
-            <p className="text-[#405862]/80 mb-6 leading-relaxed">
-              Dr. Interested is a youth-run project dedicated to providing accessible wellness career education, policy
+            <p className="text-[#405862]/90 mb-6 leading-relaxed">
+              Dr. Interested is a youth-run project dedicated to providing accessible healthcare career education, policy
               access, and community spaces to youth worldwide. Your donations directly support:
             </p>
             <ul className="grid md:grid-cols-2 gap-4 mb-8">
@@ -99,25 +102,25 @@ export default function SponsorshipsPage() {
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-[#4ecdc4]"></div>
                 </div>
-                <span className="text-[#405862]/80">Youth wellness career education and mentorship programs</span>
+                <span className="text-[#405862]/90">Youth healthcare career education and mentorship programs</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-[#4ecdc4]"></div>
                 </div>
-                <span className="text-[#405862]/80">Events, workshops, and outreach initiatives</span>
+                <span className="text-[#405862]/90">Events, workshops, and outreach initiatives</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-[#4ecdc4]"></div>
                 </div>
-                <span className="text-[#405862]/80">Recurring and one-time educational programs</span>
+                <span className="text-[#405862]/90">Recurring and one-time educational programs</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-[#4ecdc4]"></div>
                 </div>
-                <span className="text-[#405862]/80">Core platform and operational costs</span>
+                <span className="text-[#405862]/90">Core platform and operational costs</span>
               </li>
             </ul>
           </div>
@@ -125,32 +128,32 @@ export default function SponsorshipsPage() {
           {/* Donation Method */}
           <div className="bg-white rounded-2xl border-2 border-[#4ecdc4]/20 p-8 md:p-12 mb-8 shadow-sm">
             <h3 className="text-2xl font-bold text-[#405862] mb-6 flex items-center gap-2">
-              <Mail className="h-6 w-6 text-[#4ecdc4]" />
+              <Mail className="h-6 w-6 text-teal-deep" />
               How to Donate
             </h3>
-            <p className="text-[#405862]/80 mb-6 leading-relaxed">
+            <p className="text-[#405862]/90 mb-6 leading-relaxed">
               We accept donations via E-Transfer to support our mission:
             </p>
             <div className="bg-[#f5f1eb] rounded-lg p-6 mb-6 border border-[#4ecdc4]/20">
-              <p className="text-sm text-[#405862]/70 mb-2">E-Transfer Email Address</p>
+              <p className="text-sm text-[#405862]/85 mb-2">E-Transfer Email Address</p>
               <p className="text-2xl font-bold text-[#405862] mb-4">finance@drinterested.org</p>
             </div>
 
             <div className="space-y-4">
               <h4 className="font-semibold text-[#405862]">Donation Instructions:</h4>
-              <ul className="space-y-3 text-[#405862]/80">
+              <ul className="space-y-3 text-[#405862]/90">
                 <li className="flex gap-3">
-                  <span className="flex-shrink-0 font-bold text-[#4ecdc4]">1.</span>
+                  <span className="flex-shrink-0 font-bold text-teal-deep">1.</span>
                   <span>
                     Send an E-Transfer to <span className="font-medium text-[#405862]">finance@drinterested.org</span>
                   </span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="flex-shrink-0 font-bold text-[#4ecdc4]">2.</span>
+                  <span className="flex-shrink-0 font-bold text-teal-deep">2.</span>
                   <span>Include your name and the word "Donation" in the message field</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="flex-shrink-0 font-bold text-[#4ecdc4]">3.</span>
+                  <span className="flex-shrink-0 font-bold text-teal-deep">3.</span>
                   <span>
                     Optional: If you'd like your donation directed toward a specific program or event, include the
                     program name in the e-transfer description
@@ -160,7 +163,7 @@ export default function SponsorshipsPage() {
             </div>
 
             <div className="bg-[#4ecdc4]/5 rounded-lg p-4 mt-6 border border-[#4ecdc4]/20">
-              <p className="text-sm text-[#405862]/80">
+              <p className="text-sm text-[#405862]/90">
                 <span className="font-medium text-[#405862]">Program Direction:</span> We honor program-specific
                 donation requests where possible and subject to organizational needs. If you'd like your donation
                 directed toward a specific program or event, please include the program name in the e-transfer
@@ -187,7 +190,7 @@ export default function SponsorshipsPage() {
 
           <Card>
             <LevelHeading level={1} icon={Share2} title="Follow us and share what you learn" />
-            <p className="text-[#405862]/80 mb-4">
+            <p className="text-[#405862]/90 mb-4">
               The easiest way to support us is to stay connected. Follow our accounts, subscribe to our newsletter, and
               share what you learn with youth in your community.
             </p>
@@ -213,7 +216,7 @@ export default function SponsorshipsPage() {
 
           <Card>
             <LevelHeading level={2} icon={UserPlus} title="Join our team" />
-            <p className="text-[#405862]/80 mb-4">
+            <p className="text-[#405862]/90 mb-4">
               Join us as an executive, volunteer, ambassador, or podcast member. Contribute to UN reports, earn verified
               hours, and work with an international team of {YEAR_2026.executives} executives in{" "}
               {YEAR_2026.teamCountries} countries.
@@ -228,8 +231,8 @@ export default function SponsorshipsPage() {
 
           <Card>
             <LevelHeading level={3} icon={Heart} title="Donate as an individual or family" />
-            <p className="text-[#405862]/80 mb-4 leading-relaxed">
-              Donations fund our programs, events, and the tools that keep our programs free. Send an e-transfer to{" "}
+            <p className="text-[#405862]/90 mb-4 leading-relaxed">
+              Donations fund our programs, events, and the tools that keep our programs low barrier. Send an e-transfer to{" "}
               <a href="mailto:finance@drinterested.org" className="font-semibold text-[#405862] underline underline-offset-2">
                 finance@drinterested.org
               </a>{" "}
@@ -241,7 +244,7 @@ export default function SponsorshipsPage() {
                 <Receipt className="h-4 w-4" />
                 Want a tax receipt? Email us before you donate.
               </p>
-              <p className="text-[#405862]/80">
+              <p className="text-[#405862]/90">
                 Tax receipts cannot be issued for e-transfers. If you want a receipt, do not send money first: email{" "}
                 finance@drinterested.org in advance, tell us whether you are in Canada or the United States, and we will
                 set up your receipt before you donate.
@@ -251,7 +254,7 @@ export default function SponsorshipsPage() {
 
           <Card>
             <LevelHeading level={4} icon={Building2} title="Bring your company, employer, or community organization" />
-            <p className="text-[#405862]/80 mb-6 leading-relaxed">
+            <p className="text-[#405862]/90 mb-6 leading-relaxed">
               Ask your employer, your company, or a local organization to sponsor or partner with us. Sponsors can give
               money or in kind support (anything they sell or provide). In return, sponsors receive marketing and logo
               placement on our materials, and recognition grows with the level of sponsorship. Tax receipts for sponsors
@@ -276,16 +279,16 @@ export default function SponsorshipsPage() {
                 },
               ].map(({ icon: Icon, title, text }) => (
                 <div key={title} className="rounded-xl bg-[#f5f1eb] p-4">
-                  <Icon className="h-5 w-5 text-[#4ecdc4] mb-2" />
+                  <Icon className="h-5 w-5 text-teal-deep mb-2" />
                   <h4 className="font-semibold text-[#405862] mb-1">{title}</h4>
-                  <p className="text-sm text-[#405862]/75">{text}</p>
+                  <p className="text-sm text-[#405862]/85">{text}</p>
                 </div>
               ))}
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="rounded-xl border border-[#405862]/15 p-4">
                 <p className="text-sm font-semibold text-[#405862] mb-1">Partner with us</p>
-                <p className="text-sm text-[#405862]/75 mb-2">Email our Director of Events, Lalit Sai.</p>
+                <p className="text-sm text-[#405862]/85 mb-2">Email our Director of Events, Lalit Sai.</p>
                 <a href="mailto:lalits@drinterested.org" className="inline-flex items-center gap-2 text-sm font-semibold text-[#405862] underline">
                   <Mail className="h-4 w-4" />
                   lalits@drinterested.org
@@ -293,7 +296,7 @@ export default function SponsorshipsPage() {
               </div>
               <div className="rounded-xl border border-[#405862]/15 p-4">
                 <p className="text-sm font-semibold text-[#405862] mb-1">Sponsor us</p>
-                <p className="text-sm text-[#405862]/75 mb-2">Our finance team will share current packages and details.</p>
+                <p className="text-sm text-[#405862]/85 mb-2">Our finance team will share current packages and details.</p>
                 <a href="mailto:finance@drinterested.org" className="inline-flex items-center gap-2 text-sm font-semibold text-[#405862] underline">
                   <Mail className="h-4 w-4" />
                   finance@drinterested.org
@@ -346,7 +349,7 @@ export default function SponsorshipsPage() {
                     .
                   </p>
                 </div>
-                <p className="text-xs text-[#405862]/60">
+                <p className="text-xs text-[#405862]/85">
                   By donating, you agree to our{" "}
                   <Link href="/privacy-policy" className="underline">
                     Privacy Policy
@@ -361,7 +364,7 @@ export default function SponsorshipsPage() {
             </div>
           </div>
           <p className="mt-10 text-center text-lg text-[#405862] font-medium text-pretty">
-            Thank you for helping youth explore wellness careers and change policy.
+            Thank you for helping youth explore healthcare careers and change policy.
           </p>
         </div>
       </section>

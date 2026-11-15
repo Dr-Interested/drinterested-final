@@ -29,7 +29,7 @@ export async function generateMetadata({
   }
 
   const description = truncate(
-    member.bio || `${member.name} is ${member.role} at Dr. Interested, a youth led global wellness organization.`
+    member.bio || `${member.name} is ${member.role} at Dr. Interested, a youth led global healthcare organization.`
   )
   const imageUrl = member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`
   const url = `${baseUrl}/team/${member.slug || member.id}`
@@ -42,8 +42,8 @@ export async function generateMetadata({
     ...roleKeywords,
     "Dr. Interested",
     "Dr. Interested team",
-    "youth wellness",
-    "wellness careers",
+    "youth health",
+    "healthcare careers",
     "youth leadership",
     "student organization",
   ]

@@ -13,13 +13,23 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: { DEFAULT: "1rem", sm: "1.5rem", lg: "2rem" },
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-sans)", "ui-sans-serif", "sans-serif"],
+      },
       colors: {
+        // Brand palette, shared with the impact report and Instagram.
+        // ink, teal-deep and cream are CSS variables (globals.css) so they flip in dark mode:
+        // ink text turns light, cream surfaces turn dark, teal-deep turns a readable light teal.
+        ink: { DEFAULT: "rgb(var(--c-ink) / <alpha-value>)", deep: "#2b3f47", soft: "#5d7680" },
+        teal: { DEFAULT: "#4ecdc4", deep: "rgb(var(--c-teal-deep) / <alpha-value>)", wash: "#e3f6f4" },
+        cream: { DEFAULT: "rgb(var(--c-cream) / <alpha-value>)", deep: "rgb(var(--c-cream-deep) / <alpha-value>)" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -68,10 +78,21 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "marquee-y": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        marquee: "marquee var(--marquee-duration, 60s) linear infinite",
+        "marquee-reverse": "marquee var(--marquee-duration, 60s) linear infinite reverse",
+        "marquee-y": "marquee-y var(--marquee-duration, 50s) linear infinite",
       },
     },
   },

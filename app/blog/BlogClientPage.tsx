@@ -67,7 +67,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
     "@type": "CollectionPage",
     name: "Dr. Interested Blog",
     description:
-      "Youth written insights, research, and guides on wellness careers, health, medicine, and skill building.",
+      "Youth written insights, research, and guides on healthcare careers, health, medicine, and skill building.",
     url: "https://www.drinterested.org/blog",
     isPartOf: {
       "@type": "WebSite",
@@ -96,13 +96,13 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-[#405862] mb-4">
             Dr. Interested Blog
           </h1>
-          <p className="text-center text-lg text-[#405862]/80 max-w-2xl mx-auto mb-8">
-            Youth written insights, research, and guides on wellness careers, health, medicine, and skill building.
+          <p className="text-center text-lg text-[#405862]/90 max-w-2xl mx-auto mb-8">
+            Youth written insights, research, and guides on healthcare careers, health, medicine, and skill building.
           </p>
 
           <div className="max-w-xl mx-auto relative">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-[#405862]/60" />
+              <Search className="h-5 w-5 text-[#405862]/85" />
             </div>
             <input
               type="text"
@@ -181,7 +181,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
           {filteredPosts.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-xl font-medium text-[#405862] mb-2">No articles found</h3>
-              <p className="text-[#405862]/70 mb-6">Try adjusting your search or browse all topics</p>
+              <p className="text-[#405862]/85 mb-6">Try adjusting your search or browse all topics</p>
               <Button
                 variant="outline"
                 className="border-[#405862] text-[#405862] hover:bg-[#405862] hover:text-white bg-transparent"
@@ -211,7 +211,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
                   </div>
                   <CardContent className="p-6 flex flex-col flex-grow">
                     <div>
-                      <div className="text-sm text-[#405862]/70 mb-2 flex items-center flex-wrap">
+                      <div className="text-sm text-[#405862]/85 mb-2 flex items-center flex-wrap">
                         <span className="bg-[#f5f1eb] px-2 py-1 rounded-full text-xs">{post.topic}</span>
                         <span className="mx-2">•</span>
                         <span className="flex items-center">
@@ -219,12 +219,12 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
                           {post.readingTime}
                         </span>
                       </div>
-                      <Link href={`/blog/${post.slug}`} className="block group-hover:text-[#4ecdc4] transition-colors">
-                        <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+                      <Link href={`/blog/${post.slug}`} className="block group-hover:text-teal-deep transition-colors">
+                        <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors">
                           {post.title}
                         </h3>
                       </Link>
-                      <p className="text-[#405862]/80 mb-4 text-sm leading-relaxed line-clamp-3">{post.excerpt}</p>
+                      <p className="text-[#405862]/90 mb-4 text-sm leading-relaxed line-clamp-3">{post.excerpt}</p>
                     </div>
                     <div className="mt-auto">
                       <div className="flex items-center justify-between pt-4 border-t border-[#405862]/10">
@@ -239,12 +239,12 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
                           </div>
                           <div>
                             <span className="text-xs font-medium text-[#405862] block">{post.author.name}</span>
-                            <span className="text-xs text-[#405862]/70">{post.date}</span>
+                            <span className="text-xs text-[#405862]/85">{post.date}</span>
                           </div>
                         </div>
                         <Link
                           href={`/blog/${post.slug}`}
-                          className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-medium"
+                          className="text-teal-deep hover:text-[#405862] transition-colors text-sm font-medium"
                         >
                           Read
                         </Link>
@@ -284,15 +284,15 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
                   </div>
                   <CardContent className="p-4 flex flex-col flex-grow">
                     <div>
-                      <div className="text-xs text-[#405862]/70 mb-1">{post.date}</div>
-                      <h3 className="text-base font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors line-clamp-2">
+                      <div className="text-xs text-[#405862]/85 mb-1">{post.date}</div>
+                      <h3 className="text-base font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors line-clamp-2">
                         {post.title}
                       </h3>
                     </div>
                     <div className="mt-auto">
                       <Link
                         href={`/blog/${post.slug}`}
-                        className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-xs font-medium flex items-center mt-2"
+                        className="text-teal-deep hover:text-[#405862] transition-colors text-xs font-medium flex items-center mt-2"
                       >
                         Read article
                         <ChevronRight className="h-3 w-3 ml-1" />
@@ -316,7 +316,7 @@ export default function BlogClientPage({ initialBlogs }: { initialBlogs: BlogPos
           <div className="max-w-md mx-auto mb-6">
             <NewsletterForm darkMode={true} showFirstName={false} compact={true} />
           </div>
-          <p className="text-white/60 text-sm">
+          <p className="text-white/80 text-sm">
             Or join the conversation on our{" "}
             <Link href="https://discord.gg/pzbGRgsGXY" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">
               Discord server

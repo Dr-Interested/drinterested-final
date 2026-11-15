@@ -48,11 +48,11 @@ export default function SafeguardingPolicyClientPage() {
             <li>Never request or share inappropriate images, messages, or personal information with a minor</li>
             <li>Never provide alcohol, drugs, or other age-restricted substances to a minor</li>
             <li>Follow our{" "}
-              <Link href="/ai-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+              <Link href="/ai-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
                 AI Policy
               </Link>
               , our{" "}
-              <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+              <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
                 Privacy Policy
               </Link>
               , and any media consent requirements when photographing or filming students
@@ -65,7 +65,7 @@ export default function SafeguardingPolicyClientPage() {
           <p className="text-slate-600">
             Where we photograph, film, or record students at our events, we seek consent in advance — for minors,
             from a parent or legal guardian — before using that media publicly. See our{" "}
-            <Link href="/media-consent" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/media-consent" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Media Consent and Release
             </Link>{" "}
             page for details on how that consent works.
@@ -77,7 +77,7 @@ export default function SafeguardingPolicyClientPage() {
           <p className="text-slate-600">
             If you have a concern about the safety or wellbeing of a young person involved with Dr. Interested — or
             about the conduct of anyone representing us — please report it as soon as possible to{" "}
-            <a href="mailto:hr@drinterested.org" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <a href="mailto:hr@drinterested.org" className="text-[#405862] font-medium underline hover:text-teal-deep">
               hr@drinterested.org
             </a>
             . Reports are taken seriously and handled as confidentially as circumstances allow. If a young person is
@@ -91,7 +91,7 @@ export default function SafeguardingPolicyClientPage() {
             Where a concern is raised about someone representing Dr. Interested, we will review the situation and
             may suspend or remove that person's access, role, or involvement while the matter is looked into,
             consistent with our{" "}
-            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/terms" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Terms and Conditions
             </Link>
             . Where a concern involves suspected abuse, harm, or illegal conduct, we will refer the matter to the
@@ -111,7 +111,7 @@ export default function SafeguardingPolicyClientPage() {
           <h2 className="text-xl font-semibold mb-3 text-[#405862]">8. Contact Us</h2>
           <p className="text-slate-600">
             Questions about this Safeguarding Policy can be directed to{" "}
-            <a href="mailto:hr@drinterested.org" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <a href="mailto:hr@drinterested.org" className="text-[#405862] font-medium underline hover:text-teal-deep">
               hr@drinterested.org
             </a>
             .
@@ -120,7 +120,7 @@ export default function SafeguardingPolicyClientPage() {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors">
+        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-teal-deep transition-colors">
           <FileText className="h-4 w-4 mr-2" />
           Return Home
         </Link>

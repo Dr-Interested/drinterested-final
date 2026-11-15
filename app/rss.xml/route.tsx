@@ -23,10 +23,10 @@ export async function GET() {
   const imageDescriptions: Record<string, string> = {
     // Logo and branding
     "/logo.png":
-      "Dr. Interested official logo - A youth led global wellness organization helping young people explore wellness careers, policy, and community",
+      "Dr. Interested official logo - A youth led global healthcare organization helping young people explore healthcare careers, policy, and community",
     "/circle-logo.png":
       "Dr. Interested circular logo variant",
-    "/websitebanner.jpg":
+    "/og-2026.jpg":
       "Dr. Interested website banner",
 
     // Favicons and app icons
@@ -240,7 +240,7 @@ export async function GET() {
   // ===== Policy Submissions (e.g. UN/OHCHR filings) =====
   POLICY_SUBMISSIONS.forEach((submission) => {
     const policyUrl = `${baseUrl}/publications/policy/${submission.slug}`
-    const policyImage = `${baseUrl}${submission.documents[0]?.pages[0]?.file || "/websitebanner.jpg"}`
+    const policyImage = `${baseUrl}${submission.documents[0]?.pages[0]?.file || "/og-2026.jpg"}`
 
     items.push(`
     <item>
@@ -487,9 +487,9 @@ export async function GET() {
      xmlns:media="http://search.yahoo.com/mrss/"
      xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Dr. Interested: Youth Led Global Wellness Organization</title>
+    <title>Dr. Interested: Youth Led Global Healthcare Organization</title>
     <link>${escapeXml(baseUrl)}</link>
-    <description>Dr. Interested is a youth led global wellness organization. We help young people explore wellness careers, from health and medicine to law and finance, take part in policy decisions, and find a safe community. Articles, op eds, podcasts, webinars and events.</description>
+    <description>Dr. Interested is a youth led global healthcare organization. We help young people explore healthcare careers, from health and medicine to law and finance, take part in policy decisions, and find a safe community. Articles, op eds, podcasts, webinars and events.</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${escapeXml(baseUrl)}/rss.xml" rel="self" type="application/rss+xml" />

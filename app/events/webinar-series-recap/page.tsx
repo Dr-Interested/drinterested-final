@@ -40,7 +40,7 @@ export default async function WebinarGalleryPage() {
           <div className="flex items-center gap-2 mb-6">
             <Link
               href="/events"
-              className="text-[#405862] hover:text-[#4ecdc4] transition-colors flex items-center"
+              className="text-[#405862] hover:text-teal-deep transition-colors flex items-center"
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Events
@@ -84,7 +84,7 @@ export default async function WebinarGalleryPage() {
                     <p className="text-sm text-[#405862] mb-2 line-clamp-3">
                       {webinar.description}
                     </p>
-                    <p className="text-xs text-[#4ecdc4]">
+                    <p className="text-xs text-teal-deep">
                       {webinar.date} • {webinar.time}
                     </p>
                   </div>

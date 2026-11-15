@@ -110,7 +110,7 @@ export default async function PolicySubmissionPage({ params }: { params: Promise
           />
           <Link
             href="/publications"
-            className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] mb-6 transition-colors"
+            className="inline-flex items-center text-[#405862] hover:text-teal-deep mb-6 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Publications
@@ -120,22 +120,22 @@ export default async function PolicySubmissionPage({ params }: { params: Promise
             <span className="bg-[#405862]/10 px-3 py-1 rounded-full text-sm font-medium text-[#405862]">
               Policy Work
             </span>
-            <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#1976d2]">
+            <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#0d5aa7]">
               {submission.resolution}
             </span>
           </div>
 
           <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mb-4 leading-tight">{submission.title}</h1>
-          <p className="text-[#405862]/80 text-base md:text-lg mb-6 max-w-2xl">{submission.summary}</p>
+          <p className="text-[#405862]/90 text-base md:text-lg mb-6 max-w-2xl">{submission.summary}</p>
 
-          <p className="text-sm text-[#405862]/70 mb-8">
+          <p className="text-sm text-[#405862]/85 mb-8">
             Presented to the Council by <strong>{submission.presentedBy}</strong> &middot; Dated{" "}
             {submission.date}
           </p>
 
           {/* Prominent OHCHR links */}
           <div className="bg-white rounded-2xl border border-[#405862]/10 shadow-sm p-5 md:p-6">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#4ecdc4] mb-3">
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-deep mb-3">
               Hosted by the UN Office of the High Commissioner for Human Rights (OHCHR)
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -173,7 +173,7 @@ export default async function PolicySubmissionPage({ params }: { params: Promise
                 href={doc.pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#405862] hover:text-[#4ecdc4] transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#405862] hover:text-teal-deep transition-colors"
               >
                 <Download className="h-4 w-4" />
                 Download original PDF
@@ -183,7 +183,7 @@ export default async function PolicySubmissionPage({ params }: { params: Promise
             <PolicyPageGallery label={doc.label} pages={doc.pages} />
 
             <div className="mt-8 pt-8 border-t border-[#405862]/10">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#4ecdc4] mb-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-teal-deep mb-4">
                 Full text (converted from the original PDF for readability)
               </p>
               <div className="blog-prose">
@@ -207,7 +207,7 @@ export default async function PolicySubmissionPage({ params }: { params: Promise
               href={submission.ohchrPdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#405862] font-bold px-5 py-2.5 rounded-xl text-sm transition-colors"
+              className="inline-flex items-center gap-2 bg-[#4ecdc4] hover:bg-[#3dbcb3] text-[#2b3f47] font-bold px-5 py-2.5 rounded-xl text-sm transition-colors"
             >
               View on ohchr.org <ExternalLink className="h-3.5 w-3.5" />
             </a>

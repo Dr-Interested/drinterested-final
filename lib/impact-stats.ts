@@ -71,10 +71,10 @@ export const PILLARS = [
   {
     id: "career",
     number: 1,
-    name: "Wellness Career Education",
+    name: "Healthcare Career Education",
     short: "Career Education",
     description:
-      "We began with medicine and have grown well beyond it. We introduce youth to wellness as a whole: health, law, finance, and any career that improves human wellbeing and quality of life, through workshops, panels, mentorship, research and publishing, and skill building.",
+      "We began with medicine and have grown well beyond it. We introduce youth to healthcare in its widest sense: medicine, nursing and research, but also public and community health, health law, policy and finance, through workshops, panels, mentorship, research and publishing, and skill building.",
   },
   {
     id: "policy",
@@ -95,8 +95,17 @@ export const PILLARS = [
 ] as const
 
 /** One line used in meta descriptions and structured data. */
+/**
+ * What we mean by healthcare. The impact report says "wellness"; publicly we say healthcare,
+ * because it is clearer, and define it this broadly.
+ */
+export const HEALTHCARE_DEFINITION =
+  "By healthcare we mean everything that shapes human health: medicine and mental health, community and public health, and the things that keep people from quality care, like law, policy, money and access."
+
+export const TAGLINE = "Helping every young person find their spark"
+
 export const ORG_ONE_LINER =
-  "Dr. Interested is a youth led global wellness organization helping young people explore wellness careers, take part in the policy decisions that shape their lives, and find a safe community to belong to."
+  "Dr. Interested is a youth led global healthcare organization helping young people explore healthcare careers, take part in the policy decisions that shape their lives, and find a safe community to belong to."
 
 export const LEGAL_STATUS = {
   short:

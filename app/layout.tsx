@@ -1,7 +1,7 @@
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Poppins } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
@@ -16,11 +16,18 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 import AnalyticsConsent from "@/components/analytics-consent"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" })
+// Poppins is the heading face of the impact report and our Instagram graphics.
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+})
 
-const SITE_TITLE = "Dr. Interested | Youth Led Global Wellness Organization"
-const SITE_DESCRIPTION = `Youth led global wellness organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through free wellness career education, policy access, and community spaces.`
-const BANNER_ALT = "Dr. Interested: a youth led global wellness organization"
+const SITE_TITLE = "Dr. Interested | Youth Led Global Healthcare Organization"
+const SITE_DESCRIPTION = `Youth led global healthcare organization. ${ALL_TIME.youthImpacted} youth impacted in ${ALL_TIME.countries} countries through accessible healthcare career education, policy access, and community spaces.`
+const BANNER_ALT = "Dr. Interested: a youth led global healthcare organization"
 
 export const metadata: Metadata = {
   title: {
@@ -34,9 +41,9 @@ export const metadata: Metadata = {
     "doctor interested",
     "Adil Mukhi",
     "Future Interested",
-    "youth wellness organization",
+    "youth healthcare organization",
     "youth led organization",
-    "wellness careers",
+    "healthcare careers",
     "career education for youth",
     "youth in policy",
     "youth voice in policy",
@@ -70,9 +77,9 @@ export const metadata: Metadata = {
     siteName: "Dr. Interested",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: BANNER_ALT,
         type: "image/jpeg",
       },
@@ -83,7 +90,7 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: {
-      url: "/websitebanner.jpg",
+      url: "/og-2026.jpg",
       alt: BANNER_ALT,
       type: "image/jpeg",
     },
@@ -153,7 +160,7 @@ export default function RootLayout({
           href="https://www.drinterested.org/rss.xml"
         />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${inter.variable} ${poppins.variable} ${inter.className}`} suppressHydrationWarning>
         {/* enableSystem={false}: the site is light-by-default and only goes dark via the
             AccessibilityWidget toggle. Letting next-themes also react to the OS
             prefers-color-scheme made its resolved theme disagree with the inline
@@ -164,7 +171,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <div className="flex min-h-screen flex-col">
               <Navbar />
-              <div className="h-16 md:hidden" aria-hidden="true" />
+              <div className="h-16 lg:hidden" aria-hidden="true" />
               <main className="flex-1">{children}</main>
               <Footer />
               <Toaster />

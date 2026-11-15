@@ -63,7 +63,7 @@ export default async function WebinarsPage() {
             ]}
           />
           <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mb-4">Webinars</h1>
-          <p className="text-[#405862]/80 text-base md:text-lg max-w-2xl">
+          <p className="text-[#405862]/90 text-base md:text-lg max-w-2xl">
             Every recording from the Dr. Interested Webinar Series and Code Blue Planet 2026 — {sorted.length} episodes and counting.
           </p>
         </div>

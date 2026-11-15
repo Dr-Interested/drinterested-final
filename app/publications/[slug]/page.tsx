@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     contentTypeLabel,
     publication.policy_type ? publication.policy_type.replace(/-/g, " ") : undefined,
     "Dr. Interested",
-    "youth wellness",
-    "wellness careers",
+    "youth health",
+    "healthcare careers",
     ...String(publication.title || "")
       .split(/\s+/)
       .filter((w: string) => w.length > 3),
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: publication.excerpt,
     keywords,
     url: `https://www.drinterested.org/publications/${publication.slug}`,
-    image: publication.cover_image || "/websitebanner.jpg",
+    image: publication.cover_image || "/og-2026.jpg",
     type: "article",
     publishedTime: publication.created_at,
     modifiedTime: publication.updated_at || publication.created_at,
@@ -82,7 +82,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
     return (
       <div className="text-center py-20">
         <h1 className="text-2xl font-bold text-[#405862] mb-4">Publication Not Found</h1>
-        <Link href="/publications" className="text-[#4ecdc4] hover:text-[#405862] underline">
+        <Link href="/publications" className="text-teal-deep hover:text-[#405862] underline">
           Back to Publications
         </Link>
       </div>
@@ -102,9 +102,9 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
   const resolvedAuthorName = author.name
 
   const postUrl = `https://www.drinterested.org/publications/${publication.slug}`
-  const absoluteImage = (publication.cover_image || "/websitebanner.jpg").startsWith("http")
+  const absoluteImage = (publication.cover_image || "/og-2026.jpg").startsWith("http")
     ? publication.cover_image
-    : `https://www.drinterested.org${publication.cover_image || "/websitebanner.jpg"}`
+    : `https://www.drinterested.org${publication.cover_image || "/og-2026.jpg"}`
   const absoluteAuthorImage = author.image?.startsWith("http")
     ? author.image
     : author.image
@@ -171,7 +171,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
           />
           <Link
             href="/publications"
-            className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] mb-6 transition-colors"
+            className="inline-flex items-center text-[#405862] hover:text-teal-deep mb-6 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Publications
@@ -182,7 +182,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
               {contentTypeLabel}
             </span>
             {publication.policy_type && (
-              <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#1976d2]">
+              <span className="bg-[#e3f2fd] px-3 py-1 rounded-full text-sm font-medium text-[#0d5aa7]">
                 {publication.policy_type.replace("-", " ")}
               </span>
             )}
@@ -202,11 +202,11 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
               </div>
               <div>
                 <p className="font-semibold text-[#405862]">{resolvedAuthorName}</p>
-                {author.bio && <p className="text-sm text-[#405862]/70">{author.bio}</p>}
+                {author.bio && <p className="text-sm text-[#405862]/85">{author.bio}</p>}
               </div>
             </div>
 
-            <div className="flex gap-6 text-sm text-[#405862]/70 ml-auto">
+            <div className="flex gap-6 text-sm text-[#405862]/85 ml-auto">
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
                 {new Date(publication.created_at).toLocaleDateString("en-US", {
@@ -231,7 +231,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
             <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg bg-[#f5f1eb]">
               <SafeImage
                 src={publication.cover_image}
-                fallbackSrc="/websitebanner.jpg"
+                fallbackSrc="/og-2026.jpg"
                 alt={publication.title}
                 fill
                 className="object-cover"
@@ -262,11 +262,11 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
               </div>
               <div>
                 <p className="font-semibold text-[#405862] mb-2">{resolvedAuthorName}</p>
-                {author.bio && <p className="text-[#405862]/80 text-sm mb-4">{author.bio}</p>}
+                {author.bio && <p className="text-[#405862]/90 text-sm mb-4">{author.bio}</p>}
                 {author.isGenericFallback && (
                   <Link
                     href="/members"
-                    className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-semibold"
+                    className="text-teal-deep hover:text-[#405862] transition-colors text-sm font-semibold"
                   >
                     Meet the current Dr. Interested team →
                   </Link>
@@ -278,7 +278,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
                         href={author.linkedIn}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862] hover:text-[#4ecdc4] transition-colors text-sm font-medium"
+                        className="text-[#405862] hover:text-teal-deep transition-colors text-sm font-medium"
                       >
                         LinkedIn
                       </Link>
@@ -288,7 +288,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ sl
                         href={author.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862] hover:text-[#4ecdc4] transition-colors text-sm font-medium"
+                        className="text-[#405862] hover:text-teal-deep transition-colors text-sm font-medium"
                       >
                         Instagram
                       </Link>

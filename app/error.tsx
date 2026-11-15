@@ -23,7 +23,7 @@ export default function GlobalError({
         <h1 className="text-2xl font-bold text-[#405862] mb-3 font-bricolage">
           Something went wrong
         </h1>
-        <p className="text-[#405862]/70 mb-8 text-sm leading-relaxed">
+        <p className="text-[#405862]/85 mb-8 text-sm leading-relaxed">
           We had trouble loading this page. This is usually a temporary issue — try refreshing or go back to the home page.
         </p>
         <div className="flex gap-3 justify-center">

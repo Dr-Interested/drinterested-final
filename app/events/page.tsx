@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import EventsClientPage from "./EventsClientPage"
 import { supabase } from "@/lib/supabase-client"
+import { recapHrefFor } from "@/data/recaps"
+import { todayET } from "@/lib/dates"
+import { isDateRange, parseEventDate } from "@/lib/event-date"
 import SeoSchema from "@/components/seo-schema"
 
 const baseUrl = "https://www.drinterested.org"
@@ -16,7 +19,7 @@ function toIsoDate(dateStr: string, timeStr?: string): string {
 function eventSchema(e: any) {
   const isVirtual = /virtual|online|zoom|webinar/i.test(e.location || "")
   const registrationUrl = e.link && e.link.startsWith("http") ? e.link : `${baseUrl}/events`
-  // Dr. Interested events are free to attend; availability tracks the registration status.
+  // Availability tracks the registration status.
   const availability =
     e.status === "full" || e.status === "closed"
       ? "https://schema.org/SoldOut"
@@ -55,11 +58,11 @@ export const revalidate = 60; // Revalidate events every 60 seconds (ISR)
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "Free events for youth from Dr. Interested: wellness career webinars, conferences, case and research competitions, and policy sessions. Find your next event.",
+    "Accessible, low barrier events for youth from Dr. Interested: healthcare career webinars, conferences, case and research competitions, and policy sessions. Find your next event.",
   keywords: [
     "Dr. Interested events",
-    "free youth events",
-    "wellness career webinars",
+    "youth healthcare events",
+    "healthcare career webinars",
     "healthcare career events",
     "youth policy events",
     "case competition for high school students",
@@ -70,15 +73,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Events | Dr. Interested",
     description:
-      "Free Dr. Interested events for youth: wellness career talks, conferences, case competitions, policy sessions and community events.",
+      "Accessible Dr. Interested events for youth: healthcare career talks, conferences, case competitions, policy sessions and community events.",
     url: "https://www.drinterested.org/events",
     siteName: "Dr. Interested",
     type: "website",
     images: [
       {
-        url: "/websitebanner.jpg",
-        width: 1920,
-        height: 1080,
+        url: "/og-2026.jpg",
+        width: 1200,
+        height: 630,
         alt: "Dr. Interested Events",
       },
     ],
@@ -95,16 +98,36 @@ export default async function EventsPage() {
     .select("*")
     .order("created_at", { ascending: false })
 
+  // Dated events in date order (newest first for past, soonest first for upcoming); events
+  // with no readable date go last, newest added first.
   const sortEvents = (eventsList: any[], ascending = true) => {
     return [...eventsList].sort((a, b) => {
-      const dateA = new Date(a.date).getTime() || 0
-      const dateB = new Date(b.date).getTime() || 0
+      const dateA = parseEventDate(a.date)
+      const dateB = parseEventDate(b.date)
+      if (dateA === null && dateB === null) {
+        return String(b.created_at ?? "").localeCompare(String(a.created_at ?? ""))
+      }
+      if (dateA === null) return 1
+      if (dateB === null) return -1
       return ascending ? dateA - dateB : dateB - dateA
     })
   }
 
-  const rawUpcoming = allEventsData?.filter(e => !e.is_past) || []
-  const rawPast = allEventsData?.filter(e => e.is_past) || []
+  // An event counts as past once its date is behind us (ET), even if nobody has flipped
+  // is_past in the portal yet; that is how the 2026 Explore 3 showed as upcoming. Ranges
+  // ("October to November 2026") and unreadable dates rely on the is_past flag, so a program
+  // that is still running is never moved early.
+  const today = todayET()
+  const isPast = (e: any) => {
+    if (e.is_past) return true
+    if (isDateRange(e.date)) return false
+    const t = parseEventDate(e.date)
+    if (t === null) return false
+    return new Date(t).toISOString().slice(0, 10) < today
+  }
+  const withRecap = (e: any) => ({ ...e, recapHref: recapHrefFor(e.title || "", e.date) })
+  const rawUpcoming = (allEventsData?.filter((e) => !isPast(e)) || []).map(withRecap)
+  const rawPast = (allEventsData?.filter(isPast) || []).map(withRecap)
 
   const upcomingEvents = sortEvents(rawUpcoming, true)
   const pastEvents = sortEvents(rawPast, false)

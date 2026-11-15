@@ -191,7 +191,7 @@ export default function VolunteerAgreementClientPage() {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href="/dashboard" className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors">
+        <Link href="/dashboard" className="inline-flex items-center text-[#405862] hover:text-teal-deep transition-colors">
           <FileText className="h-4 w-4 mr-2" />
           Return to Portal
         </Link>

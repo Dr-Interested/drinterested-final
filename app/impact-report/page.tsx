@@ -3,11 +3,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { Download, FileText, ExternalLink } from "lucide-react"
 import SeoSchema from "@/components/seo-schema"
+import { PhotoStrip } from "@/components/site/photo-strip"
+import { HIGHLIGHT_REEL } from "@/lib/media"
 import { generateBreadcrumbSchema, generateSeoMetadata } from "@/lib/seo-utils"
 import {
   ALL_TIME,
   IMPACT_REPORT_2025,
   IMPACT_REPORT_2026,
+  HEALTHCARE_DEFINITION,
   LEGAL_STATUS,
   PILLARS,
   YEAR_2026,
@@ -25,7 +28,7 @@ export const metadata: Metadata = generateSeoMetadata({
     "Dr. Interested impact report",
     "Dr. Interested 2026 annual impact report",
     "impact report 2026",
-    "youth wellness organization impact",
+    "youth healthcare organization impact",
     "youth led nonprofit impact report",
     "Future Interested",
   ],
@@ -100,7 +103,7 @@ export default function ImpactReportPage() {
               Advance copy, figures as of {IMPACT_REPORT_2026.asOf}
             </p>
             <h1 className="text-3xl md:text-5xl font-bold text-[#405862] mb-4">Dr. Interested 2026 Annual Impact Report</h1>
-            <p className="text-lg text-[#405862]/80 mb-6 leading-relaxed">
+            <p className="text-lg text-[#405862]/90 mb-6 leading-relaxed">
               A year of youth led change and impact. This year, {YEAR_2026.executives} executives and{" "}
               {YEAR_2026.volunteers} volunteers gave {YEAR_2026.volunteerHours} hours, and {YEAR_2026.members} members
               across {YEAR_2026.memberCountries} countries and territories helped us reach{" "}
@@ -137,12 +140,15 @@ export default function ImpactReportPage() {
               alt="Cover of the Dr. Interested 2026 Annual Impact Report"
               width={900}
               height={1165}
-              sizes="280px"
-              priority
+              sizes="280px" loading="eager"
             />
           </a>
         </div>
       </section>
+
+      <div className="pb-2 pt-6">
+        <PhotoStrip photos={HIGHLIGHT_REEL} height="h-32 sm:h-40" duration={90} />
+      </div>
 
       {/* 2026 highlights */}
       <section className="py-12 bg-white">
@@ -161,7 +167,7 @@ export default function ImpactReportPage() {
             ].map(([n, l]) => (
               <div key={l} className="rounded-xl bg-[#4ecdc4]/10 border border-[#4ecdc4]/20 p-4 text-center">
                 <div className="text-2xl md:text-3xl font-bold text-[#405862]">{n}</div>
-                <div className="text-xs text-[#405862]/70 mt-1">{l}</div>
+                <div className="text-xs text-[#405862]/85 mt-1">{l}</div>
               </div>
             ))}
           </div>
@@ -172,13 +178,13 @@ export default function ImpactReportPage() {
       <section className="py-12 bg-[#f5f1eb]/50">
         <div className="container max-w-5xl">
           <h2 className="text-2xl md:text-3xl font-bold text-[#405862] mb-2">All time impact: 2025 and 2026</h2>
-          <p className="text-[#405862]/70 mb-6 text-sm">The last page of the report, combining both annual reports.</p>
+          <p className="text-[#405862]/85 mb-6 text-sm">The last page of the report, combining both annual reports.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {ALL_TIME_ROWS.map((r) => (
               <div key={r.label} className="bg-white rounded-xl p-4 border border-[#405862]/10">
                 <div className="text-2xl font-bold text-[#405862]">{r.total}</div>
-                <div className="text-sm font-medium text-[#405862]/80">{r.label}</div>
-                <div className="text-xs text-[#405862]/60 mt-1">{r.split}</div>
+                <div className="text-sm font-medium text-[#405862]/90">{r.label}</div>
+                <div className="text-xs text-[#405862]/85 mt-1">{r.split}</div>
               </div>
             ))}
           </div>
@@ -188,17 +194,20 @@ export default function ImpactReportPage() {
       {/* Pillars */}
       <section className="py-12 bg-white">
         <div className="container max-w-5xl">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#405862] mb-6">Our three pillars</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#405862] mb-2">Our three pillars</h2>
+          <p className="text-sm text-[#405862]/85 mb-6 max-w-3xl">
+            The report uses the word wellness. {HEALTHCARE_DEFINITION}
+          </p>
           <div className="grid md:grid-cols-3 gap-4">
             {PILLARS.map((p) => (
               <div key={p.id} className="rounded-xl border border-[#405862]/10 p-5">
-                <div className="text-xs font-semibold text-[#2d8659] mb-1">Pillar {p.number}</div>
+                <div className="text-xs font-semibold text-teal-deep mb-1">Pillar {p.number}</div>
                 <h3 className="font-bold text-[#405862] mb-2">{p.name}</h3>
-                <p className="text-sm text-[#405862]/80 leading-relaxed">{p.description}</p>
+                <p className="text-sm text-[#405862]/90 leading-relaxed">{p.description}</p>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-sm text-[#405862]/70">
+          <p className="mt-6 text-sm text-[#405862]/85">
             See how each program fits on{" "}
             <Link href="/our-work" className="underline underline-offset-2 text-[#405862]">
               Our Work
@@ -217,7 +226,7 @@ export default function ImpactReportPage() {
         <div className="container max-w-5xl grid md:grid-cols-2 gap-8">
           <div>
             <h2 className="text-xl font-bold text-[#405862] mb-4">What&apos;s inside</h2>
-            <ol className="space-y-1.5 text-sm text-[#405862]/80 list-decimal list-inside">
+            <ol className="space-y-1.5 text-sm text-[#405862]/90 list-decimal list-inside">
               {CONTENTS.map((c) => (
                 <li key={c}>{c}</li>
               ))}
@@ -225,8 +234,8 @@ export default function ImpactReportPage() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-[#405862] mb-4">Legal status</h2>
-            <p className="text-sm text-[#405862]/80 leading-relaxed mb-3">{LEGAL_STATUS.short}</p>
-            <p className="text-sm text-[#405862]/80 leading-relaxed mb-3">
+            <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">{LEGAL_STATUS.short}</p>
+            <p className="text-sm text-[#405862]/90 leading-relaxed mb-3">
               2026 revenue to date was {YEAR_2026.revenue}, with a net surplus of $1,546.34 CAD. $45,000 of that was
               travel, micro, and technology grants allocated through Dr. Interested.
             </p>
@@ -240,7 +249,7 @@ export default function ImpactReportPage() {
       {/* Previous report */}
       <section className="py-10 bg-white">
         <div className="container max-w-5xl text-center">
-          <p className="text-sm text-[#405862]/70">
+          <p className="text-sm text-[#405862]/85">
             Looking for last year?{" "}
             <a
               href={IMPACT_REPORT_2025.web}

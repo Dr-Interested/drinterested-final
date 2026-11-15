@@ -95,7 +95,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
     return (
       <div className="container py-16 text-center">
         <h1 className="text-2xl font-bold text-[#405862] mb-4">Article not found</h1>
-        <p className="text-[#405862]/70 mb-6">The article you're looking for doesn't exist or has been moved.</p>
+        <p className="text-[#405862]/85 mb-6">The article you're looking for doesn't exist or has been moved.</p>
         <Button asChild>
           <Link href="/publications">Back to Publications</Link>
         </Button>
@@ -115,14 +115,14 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
       <section className="hero-section bg-[#f5f1eb] py-12">
         <div className="container">
           <div className="flex items-center gap-2 mb-6">
-            <Link href="/publications" className="text-[#405862] hover:text-[#4ecdc4] transition-colors flex items-center">
+            <Link href="/publications" className="text-[#405862] hover:text-teal-deep transition-colors flex items-center">
               <ChevronLeft className="h-4 w-4 mr-1" />
               Back to All Publications
             </Link>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="text-sm text-[#405862]/70 mb-3 flex items-center flex-wrap">
+            <div className="text-sm text-[#405862]/85 mb-3 flex items-center flex-wrap">
               <Link
                 href={`/blog?topic=${encodeURIComponent(post.topic)}`}
                 className="bg-[#405862]/10 hover:bg-[#405862]/20 px-3 py-1 rounded-full transition-colors"
@@ -161,7 +161,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                         href={post.author.linkedIn}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/70 hover:text-[#4ecdc4]"
+                        className="text-[#405862]/85 hover:text-teal-deep"
                       >
                         <Linkedin className="h-4 w-4" />
                       </Link>
@@ -171,7 +171,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                         href={post.author.twitter}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/70 hover:text-[#4ecdc4]"
+                        className="text-[#405862]/85 hover:text-teal-deep"
                       >
                         <Twitter className="h-4 w-4" />
                       </Link>
@@ -181,7 +181,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                         href={post.author.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/70 hover:text-[#4ecdc4]"
+                        className="text-[#405862]/85 hover:text-teal-deep"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +209,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-[#405862]/20 text-[#405862]/70 hover:bg-[#405862]/10 hover:text-[#405862]"
+                  className="border-[#405862]/20 text-[#405862]/85 hover:bg-[#405862]/10 hover:text-[#405862]"
                   onClick={copyToClipboard}
                 >
                   {copied ? "Copied!" : "Share"}
@@ -254,7 +254,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
               <li key={index} className={`${heading.level === 1 ? "" : heading.level === 2 ? "ml-3" : "ml-6"}`}>
                 <a
                   href={`#${heading.id}`}
-                  className="text-[#4ecdc4] hover:text-[#405862] transition-colors flex items-center"
+                  className="text-teal-deep hover:text-[#405862] transition-colors flex items-center"
                 >
                   {heading.level > 1 && (
                     <span className="mr-1.5 text-[#405862]/40">{heading.level === 2 ? "○" : "•"}</span>
@@ -271,7 +271,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
       <section className="py-16 bg-white">
         <div className="container">
           <div className="max-w-3xl mx-auto">
-            <div className="prose prose-lg max-w-none prose-headings:text-[#405862] prose-h1:text-3xl prose-h2:text-2xl prose-h2:mt-8 prose-p:text-[#405862]/90 prose-a:text-[#4ecdc4] prose-a:no-underline hover:prose-a:text-[#405862] prose-strong:text-[#405862] prose-ul:text-[#405862]/90 prose-ol:text-[#405862]/90 prose-li:my-1">
+            <div className="prose prose-lg max-w-none prose-headings:text-[#405862] prose-h1:text-3xl prose-h2:text-2xl prose-h2:mt-8 prose-p:text-[#405862]/90 prose-a:text-teal-deep prose-a:no-underline hover:prose-a:text-[#405862] prose-strong:text-[#405862] prose-ul:text-[#405862]/90 prose-ol:text-[#405862]/90 prose-li:my-1">
               {post.content && (
                 <Markdown
                   components={{
@@ -320,7 +320,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                       return (
                         <a 
                           href={isSafe ? href : undefined} 
-                          className="text-[#4ecdc4] hover:text-[#405862] transition-colors font-medium"
+                          className="text-teal-deep hover:text-[#405862] transition-colors font-medium"
                           target={isSafe && href.startsWith("http") ? "_blank" : undefined}
                           rel={isSafe && href.startsWith("http") ? "noopener noreferrer" : undefined}
                         >
@@ -329,7 +329,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                       )
                     },
                     blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-[#4ecdc4] pl-4 italic my-4 text-[#405862]/80">
+                      <blockquote className="border-l-4 border-[#4ecdc4] pl-4 italic my-4 text-[#405862]/90">
                         {children}
                       </blockquote>
                     ),
@@ -370,14 +370,14 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                 </div>
                 <div>
                   <h4 className="font-bold text-[#405862]">{post.author.name}</h4>
-                  <p className="text-[#405862]/80 text-sm mt-1">{post.author.bio}</p>
+                  <p className="text-[#405862]/90 text-sm mt-1">{post.author.bio}</p>
                   <div className="flex items-center gap-3 mt-2">
                     {post.author.linkedIn && (
                       <Link
                         href={post.author.linkedIn}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/70 hover:text-[#4ecdc4]"
+                        className="text-[#405862]/85 hover:text-teal-deep"
                       >
                         <Linkedin className="h-5 w-5" />
                       </Link>
@@ -387,7 +387,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                         href={post.author.twitter}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/70 hover:text-[#4ecdc4]"
+                        className="text-[#405862]/85 hover:text-teal-deep"
                       >
                         <Twitter className="h-5 w-5" />
                       </Link>
@@ -397,7 +397,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                         href={post.author.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#405862]/70 hover:text-[#4ecdc4]"
+                        className="text-[#405862]/85 hover:text-teal-deep"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -429,7 +429,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-[#405862]/20 text-[#405862]/70 hover:bg-[#405862]/10 hover:text-[#405862]"
+                  className="border-[#405862]/20 text-[#405862]/85 hover:bg-[#405862]/10 hover:text-[#405862]"
                   onClick={() =>
                     window.open(
                       `https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post.title)}`,
@@ -443,7 +443,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-[#405862]/20 text-[#405862]/70 hover:bg-[#405862]/10 hover:text-[#405862]"
+                  className="border-[#405862]/20 text-[#405862]/85 hover:bg-[#405862]/10 hover:text-[#405862]"
                   onClick={() =>
                     window.open(
                       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
@@ -457,7 +457,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-[#405862]/20 text-[#405862]/70 hover:bg-[#405862]/10 hover:text-[#405862]"
+                  className="border-[#405862]/20 text-[#405862]/85 hover:bg-[#405862]/10 hover:text-[#405862]"
                   onClick={() =>
                     window.open(
                       `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(post.title)}`,
@@ -471,7 +471,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-[#405862]/20 text-[#405862]/70 hover:bg-[#405862]/10 hover:text-[#405862]"
+                  className="border-[#405862]/20 text-[#405862]/85 hover:bg-[#405862]/10 hover:text-[#405862]"
                   onClick={copyToClipboard}
                 >
                   <Link2 className="h-4 w-4 mr-2" />
@@ -509,7 +509,7 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                   </div>
                   <CardContent className="p-4 flex flex-col flex-grow">
                     <div>
-                      <div className="text-xs text-[#405862]/70 mb-1.5 flex items-center">
+                      <div className="text-xs text-[#405862]/85 mb-1.5 flex items-center">
                         <span className="bg-[#405862]/10 px-2 py-0.5 rounded-full">{relatedPost.topic}</span>
                         <span className="mx-1.5">•</span>
                         <span className="flex items-center">
@@ -517,15 +517,15 @@ export default function BlogPostClient({ post, relatedPosts }: { post: BlogPost,
                           {relatedPost.readingTime}
                         </span>
                       </div>
-                      <h3 className="text-base font-bold mb-1.5 text-[#405862] group-hover:text-[#4ecdc4] transition-colors line-clamp-2">
+                      <h3 className="text-base font-bold mb-1.5 text-[#405862] group-hover:text-teal-deep transition-colors line-clamp-2">
                         {relatedPost.title}
                       </h3>
-                      <p className="text-[#405862]/80 mb-3 text-sm line-clamp-2">{relatedPost.excerpt}</p>
+                      <p className="text-[#405862]/90 mb-3 text-sm line-clamp-2">{relatedPost.excerpt}</p>
                     </div>
                     <div className="mt-auto">
                       <Link
                         href={`/blog/${relatedPost.slug}`}
-                        className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-medium flex items-center"
+                        className="text-teal-deep hover:text-[#405862] transition-colors text-sm font-medium flex items-center"
                       >
                         Read article
                         <ChevronLeft className="h-4 w-4 ml-1 rotate-180" />

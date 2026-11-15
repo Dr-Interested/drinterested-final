@@ -30,12 +30,12 @@ function CategorySectionHeader({
     <div className="flex flex-wrap items-end justify-between gap-5 mb-8">
       <div>
         <Link href={href} className="inline-block group">
-          <h2 className="text-2xl font-bold text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+          <h2 className="text-2xl font-bold text-[#405862] group-hover:text-teal-deep transition-colors">
             {title}
           </h2>
           <div className="w-24 h-1 bg-[#4ecdc4] mt-2"></div>
         </Link>
-        <p className="text-[#405862]/80 mt-4 max-w-2xl">{description}</p>
+        <p className="text-[#405862]/90 mt-4 max-w-2xl">{description}</p>
       </div>
       {totalCount > PREVIEW_COUNT && (
         <Link
@@ -71,7 +71,7 @@ export default function PublicationsClientPage({
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Dr. Interested Publications",
-    description: "Explore youth written blog posts, op-eds, and policy work on wellness careers, health, and policy.",
+    description: "Explore youth written blog posts, op-eds, and policy work on healthcare careers, health, and policy.",
     url: "https://www.drinterested.org/publications",
     isPartOf: {
       "@type": "WebSite",
@@ -100,10 +100,10 @@ export default function PublicationsClientPage({
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-[#405862] mb-4">
             Publications
           </h1>
-          <p className="text-center text-lg text-[#405862]/80 max-w-2xl mx-auto mb-3">
-            Youth written blog posts, op-eds, and policy work on wellness careers, health, policy, and systemic change.
+          <p className="text-center text-lg text-[#405862]/90 max-w-2xl mx-auto mb-3">
+            Youth written blog posts, op-eds, and policy work on healthcare careers, health, policy, and systemic change.
           </p>
-          <p className="text-center text-xs text-[#405862]/50 max-w-2xl mx-auto mb-8">
+          <p className="text-center text-xs text-[#405862]/85 max-w-2xl mx-auto mb-8">
             Content on this page is for informational and entertainment purposes only and is not medical or career
             advice. See our{" "}
             <Link href="/terms" className="underline hover:text-[#405862]">
@@ -164,7 +164,7 @@ export default function PublicationsClientPage({
           <div className="container">
             <CategorySectionHeader
               title="Blog"
-              description="Insights, research, and guides on wellness careers, health, medicine, and skill building."
+              description="Insights, research, and guides on healthcare careers, health, medicine, and skill building."
               href="/publications/blog"
               totalCount={blogs.length}
               itemLabel="Posts"
@@ -228,7 +228,7 @@ export default function PublicationsClientPage({
           <div className="max-w-md mx-auto mb-6">
             <NewsletterForm darkMode={true} showFirstName={false} compact={true} />
           </div>
-          <p className="text-white/60 text-sm">
+          <p className="text-white/80 text-sm">
             Or join the conversation on our{" "}
             <Link
               href="https://discord.gg/pzbGRgsGXY"

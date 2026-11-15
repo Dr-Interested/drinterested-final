@@ -111,7 +111,7 @@ export default function AnalyticsConsent() {
             <p className="text-sm text-gray-700 flex-1">
               We&apos;d like to use Google Analytics and the Meta Pixel to understand how people find and use our site.
               They only load if you allow them.{" "}
-              <Link href="/privacy-policy#cookies" className="text-[#2d8659] underline underline-offset-2">
+              <Link href="/privacy-policy#cookies" className="text-teal-deep underline underline-offset-2">
                 Privacy Policy
               </Link>
             </p>

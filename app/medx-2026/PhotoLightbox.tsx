@@ -68,7 +68,7 @@ export default function PhotoLightbox({
             {state?.caption && (
               <div className="px-4 py-3 bg-[#11161d] border-t border-white/10 text-center">
                 <p className="text-sm font-semibold text-white">{state.caption}</p>
-                <p className="text-xs text-white/60 mt-0.5">
+                <p className="text-xs text-white/80 mt-0.5">
                   Dr. Interested MedExplore 2026 Conference (MedX 2026) &middot; University of Toronto Mississauga,
                   Davis Building &middot; Sunday, August 16, 2026
                 </p>

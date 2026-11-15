@@ -30,8 +30,8 @@ export default function ContentCard({ post, index }: { post: Publication; index:
     <Card className="overflow-hidden border-[#405862]/20 hover:shadow-lg transition-all duration-300 hover:border-[#405862] flex flex-col h-full group">
       <div className="relative h-48 w-full bg-[#f5f1eb]">
         <SafeImage
-          src={post.coverImage || "/websitebanner.jpg"}
-          fallbackSrc="/websitebanner.jpg"
+          src={post.coverImage || "/og-2026.jpg"}
+          fallbackSrc="/og-2026.jpg"
           alt={post.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -40,10 +40,10 @@ export default function ContentCard({ post, index }: { post: Publication; index:
       </div>
       <CardContent className="p-6 flex flex-col flex-grow">
         <div>
-          <div className="text-sm text-[#405862]/70 mb-2 flex items-center flex-wrap gap-2">
+          <div className="text-sm text-[#405862]/85 mb-2 flex items-center flex-wrap gap-2">
             <span className="bg-[#f5f1eb] px-2 py-1 rounded-full text-xs font-medium">{post.topic}</span>
             {post.policyType && (
-              <span className="bg-[#e3f2fd] px-2 py-1 rounded-full text-xs font-medium text-[#1976d2]">
+              <span className="bg-[#e3f2fd] px-2 py-1 rounded-full text-xs font-medium text-[#0d5aa7]">
                 {post.policyType.replace("-", " ")}
               </span>
             )}
@@ -53,12 +53,12 @@ export default function ContentCard({ post, index }: { post: Publication; index:
               {post.readingTime}
             </span>
           </div>
-          <Link href={`/publications/${post.slug}`} className="block group-hover:text-[#4ecdc4] transition-colors">
-            <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-[#4ecdc4] transition-colors">
+          <Link href={`/publications/${post.slug}`} className="block group-hover:text-teal-deep transition-colors">
+            <h3 className="text-lg font-bold mb-2 text-[#405862] group-hover:text-teal-deep transition-colors">
               {post.title}
             </h3>
           </Link>
-          <p className="text-[#405862]/80 mb-4 text-sm leading-relaxed line-clamp-3">{post.excerpt}</p>
+          <p className="text-[#405862]/90 mb-4 text-sm leading-relaxed line-clamp-3">{post.excerpt}</p>
         </div>
         <div className="mt-auto">
           <div className="flex items-center justify-between pt-4 border-t border-[#405862]/10">
@@ -68,12 +68,12 @@ export default function ContentCard({ post, index }: { post: Publication; index:
               </div>
               <div>
                 <span className="text-xs font-medium text-[#405862] block">{post.author.name}</span>
-                <span className="text-xs text-[#405862]/70">{post.date}</span>
+                <span className="text-xs text-[#405862]/85">{post.date}</span>
               </div>
             </div>
             <Link
               href={`/publications/${post.slug}`}
-              className="text-[#4ecdc4] hover:text-[#405862] transition-colors text-sm font-medium"
+              className="text-teal-deep hover:text-[#405862] transition-colors text-sm font-medium"
             >
               Read
             </Link>

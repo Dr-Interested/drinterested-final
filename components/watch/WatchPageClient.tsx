@@ -362,11 +362,11 @@ export default function WatchPageClient({ webinar }: WatchPageClientProps) {
                             <option value="2">2x</option>
                           </select>
                         </div>
-                        <button onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"} className="hover:text-[#4ecdc4] transition-colors">
+                        <button onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"} className="hover:text-teal-deep transition-colors">
                           {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                         </button>
                         <input type="range" min={0} max={1} step={0.05} value={volume} onChange={handleVolumeChange} className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-[#4ecdc4]" />
-                        <button onClick={toggleFullscreen} aria-label="Fullscreen" className="hover:text-[#4ecdc4] transition-colors">
+                        <button onClick={toggleFullscreen} aria-label="Fullscreen" className="hover:text-teal-deep transition-colors">
                           <Maximize className="w-5 h-5" />
                         </button>
                       </div>
@@ -448,7 +448,7 @@ export default function WatchPageClient({ webinar }: WatchPageClientProps) {
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-6">
                   {tags.map((tag) => (
-                    <span key={tag} className="text-xs bg-[#4ecdc4]/20 text-[#4ecdc4] px-3 py-1 rounded-full">
+                    <span key={tag} className="text-xs bg-[#4ecdc4]/20 text-teal-deep px-3 py-1 rounded-full">
                       #{tag}
                     </span>
                   ))}
@@ -457,16 +457,16 @@ export default function WatchPageClient({ webinar }: WatchPageClientProps) {
                 {/* Description */}
                 <Card className="mt-8 p-6 bg-[#4ecdc4]/10 border border-[#4ecdc4]/30 rounded-lg text-left">
                   <CardContent className="p-6">
-                    <p className="text-[#405862]/80 mb-4">{webinar.description}</p>
-                    <p className="text-[#405862]/60 text-sm leading-relaxed">{webinar.longDescription}</p>
+                    <p className="text-[#405862]/90 mb-4">{webinar.description}</p>
+                    <p className="text-[#405862]/85 text-sm leading-relaxed">{webinar.longDescription}</p>
                     {webinar.speaker && (
-                      <p className="text-[#405862]/60 text-sm mt-4">
-                        <span className="text-[#4ecdc4] font-semibold">Speaker:</span> {webinar.speaker}
+                      <p className="text-[#405862]/85 text-sm mt-4">
+                        <span className="text-teal-deep font-semibold">Speaker:</span> {webinar.speaker}
                       </p>
                     )}
                     {webinar.host && (
-                      <p className="text-[#405862]/60 text-sm">
-                        <span className="text-[#4ecdc4] font-semibold">Hosted by:</span> {webinar.host}
+                      <p className="text-[#405862]/85 text-sm">
+                        <span className="text-teal-deep font-semibold">Hosted by:</span> {webinar.host}
                       </p>
                     )}
                   </CardContent>

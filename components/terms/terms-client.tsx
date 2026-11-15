@@ -24,7 +24,7 @@ export default function TermsClient() {
         <section>
           <h2 className="text-xl font-semibold mb-3 text-[#405862]">1. Legal Status of Dr. Interested</h2>
           <p className="text-slate-600">
-            Dr. Interested is a Canadian youth-led project that provides wellness career education, access to
+            Dr. Interested is a Canadian youth-led project that provides healthcare career education, access to
             policy spaces, and community spaces for young people. It is listed as a civil society organization with
             the United Nations Department of Economic and Social Affairs (ECOSOC). Dr. Interested itself is not a
             registered business, corporation, nonprofit, charity, or other legal entity in any jurisdiction. All
@@ -64,7 +64,7 @@ export default function TermsClient() {
           <p className="text-slate-600">
             All content, events, webinars, publications, podcasts, and resources provided by Dr. Interested —
             including anything produced with the assistance of AI tools (see our{" "}
-            <Link href="/ai-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/ai-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               AI Policy
             </Link>
             ) — are for informational and entertainment purposes only. Nothing we publish or present is intended as
@@ -136,11 +136,11 @@ export default function TermsClient() {
             Many participants in our programs are minors. Where we photograph, film, or record a participant under
             18 for use on our website, social media, or newsletters, we require a parent or legal guardian's signed
             consent beforehand — see our{" "}
-            <Link href="/media-consent" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/media-consent" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Media Consent and Release
             </Link>{" "}
             page. Our approach to the safety and wellbeing of the youth we work with is set out in our{" "}
-            <Link href="/safeguarding-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/safeguarding-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Safeguarding Policy
             </Link>
             .
@@ -163,7 +163,7 @@ export default function TermsClient() {
           <h2 className="text-xl font-semibold mb-3 text-[#405862]">11. Privacy</h2>
           <p className="text-slate-600">
             Our{" "}
-            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-[#4ecdc4]">
+            <Link href="/privacy-policy" className="text-[#405862] font-medium underline hover:text-teal-deep">
               Privacy Policy
             </Link>{" "}
             outlines how personal data is collected, stored, and used. By using our services, you consent to the
@@ -222,7 +222,7 @@ export default function TermsClient() {
             For questions or concerns regarding these Terms and Conditions, please contact us at:{" "}
             <a
               href="mailto:admin@drinterested.org"
-              className="text-[#405862] font-medium underline hover:text-[#4ecdc4]"
+              className="text-[#405862] font-medium underline hover:text-teal-deep"
             >
               admin@drinterested.org
             </a>
@@ -232,7 +232,7 @@ export default function TermsClient() {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-[#4ecdc4] transition-colors">
+        <Link href="/" className="inline-flex items-center text-[#405862] hover:text-teal-deep transition-colors">
           <FileText className="h-4 w-4 mr-2" />
           Return Home
         </Link>

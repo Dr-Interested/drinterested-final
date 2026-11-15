@@ -24,21 +24,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Column 1: Logo and Description */}
           <div className="md:col-span-3">
-            <div className="flex items-center gap-3 mb-4">
-              <Image
-                src="/circle-logo.png"
-                alt="Dr. Interested Logo"
-                width={50}
-                height={50}
-                className="rounded-full"
-                priority
-              />
-              <span className="font-bold text-lg">
-                Dr. <span className="text-[#4ecdc4]">Interested</span>
-              </span>
+            <div className="mb-4 inline-flex rounded-2xl bg-cream px-4 py-3">
+              <Image src="/brand/logo-stacked.png" alt="Dr. Interested" width={120} height={98} className="logo-adapt h-auto w-[104px]" />
             </div>
             <p className="text-sm mb-4 text-white/80">
-              A youth led global wellness organization: wellness career education, access to policy spaces, and
+              A youth led global healthcare organization: healthcare career education, access to policy spaces, and
               community spaces for young people everywhere.
             </p>
             <div className="flex space-x-3">
@@ -140,7 +130,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Need our Admin?</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Need our Admin?</div>
                 <a
                   href="mailto:admin@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"
@@ -149,7 +139,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Want to sponsor us?</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Want to sponsor us?</div>
                 <a
                   href="mailto:finance@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"
@@ -158,7 +148,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Want to work with us?</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Want to work with us?</div>
                 <a
                   href="mailto:outreach@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"
@@ -167,7 +157,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <div className="text-[#4ecdc4] font-medium text-xs">Everything else:</div>
+                <div className="text-[#8ee6df] font-medium text-xs">Everything else:</div>
                 <a
                   href="mailto:general@drinterested.org"
                   className="text-white/80 hover:text-[#4ecdc4] transition-colors"
