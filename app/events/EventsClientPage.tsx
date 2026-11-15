@@ -1,6 +1,6 @@
 "use client"
 
-import Image from "next/image"
+import Image from "@/components/site/img"
 import Link from "next/link"
 import { AlertCircle, ArrowRight, CalendarDays, Clock, ExternalLink, MapPin } from "lucide-react"
 import { PhotoStrip } from "@/components/site/photo-strip"
@@ -15,7 +15,7 @@ function RegisterButton({ event }: { event: any }) {
   if (event.status === "open" && event.link)
     return (
       <Link href={event.link} target="_blank" rel="noopener noreferrer" className={`${base} bg-ink text-white hover:bg-ink-deep`}>
-        Register
+        {event.ongoing ? "Book a time on Discord" : "Register"}
         <ExternalLink className="h-3.5 w-3.5" />
       </Link>
     )
@@ -64,7 +64,15 @@ export default function EventsClientPage({ upcomingEvents, pastEvents }: { upcom
                     <Image src={event.image || "/brand/icon.png"} alt={event.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
                   </div>
                   <div className="flex flex-1 flex-col p-4">
-                    <h3 className="font-semibold leading-snug text-ink">{event.title}</h3>
+                    <h3 className="font-semibold leading-snug text-ink">
+                      {event.title}
+                      {event.ongoing && (
+                        <span className="ml-2 inline-flex translate-y-[-1px] items-center gap-1 rounded-full bg-teal-deep/10 px-2 py-0.5 align-middle text-[11px] font-medium text-teal-deep">
+                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal-deep" aria-hidden="true" />
+                          Active
+                        </span>
+                      )}
+                    </h3>
                     <ul className="mt-2 space-y-1 text-xs text-ink/85">
                       <li className="flex items-center gap-1.5">
                         <CalendarDays className="h-3.5 w-3.5 text-teal-deep" />

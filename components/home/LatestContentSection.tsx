@@ -1,6 +1,6 @@
 "use client"
 
-import Image from "next/image"
+import Image from "@/components/site/img"
 import Link from "next/link"
 import { Calendar, Clock, ArrowRight, Youtube, Music, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"

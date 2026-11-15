@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
+import Image from "@/components/site/img"
 import Link from "next/link"
 import {
   Users,

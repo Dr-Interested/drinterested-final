@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "@/components/site/img"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { BgVideo } from "@/components/site/bg-video"
