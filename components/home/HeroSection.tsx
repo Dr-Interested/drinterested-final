@@ -41,7 +41,7 @@ export default function HeroSection({ isLoaded }: { isLoaded: boolean }) {
           <motion.p {...rise(0.12)} className="mt-4 max-w-xl text-base leading-relaxed text-ink/85 sm:text-lg">
             We&apos;re a youth led global organization. We help young people explore healthcare careers, from
             medicine and research to public health, law and policy, get a voice in the rooms where health decisions
-            are made, and find a community that feels like theirs. Free, always.
+            are made, and find a community that feels like theirs.
           </motion.p>
           <motion.div {...rise(0.18)} className="mt-6 flex flex-wrap items-center gap-3">
             <Link
