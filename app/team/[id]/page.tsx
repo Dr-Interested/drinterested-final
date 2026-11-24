@@ -1,3 +1,4 @@
+import { WIKIDATA } from "@/data/media-features"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import SeoSchema from "@/components/seo-schema"
@@ -104,6 +105,8 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const sameAs = member.socials
     ? Object.values(member.socials).filter(Boolean)
     : []
+  // The founder has a Wikidata item; linking it helps search engines connect this profile.
+  if (/^adil mukhi$/i.test(member.name.trim())) sameAs.unshift(WIKIDATA.founder)
   const memberUrl = `${baseUrl}/team/${member.slug || member.id}`
   const memberImage = member.image.startsWith("http") ? member.image : `${baseUrl}${member.image}`
 
