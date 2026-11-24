@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ALL_TIME, IMPACT_REPORT_2025, IMPACT_REPORT_2026, LEGAL_STATUS, ORG_ONE_LINER, YEAR_2026 } from "@/lib/impact-stats"
+import { WIKIDATA } from "@/data/media-features"
 
 export interface SEOConfig {
   title: string
@@ -108,6 +109,7 @@ export function generateOrganizationSchema() {
       name: "Adil Mukhi",
       jobTitle: "Founder & Executive Director",
       url: "https://adilmukhi.vercel.app/",
+      sameAs: [WIKIDATA.founder],
     },
     // Our nonprofit work runs through our sister organization, a fiscally sponsored 501(c)(3).
     parentOrganization: {
@@ -116,6 +118,7 @@ export function generateOrganizationSchema() {
       description: LEGAL_STATUS.fiscalSponsor,
     },
     sameAs: [
+      WIKIDATA.org,
       "https://www.instagram.com/dr.interested/",
       "https://www.linkedin.com/company/dr-interested/",
       "https://www.youtube.com/@Dr.Interested",

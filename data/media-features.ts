@@ -160,6 +160,12 @@ export const RECOGNITION: Recognition[] = [
   },
 ]
 
+/** Wikidata items, used in schema.org sameAs so search engines tie the site to them. */
+export const WIKIDATA = {
+  org: "https://www.wikidata.org/wiki/Q142268592",
+  founder: "https://www.wikidata.org/wiki/Q142268312",
+}
+
 export type Profile = { name: string; url: string; group: "Social" | "Directory" | "Membership" | "Research" }
 
 /** Everywhere Dr. Interested has an official profile or listing. */
@@ -208,6 +214,7 @@ export const PROFILES: Profile[] = [
   { name: "Student Sync", url: "https://www.studentsync.online/listings/dr.-interested", group: "Directory" },
   { name: "Trustpilot", url: "https://ca.trustpilot.com/review/drinterested.org", group: "Directory" },
   { name: "ResearchGate", url: "https://www.researchgate.net/lab/Dr-Interested-Pre-Med-Org-Adil-Mukhi", group: "Research" },
+  { name: "Wikidata", url: WIKIDATA.org, group: "Directory" },
   { name: "Zenodo community", url: "https://zenodo.org/communities/drinterested", group: "Research" },
 ]
 
